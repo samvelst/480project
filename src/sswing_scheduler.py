@@ -19,16 +19,12 @@ class Volunteer:
     def __repr__(self):
         return self.name
 
-    def __str__(self):
-        return self.name
-
     def add_job(self, a_job):
         self.jobs.append(a_job)
         self.current_capacity += a_job.length
 
     def can_take_job(self, a_job):
         if self.current_capacity + a_job.length > self.capacity:
-            print "%s will put %s over capacity" % (a_job, self.name)
             return False
         elif len(self.jobs) == 0:
             return True
@@ -40,7 +36,7 @@ class Volunteer:
 
     def print_schedule(self):
         self.jobs = sorted(self.jobs, key=lambda x: x.start)
-        print "Name: %s" % self.name
+        print "Name: %s :: Hours %s" % (self.name, self.capacity)
         for j in self.jobs:
             print "\t%s :: %s - %s" % (j.name, j.start, j.end)
 
@@ -77,32 +73,30 @@ def show_schedule(volunteers):
     for v in volunteers:
         v.print_schedule()
 
-V = [SS.Volunteer(a_name="Volunteer " + str(z)) for z in xrange(1,11)]
-J = sorted([SS.Job("Job "+str(z), rand_time_interval(0,4)) for z in xrange(1,21)])
+V = [SS.Volunteer(a_name="Volunteer " + str(z), a_capacity=random.randint(2,6)) for z in xrange(1,61)]
+J = sorted([SS.Job("Job "+str(z), rand_time_interval(0,21)) for z in xrange(1,31)])
 
 
+unassigned_jobs = []
 # algorithm (greedy)
-db_count = 1
 while len(J) > 0:
-    print "Current loop %s" % db_count
     j = J.pop(0)
-    print "Assigning: %s" % j
     curr_job_assigned = False
     V = sorted(V)
 
     for v in V:
-        print "Considering..."
-        v.print_schedule()
         if v.can_take_job(j):
             v.add_job(j)
-            print "Assigning job to: %s" % v
             curr_job_assigned = True
             break
 
     if not curr_job_assigned:
-        print "Error: could not find assignment for %s" % j
-        break
+        unassigned_jobs.append(j)
 
-    db_count += 1
 
-show_schedule(V)
+if len(unassigned_jobs) == 0:
+    min_v = sum([1 for x in V if len(x.jobs) != 0])
+    print min_v
+else:
+    print "There are unassigned jobs..."
+    print unassigned_jobs
