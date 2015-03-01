@@ -1,0 +1,43 @@
+Some ideas and solutions to our problem...
+
+This looks like it can be modeled as the Bin Packing problem. This is a well known problem which is NP-hard. 
+
+For our problem:
+
+We have a list of n jobs in a given day, each with a time interval and required skills. 
+
+We also have m volunteers. Each with time restrictions and skills. 
+
+Let each volunteer be a bin, and each job an item to put into a bin. 
+
+If the job is outside of the volunteers time slot, the item is "too heavy" for that bin.
+
+If the volunteer is given a job that conflicts with a current job, that bin is made "too heavy".
+
+We want to find B <= m, which is the minimum number of volunteers needed to cover all jobs. 
+
+Here we assume that each job that needs multiple people will be listed as multiple jobs. 
+
+
+We can probably find B, but how do we produce a schedule with it???
+
+
+some algorithms:
+
+First fit algorithm - provides a fast O(nlogn) but often non-optimal solution. Can be made more effective by sorting the list of elements to be packed. (Does this make sense for our problem?) However, this still doesn't guarantee an optimal solution. BUT, there exists one ordering of elements which will produce an optimal solution with this algorithm (maybe try randomized approach?).
+
+When items that are placed together have a decreased combined size, this variant is called the VM packing problem. So maybe if we have something like reducing the cost of job assignment if we group certain tasks together? 
+
+Exact Algorithms: Look into papers by 1. Martello and Toth, 2. Korf
+
+
+Approximation algorithms:
+
+Karmarkar-Karp '82 ~ Find a packing with just O(log^2(n)) bins more than optimum in poly time. 
+  - Gilmore Gomory LP relaxation of the bin packing problem with a big matrix 
+  - Sort the elements by weight, then group them and round to the biggest in each group
+  - this reduces the matrix size dramatically.
+  - ...
+
+Better: Discrepency theory -- R '13. Find packing with O(loglogn) bins more than optimum in poly-time
+
