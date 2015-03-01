@@ -1,6 +1,9 @@
-# Implementation of the greedy algorithm
+# Implementation of the BFD (Best Fit Decreasing) algorithm
+# Runs in poly-time, but not guaranteed to return optimal results
+# BFD returns optimal roughly 95% of the time though...
 
 import random
+import math
 import sswing_scheduler as SS
 
 # Set Up
@@ -21,6 +24,8 @@ for y in xrange(1, 31):
    job = SS.Job(name, time_interval)
    J.append(job)
 
+total_cap = sum([v.capacity for v in V])
+total_shift_hours = sum([j.length for j in J])
 
 unassigned_jobs = []
 J = sorted(J)
@@ -49,3 +54,8 @@ if len(unassigned_jobs) == 0:
 else:
     print "There are unassigned jobs..."
     print unassigned_jobs
+
+
+
+lower_bound_on_volunteers = float(total_cap)/total_shift_hours
+print "Lower bound on volunteers: %s" % math.ceil(lower_bound_on_volunteers)
