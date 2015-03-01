@@ -66,10 +66,26 @@ def show_schedule(volunteers):
                 print "\t%s :: %s - %s" % (j.name, j.start, j.end)
 
 V = [SS.Volunteer(a_name="Volunteer " + str(z)) for z in xrange(1,11)]
-J = sorted([SS.Job("Job "+str(z), rand_time_interval(0,4)) for z in xrange(1,21)])
+J = sorted([SS.Job("Job "+str(z), rand_time_interval(0,4)) for z in xrange(1,11)])
 
 
 # algorithm (greedy)
 
-for j in J:
-    # do magic here
+while len(J) > 0:
+    j = J.pop(0)
+    print j
+    curr_job_assigned = False
+    V = sorted(V)
+
+    for v in V:
+        if v.can_take_job(j):
+            print v
+            v.add_job(j)
+            curr_job_assigned = True
+            break
+
+    if not curr_job_assigned:
+        print "Error: could not find assignment for %s" % j
+        break
+
+show_schedule(V)
