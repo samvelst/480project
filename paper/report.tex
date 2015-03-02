@@ -1,7 +1,15 @@
-\documentclass[12pt]{article}
+\documentclass[11pt]{article}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{graphicx}
 \usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage{multicol}
+
+\addtolength{\oddsidemargin}{-.875in}
+\addtolength{\evensidemargin}{-.875in}
+\addtolength{\textwidth}{1.75in}
+
+\addtolength{\topmargin}{-.875in}
+\addtolength{\textheight}{1.75in}
 
 \title{Optimizing Volunteer Shifts for Dance Weekends}
 \author{John Jeng, Samvel Stepanyan}
@@ -29,43 +37,56 @@
 \begin{abstract}
 	The Savoy Swing Club (SSC) in Seattle, WA is a non-profit that organizes dance weekends for the general public and has outreach programs to middle schools and high schools in the greater Seattle area. All events require volunteers to run the event. Volunteer scheduling is usually done by hand, but becomes harder with larger events and does not take into account many variables that could be considered such as volunteer time preferences and minimize the number of volunteers used. Our objective was to provide a program which would take a pool of volunteers and set of shifts and jobs, and return a schedule of volunteers that optimized for work balance, number of volunteers, ``choas'', and shift preferences.
 \end{abstract}
-\newpage
-\tableofcontents
-\newpage
+%\newpage
+%\tableofcontents
+%\newpage
 %End Formalities=========
 %========================
-
+\noindent\makebox[\linewidth]{\rule{\textwidth}{0.4pt}}
 \section{Problem Description}
-
+\begin{multicols}{2}
 Savoy Swing Club (SSC) is local non-profit organization that currently seeks to teach swing dancing to middle and high school kids in the greater Seattle area.
-They are also heavily involved with 2 “dance weekends”: Seattle Lindy Exchange (SLX) and Killerdiller Weekend (KDW).
-
-Our focus is on ``full-featured'' dance events where there are classes, evening dances, performances, and competitions.
+They are also heavily involved with 2 “dance weekends”: Seattle Lindy Exchange (SLX) and Killerdiller Weekend (KDW). Our focus is on these ``full-featured'' dance events where there are classes, evening dances, performances, and competitions.
 At each of these events, volunteers are required to make the weekend go smoothly.
 
 Each volunteer has different jobs they are able (or allowed) to perform and preferences for which hours and possibly how many they are volunteering.
 Volunteers are compensated based on the number of hours they work and the type of work.
 For example, 8 hours of volunteering might mean “full pass” (access to all classes and evening dances) while fewer hours of volunteering might just mean a “dance pass” (only access to evening dances) or a “partial full pass” (eg. classes and evening dances on Saturday only).
 A technician however, might receive a full weekend pass and additional cash compensation for just 6 hours of work.
+SSC has determined that it is sufficient to just reduce the number of volunteers necessary for any given event.
 
-Given hourly requirements for various jobs and a set of volunteers, SSC would like to minimize the total compensation payout while adhering as much as possible to the volunteers’ preferences.
+Initially we considered simplifying the problem with many assumptions and constraints that resulted in schedules that were very similar to current ones done by hand and left little to be optimized or improved.
 
-One of our primary objectives was to allow volunteers to input times that they would be unavailable to work.
+One of our primary objective was to allow volunteers to input times that they would be unavailable to work.
 Typically, volunteers do not know exactly what hours they will be working until at most a few days before the event.
 This means that volunteers must commit their entire weekends even though they may only be working 6 to 8 hours over 2 days.
 
+A second objective was to create a schedule that was not too hectic and easy for a supervisor to understand.
+For example, though it might minimize the number of volunteers if Volunteer A does the cashier job in Ballroom B, then runs across the street to to sales, back to Ballroom B for another shift, and finally ends the day driving instructors home, SSC would like to have the simplified to having Volunteer A just do 3 shifts as a cashier in Ballroom B unless the trade off is warranted.
+As a secondary goal, we wanted to create a platform that would be easy for an event planner to input work shift and volunteer data.
 
+\subsection{Specific Challenges}
+Even though we have volunteer schedules from real events from around the United States, all schedules are final products after last minute adjustments and sometimes shift swaps engineered by the volunteers themselves.
+This poses a problem since we don't have each event's potential volunteer pool and we for many cases, we don't know what the initial schedule was.
+We are also missing data concerning the times that its volunteers would prefer to have worked or not worked.
 
-\section{Simplifying Assumptions}
-
-\subsection{Notes from Data}
-
+\section{Data Inspection}
+We were able to make some observations about the structure of volunteer schedules by inspecting events in North America that ranged from ones with fewer than 100 people to the largest event in North America, Lindy Focus, that spanned 5 days and had over 1000 people to its name.
+\begin{itemize}\itemsep0pt
+\item All shifts were generally about an hour long.
+\item For any volunteer, it was uncommon for them to work more than 4 hours in a day and extremely rare for them to work more than 6 in a day.
+\item 
+\end{itemize}
 \section{Mathematical Formulation}
+Our problem is a variation on the bin packing problem.
+Our volunteers are the ``bins'' and the ``items'' we fill them with are the shifts that we assigne to the volunteers.
+The difference to the traditional bin packing problem is that we have additional constraints on what sort of objects our ``bins'' can take.
 
 \section{Primary Algorithm}
 
 \section{Results}
 
+\end{multicols}
 \begin{thebibliography}{9}
 \bibitem{Fed87}
 	Greg N Federickson.
