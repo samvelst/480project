@@ -29,6 +29,7 @@ class Volunteer:
         return self.name
 
     def add_job(self, a_job):
+        """Adds a job and updates state only if job is not a pseudo job"""
         self.jobs.append(a_job)
         if not a_job.name.startswith("UNAVAILABLE"):
             self.current_capacity += a_job.length
@@ -36,6 +37,7 @@ class Volunteer:
             self.is_used = True
 
     def can_take_job(self, a_job):
+        """Will return true as long as volunteer has space and no conflicting jobs"""
         for current_job in self.jobs:
             if a_job.conflicts_with(current_job):
                 return False

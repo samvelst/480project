@@ -39,6 +39,8 @@ Solution of the mathematical problem:
 - We will take the set of volunteers, and run the BFD algo on 1000 randomized sets of our volunteers, and take the best one
 - We will then try to balance out the schedule to make it more sane for practical purposes.
 
+
+
 Results:
 
 - Present the schedules with randomized data and interpret the results
