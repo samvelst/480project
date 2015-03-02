@@ -30,9 +30,9 @@ def make_random_volunteers(num_of_volunteers, hour_range):
 
 def make_random_jobs():
     J = []
-    for x in xrange(1, 11):
+    for x in xrange(1, 16):
         id = x-1
-        num_of_shifts = random.randint(1,5)
+        num_of_shifts = random.randint(1,6)
         start_time = random.randint(0, 21-num_of_shifts)
         for y in xrange(1, num_of_shifts+1):
             name = "Shift " + str(x) + "." + str(y)

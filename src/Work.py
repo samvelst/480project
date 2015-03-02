@@ -12,6 +12,7 @@ class Volunteer:
     Int current_capacity - How many available hours the volunteer current has
     [Job] jobs - Current list of jobs assigned to volunteer
     Boolean is_used - True if the volunteer's job list is not empty
+    [Int] job_id_count - keeps count of how many shifts of each job ID a volunteer has
     """
     def __init__(self, a_name="", a_capacity=4):
         self.name = a_name
@@ -19,7 +20,7 @@ class Volunteer:
         self.current_capacity = 0
         self.jobs = []
         self.is_used = False
-        self.job_id_count = [0 for _ in xrange(10)]
+        self.job_id_count = [0 for _ in xrange(15)] # this is a bad thing to do :-(
 
     def __cmp__(self, other):
         return -cmp(self.current_capacity, other.current_capacity)
@@ -67,6 +68,7 @@ class JobShift:
     Int end - shift's end time
     [Int] interval - all hours covered by this shift
     Int length - total number of hours for this shift
+    Int id - represents this shifts job ID
     """
     def __init__(self, a_name, a_time_interval, an_id):
         self.name = a_name

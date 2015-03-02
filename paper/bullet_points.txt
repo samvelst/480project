@@ -10,11 +10,14 @@ Problem description:
 
 Simplifications:
 
-Assumptions:
-  Volunteers will work in continuous chunks of 2 - 6 hours each
-  each shift will be from 30 minutes to 2 hours
+Assumptions (Updated):
+  each job consists of 1 - 6 shifts
+  each shift is 1 hour in length
   each volunteer can get from shift to shift in very little time
-  probably more...
+  Volunteers will be available in continuous chunks of time
+  Each volunteer is able to perform any job
+  There are no breaks
+  All shifts for a day can be contained in a 24 hour period (no 25+ hour continuous events)
 
 Mathematical Model:
 
@@ -32,7 +35,7 @@ Solution of the mathematical problem:
 - We will attempt to provide the minimum number of volunteers needed to cover each shift (assign all shifts to volunteers such that the number of volunteers with assigned shifts is minimized)
 - We will present approximation algorithms (BFD) which runs fast but does not guarantee optimality.
 - Approx algo will return at most 11/9 * OPT + 4, which isn't too bad
-- Exact solution (Korf) is too memory intensive for our problem 
+- Exact solution (Korf) is too memory intensive for our problem
 - We will take the set of volunteers, and run the BFD algo on 1000 randomized sets of our volunteers, and take the best one
 - We will then try to balance out the schedule to make it more sane for practical purposes.
 
