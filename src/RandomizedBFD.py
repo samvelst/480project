@@ -30,7 +30,7 @@ def make_random_volunteers(num_of_volunteers, hour_range):
 
 def make_random_jobs(num_of_jobs):
     J = []
-    for y in xrange(1, 31):
+    for y in xrange(1, num_of_jobs+1):
         name = "Shift " + str(y)
         time_interval = rand_time_interval(0, 21, random.randint(1,3))
         job = SS.JobShift(name, time_interval)
