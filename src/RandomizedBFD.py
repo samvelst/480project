@@ -64,7 +64,7 @@ volunteers = make_random_volunteers(60, (2,6))
 jobs = make_random_jobs(30)
 
 total_job_hours = sum([j.length for j in jobs])
-avg_vol_capacity = sum([v.capacity for v in volunteers])/float(60)
+avg_vol_capacity = sum([v.capacity for v in volunteers])/float(len(volunteers))
 estimated_lower_bound = int((total_job_hours/avg_vol_capacity)+1)
 
 current_best_schedule = []
