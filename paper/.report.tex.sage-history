@@ -1,4 +1,212 @@
-"\\documentclass[12pt]{article}\n\\usepackage{amsmath,amssymb,amsthm}\n\\usepackage{graphicx}\n\\usepackage[ruled,vlined,linesnumbered]{algorithm2e}\n\n\\title{Optimizing Volunteer Shifts for Dance Weekends}\n\\author{John Jeng, Samvel Stepanyan}\n\\date{January 22nd, 2015}\n\\pagestyle{myheadings}\n\\markright{}\n\n% Custom commands\n\\newcommand{\\sumleft}{\\sum\\limits_{i=1}^n i^3}\n\\newcommand{\\sumright}{\\left(\\sum\\limits_{i=1}^n i \\right)^2}\n\\newcommand{\\Z}{\\mathbb{Z}}\n\\newcommand{\\C}{\\mathbb{C}}\n\\newcommand{\\pem}{$ (\\pi, E) $~}\n\n\\newtheorem{PF}{Proof}\n\\theoremstyle{definition}\n\\newtheorem{Def}{Definition}\n\\newtheorem{Thm}{Theorem}\n\\newtheorem{lemma}{Lemma}\n\n\\begin{document}\n%Begin Formalities========\n%=========================\n\\maketitle\n\\begin{abstract}\n\tThe Savoy Swing Club (SSC) in Seattle, WA is a non-profit that organizes dance weekends for the general public and has outreach programs to middle schools and high schools in the greater Seattle area. All events require volunteers to run the event. Volunteer scheduling is usually done by hand, but becomes harder with larger events and does not take into account many variables that could be considered such as volunteer time preferences and minimize the number of volunteers used. Our objective was to provide a program which would take a pool of volunteers and set of shifts and jobs, and return a schedule of volunteers that optimized for work balance, number of volunteers, ``choas'', and shift preferences.\n\\end{abstract}\n\\newpage\n\\tableofcontents\n\\newpage\n%End Formalities=========\n%========================\n\n\\section{Introduction}\n\nSavoy Swing Club (SSC) is local non-profit organization that currently seeks to teach swing dancing to middle and high school kids in the greater Seattle area.\nThey are also heavily involved with 2 “dance weekends”: Seattle Lindy Exchange (SLX) and Killerdiller Weekend (KDW).\n\nThe format of dance weekends includes live bands, classe, performances, and competitions. All of these activities requires volunteers to make the weekend go smoothly.\nEach volunteer has a set of capabilities (sound, driving, door management, etc) and preferences for which hours (and possibly how many) they are volunteering.\nVolunteers are compensated based on the number of hours they work and the type of work.\nFor example, 8 hours of volunteering might mean “full pass” (access to all classes and evening dances) while fewer hours of volunteering might just mean a “dance pass” (only access to evening dances) or a “partial full pass” (eg. classes and evening dances on Saturday only).\nA technician however, might receive a full weekend pass and additional cash compensation for just 6 hours of work.\n\nGiven hourly requirements for various jobs and a set of volunteers, SSC would like to minimize the total compensation payout while adhering as much as possible to the volunteers’ preferences. As a side note, SSC would like to pay out in passes as much as possible over cash since the realized expense is much lower than raw cash expenses.\n\n\\section{Problem Description}\nOur focus is on ``full-featured'' dance events where there are classes, evening dances, performances, and competitions\n\n\\section{Simplifying Assumptions}\n\n\\subsection{Notes from Data}\n\n\\section{Mathematical Formulation}\n\n\\section{Primary Algorithm}\n\n\\section{Results}\n\n\\begin{thebibliography}{9}\n\\bibitem{Fed87}\n\tGreg N Federickson.\n\tFast algorithms for shortest paths in planar graphs, with applications.\n\tSIAM Journal on Computing, 16(6):1004-1022,\n\t1987\n\n\\bibitem{Klein13}\n\tMonika R. Henzinger, Philip Klein, Satish Rao, Sairam Subramanian.\n\tFaster Shortest-Path Algorithms for Planar Graphs\n\tJournal of Computer and System Sciences Article NO. SS971493\n\t1997\n\n\\end{thebibliography}\n\n\\end{document}\n"
+"\\documentclass[12pt]{article}\n\\usepackage{amsmath,amssymb,amsthm}\n\\usepackage{graphicx}\n\\usepackage[ruled,vlined,linesnumbered]{algorithm2e}\n\n\\title{Optimizing Volunteer Shifts for Dance Weekends}\n\\author{John Jeng, Samvel Stepanyan}\n\\date{January 22nd, 2015}\n\\pagestyle{myheadings}\n\\markright{}\n\n% Custom commands\n\\newcommand{\\sumleft}{\\sum\\limits_{i=1}^n i^3}\n\\newcommand{\\sumright}{\\left(\\sum\\limits_{i=1}^n i \\right)^2}\n\\newcommand{\\Z}{\\mathbb{Z}}\n\\newcommand{\\C}{\\mathbb{C}}\n\\newcommand{\\pem}{$ (\\pi, E) $~}\n\n\\newtheorem{PF}{Proof}\n\\theoremstyle{definition}\n\\newtheorem{Def}{Definition}\n\\newtheorem{Thm}{Theorem}\n\\newtheorem{lemma}{Lemma}\n\n\\begin{document}\n%Begin Formalities========\n%=========================\n\\maketitle\n\\begin{abstract}\n\tThe Savoy Swing Club (SSC) in Seattle, WA is a non-profit that organizes dance weekends for the general public and has outreach programs to middle schools and high schools in the greater Seattle area. All events require volunteers to run the event. Volunteer scheduling is usually done by hand, but becomes harder with larger events and does not take into account many variables that could be considered such as volunteer time preferences and minimize the number of volunteers used. Our objective was to provide a program which would take a pool of volunteers and set of shifts and jobs, and return a schedule of volunteers that optimized for work balance, number of volunteers, ``choas'', and shift preferences.\n\\end{abstract}\n\\newpage\n\\tableofcontents\n\\newpage\n%End Formalities=========\n%========================\n\n\\section{Problem Description}\n\nSavoy Swing Club (SSC) is local non-profit organization that currently seeks to teach swing dancing to middle and high school kids in the greater Seattle area.\nThey are also heavily involved with 2 “dance weekends”: Seattle Lindy Exchange (SLX) and Killerdiller Weekend (KDW).\n\nOur focus is on ``full-featured'' dance events where there are classes, evening dances, performances, and competitions.\nAt each of these events, volunteers are required to make the weekend go smoothly.\n\nEach volunteer has different jobs they are able (or allowed) to perform and preferences for which hours and possibly how many they are volunteering.\nVolunteers are compensated based on the number of hours they work and the type of work.\nFor example, 8 hours of volunteering might mean “full pass” (access to all classes and evening dances) while fewer hours of volunteering might just mean a “dance pass” (only access to evening dances) or a “partial full pass” (eg. classes and evening dances on Saturday only).\nA technician however, might receive a full weekend pass and additional cash compensation for just 6 hours of work.\n\nGiven hourly requirements for various jobs and a set of volunteers, SSC would like to minimize the total compensation payout while adhering as much as possible to the volunteers’ preferences.\n\nOne of our primary objectives was to allow volunteers to input times that they would be unavailable to work.\nTypically, volunteers do not know exactly what hours they will be working until at most a few days before the event.\nThis means that volunteers must commit their entire weekends even though they may only be working 6 to 8 hours over 2 days.\n\n\n\n\\section{Simplifying Assumptions}\n\n\\subsection{Notes from Data}\n\n\\section{Mathematical Formulation}\n\n\\section{Primary Algorithm}\n\n\\section{Results}\n\n\\begin{thebibliography}{9}\n\\bibitem{Fed87}\n\tGreg N Federickson.\n\tFast algorithms for shortest paths in planar graphs, with applications.\n\tSIAM Journal on Computing, 16(6):1004-1022,\n\t1987\n\n\\bibitem{Klein13}\n\tMonika R. Henzinger, Philip Klein, Satish Rao, Sairam Subramanian.\n\tFaster Shortest-Path Algorithms for Planar Graphs\n\tJournal of Computer and System Sciences Article NO. SS971493\n\t1997\n\n\\end{thebibliography}\n\n\\end{document}\n"
+{"patch":[[[[0,"days.\n\n\n"],[-1,"\n"],[0,"\\section"]],3239,3239,17,16]],"time":1425288788579}
+{"patch":[[[[0," 2 d"],[-1,"ays.\n"],[0,"\n\n\\s"]],3236,3236,13,8]],"time":1425288785411}
+{"patch":[[[[0,"s ov"],[-1,"er 2 d"],[0,"\n\n\\s"]],3230,3230,14,8]],"time":1425288784631}
+{"patch":[[[[0,"8 hours "],[-1,"ov"],[0,"\n\n\\secti"]],3224,3224,18,16]],"time":1425288783920}
+{"patch":[[[[0,"g 6 to 8"],[-1," hours "],[0,"\n\n\\secti"]],3217,3217,23,16]],"time":1425288782383}
+{"patch":[[[[0," 6 t"],[-1,"o 8"],[0,"\n\n\\s"]],3218,3218,11,8]],"time":1425288781640}
+{"patch":[[[[0,"ing "],[-1,"6 t"],[0,"\n\n\\s"]],3215,3215,11,8]],"time":1425288780866}
+{"patch":[[[[0,"be worki"],[-1,"ng "],[0,"\n\n\\secti"]],3208,3208,19,16]],"time":1425288780112}
+{"patch":[[[[0,"y only b"],[-1,"e worki"],[0,"\n\n\\secti"]],3201,3201,23,16]],"time":1425288779367}
+{"patch":[[[[0,"ay o"],[-1,"nly b"],[0,"\n\n\\s"]],3200,3200,13,8]],"time":1425288778611}
+{"patch":[[[[0,"hey may "],[-1,"o"],[0,"\n\n\\secti"]],3195,3195,17,16]],"time":1425288777851}
+{"patch":[[[[0,"hey may "],[1,"on"],[0,"\n\n\\secti"]],3195,3195,16,18]],"time":1425288775699}
+{"patch":[[[[0,"y may on"],[1,"l"],[0,"\n\n\\secti"]],3197,3197,16,17]],"time":1425288774942}
+{"patch":[[[[0,"hey may "],[-1,"onl"],[0,"\n\n\\secti"]],3195,3195,19,16]],"time":1425288774187}
+{"patch":[[[[0," the"],[-1,"y may "],[0,"\n\n\\s"]],3193,3193,14,8]],"time":1425288773424}
+{"patch":[[[[0,"n th"],[-1,"ough the"],[0,"\n\n\\s"]],3185,3185,16,8]],"time":1425288772672}
+{"patch":[[[[0,"nds "],[-1,"even th"],[0,"\n\n\\s"]],3178,3178,15,8]],"time":1425288771915}
+{"patch":[[[[0,"eekends "],[1,"to"],[0,"\n\n\\secti"]],3174,3174,16,18]],"time":1425288771148}
+{"patch":[[[[0,"kends to"],[1," "],[0,"\n\n\\secti"]],3176,3176,16,17]],"time":1425288770391}
+{"patch":[[[[0,"weekends"],[-1," to "],[0,"\n\n\\secti"]],3173,3173,20,16]],"time":1425288765143}
+{"patch":[[[[0,"tire wee"],[-1,"kends"],[0,"\n\n\\secti"]],3168,3168,21,16]],"time":1425288764391}
+{"patch":[[[[0,"ir entir"],[-1,"e wee"],[0,"\n\n\\secti"]],3163,3163,21,16]],"time":1425288763642}
+{"patch":[[[[0,"eir "],[-1,"entir"],[0,"\n\n\\s"]],3162,3162,13,8]],"time":1425288762891}
+{"patch":[[[[0,"t th"],[-1,"eir "],[0,"\n\n\\s"]],3158,3158,12,8]],"time":1425288762124}
+{"patch":[[[[0,"ust comm"],[-1,"it th"],[0,"\n\n\\secti"]],3149,3149,21,16]],"time":1425288761391}
+{"patch":[[[[0,"rs must "],[-1,"comm"],[1,"f"],[0,"\n\n\\secti"]],3145,3145,20,17]],"time":1425288760639}
+{"patch":[[[[0,"s mu"],[-1,"st f"],[0,"\n\n\\s"]],3146,3146,12,8]],"time":1425288759875}
+{"patch":[[[[0,"ntee"],[-1,"rs mu"],[0,"\n\n\\s"]],3141,3141,13,8]],"time":1425288759118}
+{"patch":[[[[0,"that vol"],[-1,"untee"],[0,"\n\n\\secti"]],3132,3132,21,16]],"time":1425288758359}
+{"patch":[[[[0,"ns that "],[-1,"vol"],[1,"bo"],[0,"\n\n\\secti"]],3129,3129,19,18]],"time":1425288757552}
+{"patch":[[[[0,"hat "],[-1,"bo"],[0,"\n\n\\s"]],3133,3133,10,8]],"time":1425288756834}
+{"patch":[[[[0,"his mean"],[-1,"s that "],[0,"\n\n\\secti"]],3122,3122,23,16]],"time":1425288756031}
+{"patch":[[[[0,"t.\nT"],[-1,"his mean"],[0,"\n\n\\s"]],3118,3118,16,8]],"time":1425288755327}
+{"patch":[[[[0," event.\n"],[-1,"T"],[0,"\n\n\\secti"]],3113,3113,17,16]],"time":1425288754563}
+{"patch":[[[[0,"even"],[-1,"t.\n"],[0,"\n\n\\s"]],3114,3114,11,8]],"time":1425288753798}
+{"patch":[[[[0,"before t"],[-1,"he even"],[0,"\n\n\\secti"]],3103,3103,23,16]],"time":1425288753051}
+{"patch":[[[[0,"ys b"],[-1,"efore t"],[0,"\n\n\\s"]],3100,3100,15,8]],"time":1425288752274}
+{"patch":[[[[0,"w da"],[-1,"ys b"],[0,"\n\n\\s"]],3096,3096,12,8]],"time":1425288751528}
+{"patch":[[[[0," a f"],[-1,"ew da"],[0,"\n\n\\s"]],3091,3091,13,8]],"time":1425288750771}
+{"patch":[[[[0," mos"],[-1,"t a f"],[0,"\n\n\\s"]],3086,3086,13,8]],"time":1425288750011}
+{"patch":[[[[0,"il a"],[-1,"t mos"],[0,"\n\n\\s"]],3081,3081,13,8]],"time":1425288749275}
+{"patch":[[[[0,"g until "],[-1,"a"],[0,"\n\n\\secti"]],3076,3076,17,16]],"time":1425288748567}
+{"patch":[[[[0,"g un"],[-1,"til "],[0,"\n\n\\s"]],3076,3076,12,8]],"time":1425288745732}
+{"patch":[[[[0," wor"],[-1,"king un"],[0,"\n\n\\s"]],3069,3069,15,8]],"time":1425288744968}
+{"patch":[[[[0,"ill "],[-1,"be wor"],[0,"\n\n\\s"]],3063,3063,14,8]],"time":1425288744203}
+{"patch":[[[[0," they wi"],[-1,"ll "],[0,"\n\n\\secti"]],3056,3056,19,16]],"time":1425288743390}
+{"patch":[[[[0," the"],[-1,"y wi"],[0,"\n\n\\s"]],3056,3056,12,8]],"time":1425288742683}
+{"patch":[[[[0,"hat hour"],[-1,"s the"],[0,"\n\n\\secti"]],3047,3047,21,16]],"time":1425288741935}
+{"patch":[[[[0,"what hou"],[-1,"r"],[0,"\n\n\\secti"]],3046,3046,17,16]],"time":1425288741190}
+{"patch":[[[[0,"y what h"],[-1,"ou"],[0,"\n\n\\secti"]],3044,3044,18,16]],"time":1425288740407}
+{"patch":[[[[0,"tly "],[-1,"what h"],[0,"\n\n\\s"]],3042,3042,14,8]],"time":1425288739654}
+{"patch":[[[[0,"w ex"],[-1,"actly "],[0,"\n\n\\s"]],3036,3036,14,8]],"time":1425288738895}
+{"patch":[[[[0,"ot k"],[-1,"now ex"],[0,"\n\n\\s"]],3030,3030,14,8]],"time":1425288738132}
+{"patch":[[[[0,"s do"],[-1," not k"],[0,"\n\n\\s"]],3024,3024,14,8]],"time":1425288737387}
+{"patch":[[[[0,"teers do"],[1,"n"],[0,"\n\n\\secti"]],3020,3020,16,17]],"time":1425288736651}
+{"patch":[[[[0,"teer"],[-1,"s don"],[0,"\n\n\\s"]],3020,3020,13,8]],"time":1425288735883}
+{"patch":[[[[0,"ly, volu"],[-1,"nteer"],[0,"\n\n\\secti"]],3011,3011,21,16]],"time":1425288735130}
+{"patch":[[[[0,"ically, "],[-1,"volu"],[0,"\n\n\\secti"]],3007,3007,20,16]],"time":1425288734358}
+{"patch":[[[[0,"ically, "],[1,"bo"],[0,"\n\n\\secti"]],3007,3007,16,18]],"time":1425288733588}
+{"patch":[[[[0,"ally"],[-1,", bo"],[0,"\n\n\\s"]],3009,3009,12,8]],"time":1425288732867}
+{"patch":[[[[0,"ypically"],[1," "],[0,"\n\n\\secti"]],3005,3005,16,17]],"time":1425288731335}
+{"patch":[[[[0,"k.\nTypic"],[-1,"ally "],[0,"\n\n\\secti"]],3001,3001,21,16]],"time":1425288729835}
+{"patch":[[[[0,"rk.\n"],[-1,"Typic"],[0,"\n\n\\s"]],3000,3000,13,8]],"time":1425288729074}
+{"patch":[[[[0,"o work.\n"],[1,"V"],[0,"\n\n\\secti"]],2996,2996,16,17]],"time":1425288728243}
+{"patch":[[[[0," work.\nV"],[1,"olunteers c"],[0,"\n\n\\secti"]],2997,2997,16,27]],"time":1425288727568}
+{"patch":[[[[0,"nteers c"],[1,"urrently"],[0,"\n\n\\secti"]],3008,3008,16,24]],"time":1425288726811}
+{"patch":[[[[0,"urrently"],[1," "],[0,"\n\n\\secti"]],3016,3016,16,17]],"time":1425288726067}
+{"patch":[[[[0,"rrently "],[1,"are"],[0,"\n\n\\secti"]],3017,3017,16,19]],"time":1425288724623}
+{"patch":[[[[0,"ntly are"],[1," unable t"],[0,"\n\n\\secti"]],3020,3020,16,25]],"time":1425288723855}
+{"patch":[[[[0," are una"],[-1,"ble t"],[0,"\n\n\\secti"]],3024,3024,21,16]],"time":1425288722304}
+{"patch":[[[[0,"tly are "],[-1,"una"],[0,"\n\n\\secti"]],3021,3021,19,16]],"time":1425288721604}
+{"patch":[[[[0,"urrently"],[-1," are "],[0,"\n\n\\secti"]],3016,3016,21,16]],"time":1425288720847}
+{"patch":[[[[0,"ers curr"],[-1,"ently"],[0,"\n\n\\secti"]],3011,3011,21,16]],"time":1425288720063}
+{"patch":[[[[0,"unteers "],[-1,"curr"],[0,"\n\n\\secti"]],3007,3007,20,16]],"time":1425288719331}
+{"patch":[[[[0,".\nVolunt"],[-1,"eers "],[0,"\n\n\\secti"]],3002,3002,21,16]],"time":1425288717799}
+{"patch":[[[[0," work.\nV"],[-1,"olunt"],[0,"\n\n\\secti"]],2997,2997,21,16]],"time":1425288717047}
+{"patch":[[[[0,"o work.\n"],[-1,"V"],[0,"\n\n\\secti"]],2996,2996,17,16]],"time":1425288716299}
+{"patch":[[[[0,"o work.\n"],[1,"curre"],[0,"\n\n\\secti"]],2996,2996,16,21]],"time":1425288404562}
+{"patch":[[[[0,"k.\ncurre"],[1,"n"],[0,"\n\n\\secti"]],3001,3001,16,17]],"time":1425288403802}
+{"patch":[[[[0," work.\nc"],[-1,"urren"],[0,"\n\n\\secti"]],2997,2997,21,16]],"time":1425288403046}
+{"patch":[[[[0,"o work.\n"],[-1,"c"],[0,"\n\n\\secti"]],2996,2996,17,16]],"time":1425288402306}
+{"patch":[[[[0,"to work."],[-1,"\n"],[1," "],[0,"\n\n\\secti"]],2995,2995,17,17]],"time":1425288400060}
+{"patch":[[[[0,"o wo"],[-1,"rk. "],[0,"\n\n\\s"]],2996,2996,12,8]],"time":1425288398543}
+{"patch":[[[[0,"able to "],[-1,"wo"],[1,"v"],[0,"\n\n\\secti"]],2990,2990,18,17]],"time":1425288397815}
+{"patch":[[[[0,"ble to v"],[1,"olun"],[0,"\n\n\\secti"]],2991,2991,16,20]],"time":1425288397028}
+{"patch":[[[[0,"le to vo"],[-1,"lun"],[0,"\n\n\\secti"]],2992,2992,19,16]],"time":1425288395490}
+{"patch":[[[[0,"able to "],[-1,"vo"],[0,"\n\n\\secti"]],2990,2990,18,16]],"time":1425288394750}
+{"patch":[[[[0,"navailab"],[-1,"le to "],[0,"\n\n\\secti"]],2984,2984,22,16]],"time":1425288394010}
+{"patch":[[[[0,"nava"],[-1,"ilab"],[0,"\n\n\\s"]],2984,2984,12,8]],"time":1425288393261}
+{"patch":[[[[0,"d be una"],[-1,"va"],[0,"\n\n\\secti"]],2978,2978,18,16]],"time":1425288392454}
+{"patch":[[[[0," be "],[-1,"una"],[0,"\n\n\\s"]],2979,2979,11,8]],"time":1425288391749}
+{"patch":[[[[0,"they wou"],[-1,"ld be "],[0,"\n\n\\secti"]],2969,2969,22,16]],"time":1425288390955}
+{"patch":[[[[0,"t th"],[-1,"ey wou"],[0,"\n\n\\s"]],2967,2967,14,8]],"time":1425288390209}
+{"patch":[[[[0,"es that "],[-1,"th"],[0,"\n\n\\secti"]],2961,2961,18,16]],"time":1425288389454}
+{"patch":[[[[0,"ut times"],[-1," that "],[0,"\n\n\\secti"]],2955,2955,22,16]],"time":1425288388705}
+{"patch":[[[[0,"inpu"],[-1,"t times"],[0,"\n\n\\s"]],2952,2952,15,8]],"time":1425288387952}
+{"patch":[[[[0,"to i"],[-1,"npu"],[0,"\n\n\\s"]],2949,2949,11,8]],"time":1425288387196}
+{"patch":[[[[0,"teers to"],[-1," i"],[0,"\n\n\\secti"]],2943,2943,18,16]],"time":1425288386448}
+{"patch":[[[[0,"olunteer"],[-1,"s to"],[0,"\n\n\\secti"]],2939,2939,20,16]],"time":1425288385477}
+{"patch":[[[[0,"w volunt"],[-1,"eer"],[0,"\n\n\\secti"]],2936,2936,19,16]],"time":1425288384742}
+{"patch":[[[[0," allow v"],[-1,"olunt"],[0,"\n\n\\secti"]],2931,2931,21,16]],"time":1425288383970}
+{"patch":[[[[0,"o allow "],[-1,"v"],[0,"\n\n\\secti"]],2930,2930,17,16]],"time":1425288383208}
+{"patch":[[[[0,"o al"],[-1,"low "],[0,"\n\n\\s"]],2930,2930,12,8]],"time":1425288381766}
+{"patch":[[[[0," was to "],[-1,"al"],[1,"conside"],[0,"\n\n\\secti"]],2924,2924,18,23]],"time":1425288380926}
+{"patch":[[[[0," conside"],[1,"r times when"],[0,"\n\n\\secti"]],2931,2931,16,28]],"time":1425288380246}
+{"patch":[[[[0,"es w"],[-1,"hen"],[0,"\n\n\\s"]],2944,2944,11,8]],"time":1425288378679}
+{"patch":[[[[0," times w"],[1,"he"],[0,"\n\n\\secti"]],2940,2940,16,18]],"time":1425288377989}
+{"patch":[[[[0,"times wh"],[-1,"e"],[0,"\n\n\\secti"]],2941,2941,17,16]],"time":1425288377233}
+{"patch":[[[[0,"r times "],[-1,"wh"],[0,"\n\n\\secti"]],2939,2939,18,16]],"time":1425288376468}
+{"patch":[[[[0,"der "],[-1,"times "],[0,"\n\n\\s"]],2937,2937,14,8]],"time":1425288375711}
+{"patch":[[[[0,"to consi"],[-1,"der "],[0,"\n\n\\secti"]],2929,2929,20,16]],"time":1425288374963}
+{"patch":[[[[0," was to "],[-1,"consi"],[0,"\n\n\\secti"]],2924,2924,21,16]],"time":1425288374203}
+{"patch":[[[[0,"ves was "],[-1,"to "],[0,"\n\n\\secti"]],2921,2921,19,16]],"time":1425288373451}
+{"patch":[[[[0,"jectives"],[-1," was "],[0,"\n\n\\secti"]],2916,2916,21,16]],"time":1425288371951}
+{"patch":[[[[0,"bjec"],[-1,"tives"],[0,"\n\n\\s"]],2915,2915,13,8]],"time":1425288371194}
+{"patch":[[[[0,"primary "],[-1,"objec"],[0,"\n\n\\secti"]],2906,2906,21,16]],"time":1425288370423}
+{"patch":[[[[0," our pri"],[-1,"mary "],[0,"\n\n\\secti"]],2901,2901,21,16]],"time":1425288369667}
+{"patch":[[[[0,"of o"],[-1,"ur pri"],[0,"\n\n\\s"]],2899,2899,14,8]],"time":1425288368851}
+{"patch":[[[[0,"ne o"],[-1,"f o"],[0,"\n\n\\s"]],2896,2896,11,8]],"time":1425288368149}
+{"patch":[[[[0,".\n\nO"],[-1,"ne o"],[0,"\n\n\\s"]],2892,2892,12,8]],"time":1425288367391}
+{"patch":[[[[0,"ences.\n\n"],[-1,"O"],[0,"\n\n\\secti"]],2887,2887,17,16]],"time":1425288366651}
+{"patch":[[[[0,"ences.\n\n"],[1,"O"],[0,"\n\n\\secti"]],2887,2887,16,17]],"time":1425288365875}
+{"patch":[[[[0,"nces.\n\nO"],[1,"n"],[0,"\n\n\\secti"]],2888,2888,16,17]],"time":1425288365117}
+{"patch":[[[[0,"ces.\n\nOn"],[1,"e"],[0,"\n\n\\secti"]],2889,2889,16,17]],"time":1425288364143}
+{"patch":[[[[0,"es.\n\nOne"],[1," o"],[0,"\n\n\\secti"]],2890,2890,16,18]],"time":1425288363367}
+{"patch":[[[[0,".\n\nO"],[-1,"ne o"],[0,"\n\n\\s"]],2892,2892,12,8]],"time":1425288362615}
+{"patch":[[[[0,"ences.\n\n"],[-1,"O"],[0,"\n\n\\secti"]],2887,2887,17,16]],"time":1425288361875}
+{"patch":[[[[0,"nces.\n\n\n"],[-1,"\n"],[0,"\\section"]],2888,2888,17,16]],"time":1425288360247}
+{"patch":[[[[0,"ences.\n\n"],[-1,"\n"],[0,"\\section"]],2887,2887,17,16]],"time":1425288359497}
+{"patch":[[[[0,"ences.\n\n"],[1,"\n"],[0,"\\section"]],2887,2887,16,17]],"time":1425288152844}
+{"patch":[[[[0,"ences.\n\n"],[1,"\\section{Problem Description}\n\n"],[0,"\n\\sectio"]],2887,2887,16,47]],"time":1425288152004}
+{"patch":[[[[0,"erences."],[1," "],[0,"\n\n\\secti"]],2885,2885,16,17]],"time":1425287929740}
+{"patch":[[[[0,"rences. "],[1,"As a side note, SSC would like to pay out in passes as much as possible over cash since the realized expense is much lower than raw cash expenses."],[0,"\n\n\\secti"]],2886,2886,16,162]],"time":1425287928987}
+{"patch":[[[[0,"how many"],[1,","],[0," they ar"]],2190,2190,16,17]],"time":1425287902136}
+{"patch":[[[[0,"how many"],[-1,","],[0," they ar"]],2190,2190,17,16]],"time":1425287897947}
+{"patch":[[[[0,"how many"],[1,")"],[0," they ar"]],2190,2190,16,17]],"time":1425287897199}
+{"patch":[[[[0,"h hours "],[1,"("],[0,"and poss"]],2169,2169,16,17]],"time":1425287895427}
+{"patch":[[[[0," perform"],[-1," "],[0,"and pref"]],2136,2136,17,16]],"time":1425287889799}
+{"patch":[[[[0," to perf"],[-1,"orm"],[0,"and pref"]],2133,2133,19,16]],"time":1425287889047}
+{"patch":[[[[0,"ed) to p"],[-1,"erf"],[1,"r"],[0,"and pref"]],2130,2130,19,17]],"time":1425287888207}
+{"patch":[[[[0,"llowed) "],[-1,"to pr"],[0,"and pref"]],2126,2126,21,16]],"time":1425287887499}
+{"patch":[[[[0,"allowed)"],[-1," "],[0,"and pref"]],2125,2125,17,16]],"time":1425287886767}
+{"patch":[[[[0,"re able "],[1,"t "],[0,"(or allo"]],2113,2113,16,18]],"time":1425287884751}
+{"patch":[[[[0,"e able t"],[1,"o"],[0," (or all"]],2114,2114,16,17]],"time":1425287883995}
+{"patch":[[[[0,"lowe"],[-1,"d)"],[0,"and "]],2130,2130,10,8]],"time":1425287878269}
+{"patch":[[[[0,"(or allo"],[-1,"we"],[0,"and pref"]],2124,2124,18,16]],"time":1425287877504}
+{"patch":[[[[0," (or"],[-1," allo"],[0,"and "]],2123,2123,13,8]],"time":1425287876754}
+{"patch":[[[[0," to "],[-1,"(or"],[0,"and "]],2120,2120,11,8]],"time":1425287876003}
+{"patch":[[[[0," able to"],[-1," "],[0,"and pref"]],2115,2115,17,16]],"time":1425287875231}
+{"patch":[[[[0,"re able "],[-1,"to"],[0,"and pref"]],2113,2113,18,16]],"time":1425287874471}
+{"patch":[[[[0,"y are ab"],[-1,"le "],[0,"and pref"]],2110,2110,19,16]],"time":1425287873680}
+{"patch":[[[[0,"y ar"],[-1,"e ab"],[0,"and "]],2110,2110,12,8]],"time":1425287872928}
+{"patch":[[[[0,"jobs the"],[-1,"y ar"],[0,"and pref"]],2102,2102,20,16]],"time":1425287872179}
+{"patch":[[[[0,"ent jobs"],[-1," the"],[0,"and pref"]],2098,2098,20,16]],"time":1425287871403}
+{"patch":[[[[0,"ferent j"],[-1,"obs"],[0,"and pref"]],2095,2095,19,16]],"time":1425287870650}
+{"patch":[[[[0,"iffe"],[-1,"rent j"],[0,"and "]],2093,2093,14,8]],"time":1425287869902}
+{"patch":[[[[0,"has "],[-1,"diffe"],[0,"and "]],2088,2088,13,8]],"time":1425287869156}
+{"patch":[[[[0,"er has a"],[1," da"],[0,"nd prefe"]],2085,2085,16,19]],"time":1425287868378}
+{"patch":[[[[0,"r has a "],[-1,"d"],[0,"and pref"]],2086,2086,17,16]],"time":1425287867623}
+{"patch":[[[[0,"r has a "],[1,"s"],[0,"and pref"]],2086,2086,16,17]],"time":1425287866675}
+{"patch":[[[[0," has a s"],[1,"et of capa"],[0,"and pref"]],2087,2087,16,26]],"time":1425287865696}
+{"patch":[[[[0," of capa"],[1,"bilities"],[0,"and pref"]],2097,2097,16,24]],"time":1425287864931}
+{"patch":[[[[0,"bilities"],[1," "],[0,"and pref"]],2105,2105,16,17]],"time":1425287864199}
+{"patch":[[[[0,"bilities"],[1," (sound, driving, door management, etc)"],[0," and pre"]],2105,2105,16,55]],"time":1425287862159}
+{"patch":[[[[0,"oothly.\n"],[-1,"\n"],[0,"Each vol"]],2064,2064,17,16]],"time":1425287855155}
+{"patch":[[[[0," require"],[-1,"d"],[1,"e"],[0," to make"]],2029,2029,17,17]],"time":1425287849904}
+{"patch":[[[[0," require"],[-1,"e"],[1,"s volunteers"],[0," to make"]],2029,2029,17,28]],"time":1425287849146}
+{"patch":[[[[0,"teers ar"],[-1,"e"],[0," require"]],2020,2020,17,16]],"time":1425287846027}
+{"patch":[[[[0,"unteers "],[-1,"ar"],[0," require"]],2018,2018,18,16]],"time":1425287845277}
+{"patch":[[[[0,"unteers "],[1,"s"],[0," require"]],2018,2018,16,17]],"time":1425287844571}
+{"patch":[[[[0,"unteers "],[1,"are\n\nThe format of dance weekends includes live bands, classes performances, and competitions. All of these activitie"],[0,"s requir"]],2018,2018,16,133]],"time":1425287843459}
+{"patch":[[[[0,", classe"],[-1,"s"],[1,","],[0," perform"]],2079,2079,17,17]],"time":1425287822843}
+{"patch":[[[[0,"eers are"],[1," "],[0,"\n\nThe fo"]],2021,2021,16,17]],"time":1425287821003}
+{"patch":[[[[0,").\n\n"],[-1,"Our focus is on ``full-featured'' dance events where there are classes, evening dances, performances, and competitions.\nAt each of these events, volunteers are \n"],[0,"\nThe"]],1866,1866,169,8]],"time":1425287816563}
+{"patch":[[[[0,"(KDW).\n\n"],[-1,"\n"],[0,"The form"]],1862,1862,17,16]],"time":1425287815819}
+{"patch":[[[[0,"iption}\n"],[1,"Our focus is on ``full-featured'' dance events where there are classes, evening dances, performances, and competitions.\nAt each of these events, volunteers are "],[0,"\n\n\\secti"]],3038,3038,16,176]],"time":1425287812560}
+{"patch":[[[[0,"n}\n\n"],[-1,"Savoy Swing Club (SSC) is local non-profit organization that currently seeks to teach swing dancing to middle and high school kids in the greater Seattle area.\n"],[0,"They"]],1588,1588,168,8],[[[0,"s.\n\n"],[-1,"\\section{Problem Description}\nOur focus is on ``full-featured'' dance events where there are classes, evening dances, performances, and competitions.\nAt each of these events, volunteers are \n\n"],[0,"\\sec"]],2852,2852,200,8]],"time":1425287806703}
+{"patch":[[[[0,"n}\n\n"],[-1,"They are also heavily involved with 2 “dance weekends”: Seattle Lindy Exchange (SLX) and Killerdiller Weekend (KDW).\n\n"],[0,"The "]],1588,1588,126,8]],"time":1425287805944}
+{"patch":[[[[0,"n}\n\n"],[-1,"The format of dance weekends includes live bands, classe, performances, and competitions. All of these activities requires volunteers to make the weekend go smoothly.\n"],[0,"Each"]],1588,1588,175,8]],"time":1425287805207}
+{"patch":[[[[0,"ption}\n\n"],[1,"The format of dance weekends includes live bands, classe, performances, and competitions. All of these activities requires volunteers to make the weekend go smoothly.\n"],[0,"Each vol"]],1584,1584,16,183]],"time":1425287803063}
+{"patch":[[[[0,"ption}\n\n"],[1,"They are also heavily involved with 2 “dance weekends”: Seattle Lindy Exchange (SLX) and Killerdiller Weekend (KDW).\n\n"],[0,"The form"]],1584,1584,16,134]],"time":1425287801771}
+{"patch":[[[[0,"ption}\n\n"],[1,"Savoy Swing Club (SSC) is local non-profit organization that currently seeks to teach swing dancing to middle and high school kids in the greater Seattle area.\n"],[0,"They are"]],1584,1584,16,176]],"time":1425287800964}
+{"patch":[[[[0,"enses.\n\n"],[1,"\n"],[0,"\\section"]],3008,3008,16,17]],"time":1425287787635}
+{"patch":[[[[0,"enses.\n\n"],[1,"\\section{Problem Description}\nOur focus is on ``full-featured'' dance events where there are classes, evening dances, performances, and competitions.\nAt each of these events, volunteers are \n"],[0,"\n\\sectio"]],3008,3008,16,207]],"time":1425287786655}
+{"patch":[[[[0,"scriptio"],[-1,"n"],[0,"}\n\nSavoy"]],1580,1580,17,16]],"time":1425287783391}
+{"patch":[[[[0,"m Descri"],[-1,"ptio"],[0,"}\n\nSavoy"]],1576,1576,20,16]],"time":1425287782408}
+{"patch":[[[[0,"roblem D"],[-1,"escri"],[0,"}\n\nSavoy"]],1571,1571,21,16]],"time":1425287781656}
+{"patch":[[[[0,"n{Proble"],[-1,"m D"],[0,"}\n\nSavoy"]],1568,1568,19,16]],"time":1425287780899}
+{"patch":[[[[0,"ection{P"],[-1,"roble"],[0,"}\n\nSavoy"]],1563,1563,21,16]],"time":1425287780146}
+{"patch":[[[[0,"section{"],[-1,"P"],[1,"Introduction"],[0,"}\n\nSavoy"]],1562,1562,17,28]],"time":1425287779395}
+{"patch":[[[[0,"unteers "],[-1,"are "],[0,"\n\n\\secti"]],3187,3187,20,16]],"time":1425287725343}
+{"patch":[[[[0,", volunt"],[-1,"eers "],[0,"\n\n\\secti"]],3182,3182,21,16]],"time":1425287724590}
+{"patch":[[[[0,"vents, v"],[-1,"olunt"],[0,"\n\n\\secti"]],3177,3177,21,16]],"time":1425287723822}
+{"patch":[[[[0,"events, "],[-1,"v"],[0,"\n\n\\secti"]],3176,3176,17,16]],"time":1425287723063}
+{"patch":[[[[0,"e events"],[-1,", "],[0,"\n\n\\secti"]],3174,3174,18,16]],"time":1425287721339}
+{"patch":[[[[0,"these ev"],[-1,"ents"],[0,"\n\n\\secti"]],3170,3170,20,16]],"time":1425287720566}
+{"patch":[[[[0,"f these "],[-1,"ev"],[1," "],[0,"\n\n\\secti"]],3168,3168,18,17]],"time":1425287719816}
+{"patch":[[[[0," the"],[-1,"se  "],[0,"\n\n\\s"]],3169,3169,12,8]],"time":1425287719056}
+{"patch":[[[[0,"ach of t"],[-1,"he"],[0,"\n\n\\secti"]],3163,3163,18,16]],"time":1425287718279}
+{"patch":[[[[0,"t ea"],[-1,"ch of t"],[0,"\n\n\\s"]],3160,3160,15,8]],"time":1425287717507}
+{"patch":[[[[0,"s.\nA"],[-1,"t ea"],[0,"\n\n\\s"]],3156,3156,12,8]],"time":1425287716766}
+{"patch":[[[[0,"itions.\n"],[-1,"A"],[0,"\n\n\\secti"]],3151,3151,17,16]],"time":1425287716019}
+{"patch":[[[[0,"tions.\n\n"],[-1,"\n"],[0,"\\section"]],3152,3152,17,16]],"time":1425287704555}
+{"patch":[[[[0,"titions."],[1," "],[0,"\n\n\\secti"]],3150,3150,16,17]],"time":1425287703768}
+{"patch":[[[[0,"titions."],[-1," "],[0,"\n\n\\secti"]],3150,3150,17,16]],"time":1425287702701}
+{"patch":[[[[0,"etitions"],[-1,"."],[0,"\n\n\\secti"]],3149,3149,17,16]],"time":1425287701715}
+{"patch":[[[[0,"etitions"],[1," "],[0,"\n\n\\secti"]],3149,3149,16,17]],"time":1425287700788}
+{"patch":[[[[0,"etitions"],[-1," "],[0,"\n\n\\secti"]],3149,3149,17,16]],"time":1425287697551}
 {"patch":[[[[0,"n raw ca"],[1,"z"],[0,"sh expen"]],2987,2987,16,17]],"time":1425280809761}
 {"patch":[[[[0,"n raw ca"],[-1,"z"],[0,"sh expen"]],2987,2987,17,16]],"time":1425280788795}
 {"patch":[[[[0,"om D"],[-1,"ata"],[0,"}\n\n\\"]],3214,3214,11,8]],"time":1425280729107}
