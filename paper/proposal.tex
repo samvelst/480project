@@ -1,0 +1,110 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+
+\title{Revised Project Proposal}
+\author{John Jeng, Samvel Stepanyan}
+\date{January 22nd, 2015}
+\pagestyle{myheadings}
+\markright{}
+
+\setlength\parindent{24pt}
+
+% Custom commands
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\pem}{$ (\pi, E) $~}
+
+\newtheorem{PF}{Proof}
+\theoremstyle{definition}
+\newtheorem{Def}{Definition}
+\newtheorem{Thm}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\begin{document}
+\maketitle
+%===================================
+% Describing the problem
+%===================================
+\section{Introduction}
+
+Savoy Swing Club (SSC) is local non-profit organization that currently seeks to teach swing dancing to middle and high school kids in the greater Seattle area. They are also heavily involved with two ``dance weekends'': Seattle Lindy Exchange (SLX) and Killerdiller Weekend (KDW).
+
+The format of dance weekends includes live bands, classes, performances, and competitions. All of these activities require volunteers to make the weekend go smoothly. Each volunteer has a set of capabilities (sound, driving, door management, etc) and preferences for which hours (and possibly how many) they are volunteering. Volunteers are compensated based on the number of hours they work and the type of work. For example, 8 hours of volunteering might mean ``full pass'' (access to all classes and evening dances) while fewer hours of volunteering might just mean a ``dance pass'' (only access to evening dances) or a ``partial full pass'' (eg. classes and evening dances on Saturday only). A technician however, might receive a full weekend pass and additional cash compensation for just 6 hours of work.
+
+Given hourly requirements for various jobs and a set of volunteers, SSC would like to minimize the total compensation payout while adhering as much as possible to the volunteers’ preferences. As a side note, SSC would like to pay out in passes as much as possible over cash since the realized expense is much lower than raw cash expenses.
+Assignments are currently done by hand. Based on the event organizers, staffing is often times too low in some places and too high in other places. For people like technicians, low staffing may leave a sour taste in their mouth when their discounted rates get pushed for value. As a result, fewer quality people volunteer for these critical positions over time. Over staffing in places like check-in can lead to an unnecessarily high number of comped dancers. More often times though, it’s simply value that could be elsewhere.
+
+Modeling the volunteer schedule will allow these events to run more consistently and provide a benchmark for further analysis in consecutive years. It will allow SSC’s event organizers to make more accurate decisions based on the numbers instead of just their gut feeling. Better events draws more people into the community and helps retain old members.
+
+From SSC's board of directors, we've consulted Andrew Rogers and Jonathan H. Keith. We will continue to check in with them as the project progresses to ensure that the analysis continues to meet their needs. 
+
+From our homework, we have already seen a way to solve a very basic version of this problem. Our simplest model will assume that each volunteer only has one skill and that we can have them work whichever hours we want. We will solve X of these basic problems for the X jobs involved. From there we will try to incorporate volunteer preferences and time restrictions. Then we will try to implement a model where we recognize that each volunteer may have multiple capabilities.
+
+This will help SSC saving money as well as automate their current manual process of scheduling work. 
+
+%===================================
+% Breaking down the problem
+%===================================
+\section{Goal and Constraints}
+\noindent Our objective is to produce an assignment of volunteers to jobs that minimizes our total cost subject to these constraints:
+\begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
+\item All jobs have the necessary number of assigned volunteers.
+\item A job is assigned a volunteer only if the volunteer is able to work that time period.
+\item At any given time a volunteer is only assigned a single job.
+\item Each volunteer must work a minimum of $m$ hours.
+\item No volunteer can work more than T* consecutive hours without taking a break. 
+\end{itemize}
+*Varies based on need by Savoy Swing club.
+
+\noindent An individual volunteer may have any of the following restrictions:
+\begin{itemize} \itemsep1pt \parskip0pt \parsep0pt
+\item Can work no more than M hours.
+\item Is only available to work certain hours.
+\item Has an poset of prefered work times.
+\item Can only work certain job types.
+\end{itemize}
+
+%===================================
+% Modeling the problem
+%===================================
+
+\section{Modeling the Problem}
+Let $V = \{v_1, \ldots , v_n\}$ represent volunteers.\\
+Let each $v_i$ have associated availability $A_i$ and skills $S_i$\\
+Let $W = \{w_1, \ldots , w_m\}$ represent jobs. \\
+Each job $w_i$ has a beginning time ($b_i$), finish time ($f_i$), and a job type ($t_i$).
+\vspace{4mm}
+
+\noindent Let $G = (V, W)$ be a bipartite graph defined as follows:\\
+Each edge $(v_i, w_j)$ is in $E(G)$ if and only if volunteer $i$ is able to (both skill and time wise)
+to take on job $j$. Each edge also has an associated weight that represents the cost of having
+volunteer $v$ be assigned to job $w$.
+\vspace{4mm}
+
+\noindent Let $M_k$ be the set containing $k$ edge sets where each $w \in W$ is represented in at
+least one edge in each of the $k$ sets, and each such edge set does not violate any of our previously 
+stated constraints.
+\vspace{4mm}
+
+\noindent We will define a new set $C = \{c_1, \ldots , c_k\}$ where $c_i = \sum_{m \in M_j}\;m$ 
+for $j = 1, 2, ... k$. Then the optimal solution will be $c_s = min\{c_1, \ldots c_k\}$. And the corresponding schedule will be represented by the set of edges $M_s$.
+
+\end{document}
+
+
+%
+% Let's make sure we have these covered. 
+%
+
+% 1. The names of the people on the team.                                                   Yes
+% 2. A project title.                                                                       Not yet
+% 3. A clear explanation of the phenomenon to be modeled and a clearly stated goal.         Yes?
+% 4. A brief description of the impact on the community and a list of community contacts
+% you have consulted.                                                                       Yes?
+% 5. Ideas on the methods you plan to use in modeling.                                      Uhh, almost.
+% 6. Give a small example of your main problem. Translate it into a mathematical problem
+% which you can solve and interpret the results.                                            Nope?
+% 7. References that can aid your modeling (include references relating to the topic and for
+% your proposed methods of solution.)                                                       No idea

@@ -1,0 +1,7 @@
+\contentsline {section}{\numberline {1}Introduction}{3}
+\contentsline {section}{\numberline {2}Computer Science Reference}{3}
+\contentsline {subsection}{\numberline {2.1}Introductory Notions}{3}
+\contentsline {subsection}{\numberline {2.2}Basic Definitions}{3}
+\contentsline {subsection}{\numberline {2.3}Priority Queues}{4}
+\contentsline {subsection}{\numberline {2.4}Trees}{4}
+\contentsline {subsection}{\numberline {2.5}Dijkstra}{4}
