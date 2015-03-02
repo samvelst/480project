@@ -1,0 +1,480 @@
+"\\documentclass[12pt]{article}\n\\usepackage{amsmath,amssymb,amsthm}\n\\usepackage{graphicx}\n\\usepackage[ruled,vlined,linesnumbered]{algorithm2e}\n\n\\title{Optimizing Volunteer Shifts for Dance Weekends}\n\\author{John Jeng, Samvel Stepanyan}\n\\date{January 22nd, 2015}\n\\pagestyle{myheadings}\n\\markright{}\n\n% Custom commands\n\\newcommand{\\sumleft}{\\sum\\limits_{i=1}^n i^3}\n\\newcommand{\\sumright}{\\left(\\sum\\limits_{i=1}^n i \\right)^2}\n\\newcommand{\\Z}{\\mathbb{Z}}\n\\newcommand{\\C}{\\mathbb{C}}\n\\newcommand{\\pem}{$ (\\pi, E) $~}\n\n\\newtheorem{PF}{Proof}\n\\theoremstyle{definition}\n\\newtheorem{Def}{Definition}\n\\newtheorem{Thm}{Theorem}\n\\newtheorem{lemma}{Lemma}\n\n\\begin{document}\n%Begin Formalities========\n%=========================\n\\maketitle\n\\begin{abstract}\n\tThe Savoy Swing Club (SSC) in Seattle, WA is a non-profit that organizes dance weekends for the general public and has outreach programs to middle schools and high schools in the greater Seattle area. All events require volunteers to run the event. Volunteer scheduling is usually done by hand, but becomes harder with larger events and does not take into account many variables that could be considered such as volunteer time preferences and minimize the number of volunteers used. Our objective was to provide a program which would take a pool of volunteers and set of shifts and jobs, and return a schedule of volunteers that optimized for work balance, number of volunteers, ``choas'', and shift preferences.\n\\end{abstract}\n\\newpage\n\\tableofcontents\n\\newpage\n%End Formalities=========\n%========================\n\n\\section{Introduction}\n\nSavoy Swing Club (SSC) is local non-profit organization that currently seeks to teach swing dancing to middle and high school kids in the greater Seattle area.\nThey are also heavily involved with 2 “dance weekends”: Seattle Lindy Exchange (SLX) and Killerdiller Weekend (KDW).\n\nThe format of dance weekends includes live bands, classe, performances, and competitions. All of these activities requires volunteers to make the weekend go smoothly.\nEach volunteer has a set of capabilities (sound, driving, door management, etc) and preferences for which hours (and possibly how many) they are volunteering.\nVolunteers are compensated based on the number of hours they work and the type of work.\nFor example, 8 hours of volunteering might mean “full pass” (access to all classes and evening dances) while fewer hours of volunteering might just mean a “dance pass” (only access to evening dances) or a “partial full pass” (eg. classes and evening dances on Saturday only).\nA technician however, might receive a full weekend pass and additional cash compensation for just 6 hours of work.\n\nGiven hourly requirements for various jobs and a set of volunteers, SSC would like to minimize the total compensation payout while adhering as much as possible to the volunteers’ preferences. As a side note, SSC would like to pay out in passes as much as possible over cash since the realized expense is much lower than raw cash expenses.\n\n\\section{Problem Description}\nOur focus is on ``full-featured'' dance events where there are classes, evening dances, performances, and competitions\n\n\\section{Simplifying Assumptions}\n\n\\subsection{Notes from Data}\n\n\\section{Mathematical Formulation}\n\n\\section{Primary Algorithm}\n\n\\section{Results}\n\n\\begin{thebibliography}{9}\n\\bibitem{Fed87}\n\tGreg N Federickson.\n\tFast algorithms for shortest paths in planar graphs, with applications.\n\tSIAM Journal on Computing, 16(6):1004-1022,\n\t1987\n\n\\bibitem{Klein13}\n\tMonika R. Henzinger, Philip Klein, Satish Rao, Sairam Subramanian.\n\tFaster Shortest-Path Algorithms for Planar Graphs\n\tJournal of Computer and System Sciences Article NO. SS971493\n\t1997\n\n\\end{thebibliography}\n\n\\end{document}\n"
+{"patch":[[[[0,"n raw ca"],[1,"z"],[0,"sh expen"]],2987,2987,16,17]],"time":1425280809761}
+{"patch":[[[[0,"n raw ca"],[-1,"z"],[0,"sh expen"]],2987,2987,17,16]],"time":1425280788795}
+{"patch":[[[[0,"om D"],[-1,"ata"],[0,"}\n\n\\"]],3214,3214,11,8]],"time":1425280729107}
+{"patch":[[[[0,"s from D"],[1,"rat"],[0,"}\n\n\\sect"]],3210,3210,16,19]],"time":1425280728362}
+{"patch":[[[[0,"rom "],[-1,"Drat"],[0,"}\n\n\\"]],3213,3213,12,8]],"time":1425280727675}
+{"patch":[[[[0,"tes "],[-1,"from "],[0,"}\n\n\\"]],3208,3208,13,8]],"time":1425280726834}
+{"patch":[[[[0,"tion{Not"],[-1,"es "],[1,"s"],[0,"}\n\n\\sect"]],3201,3201,19,17]],"time":1425280726104}
+{"patch":[[[[0,"ion{"],[-1,"Nots"],[0,"}\n\n\\"]],3202,3202,12,8]],"time":1425280725383}
+{"patch":[[[[0,"section{"],[1,"N"],[0,"}\n\n\\sect"]],3198,3198,16,17]],"time":1425280723843}
+{"patch":[[[[0,"ection{N"],[1,"otes"],[0,"}\n\n\\sect"]],3199,3199,16,20]],"time":1425280723098}
+{"patch":[[[[0,"on{Notes"],[1," from real dat"],[0,"}\n\n\\sect"]],3203,3203,16,30]],"time":1425280722363}
+{"patch":[[[[0,"real dat"],[1,"a"],[0,"}\n\n\\sect"]],3217,3217,16,17]],"time":1425280721626}
+{"patch":[[[[0,"real"],[-1," data"],[0,"}\n\n\\"]],3217,3217,13,8]],"time":1425280720844}
+{"patch":[[[[0,"s fr"],[-1,"om real"],[0,"}\n\n\\"]],3210,3210,15,8]],"time":1425280720039}
+{"patch":[[[[0,"{Notes f"],[-1,"r"],[1,"o"],[0,"}\n\n\\sect"]],3205,3205,17,17]],"time":1425280719287}
+{"patch":[[[[0,"tion{Not"],[-1,"es fo"],[0,"}\n\n\\sect"]],3201,3201,21,16]],"time":1425280718575}
+{"patch":[[[[0,"ion{"],[-1,"Not"],[1,"n"],[0,"}\n\n\\"]],3202,3202,11,9]],"time":1425280717811}
+{"patch":[[[[0,"ection{n"],[1,"ote"],[0,"}\n\n\\sect"]],3199,3199,16,19]],"time":1425280717027}
+{"patch":[[[[0,"ection{n"],[-1,"ote"],[0,"}\n\n\\sect"]],3199,3199,19,16]],"time":1425280716319}
+{"patch":[[[[0,"section{"],[-1,"n"],[0,"}\n\n\\sect"]],3198,3198,17,16]],"time":1425280715543}
+{"patch":[[[[0,"bsection"],[-1,"{}"],[0,"\n\n\\secti"]],3197,3197,18,16]],"time":1425280708362}
+{"patch":[[[[0,"\n\\subsec"],[-1,"tion"],[0,"\n\n\\secti"]],3193,3193,20,16]],"time":1425280706580}
+{"patch":[[[[0,"\n\\subsec"],[1,"io"],[0,"\n\n\\secti"]],3193,3193,16,18]],"time":1425280704011}
+{"patch":[[[[0,"subs"],[-1,"ecio"],[0,"\n\n\\s"]],3195,3195,12,8]],"time":1425280703237}
+{"patch":[[[[0,"}\n\n\\"],[-1,"subs"],[0,"\n\n\\s"]],3191,3191,12,8]],"time":1425280702501}
+{"patch":[[[[0,"tions}\n\n"],[-1,"\\"],[0,"\n\n\\secti"]],3186,3186,17,16]],"time":1425280701763}
+{"patch":[[[[0,"ions}\n\n\n"],[-1,"\n"],[0,"\\section"]],3187,3187,17,16]],"time":1425280700983}
+{"patch":[[[[0,"tions}\n\n"],[-1,"\n"],[0,"\\section"]],3186,3186,17,16]],"time":1425280699969}
+{"patch":[[[[0,"Resu"],[-1,"lts"],[0,"}\n\n\\"]],3268,3268,11,8]],"time":1425280688484}
+{"patch":[[[[0,"ion{"],[-1,"Resu"],[0,"}\n\n\\"]],3264,3264,12,8]],"time":1425280687504}
+{"patch":[[[[0,"\\section"],[-1,"{}"],[0,"\n\n\\begin"]],3259,3259,18,16]],"time":1425280686728}
+{"patch":[[[[0,"m}\n\n\\sec"],[-1,"tion"],[0,"\n\n\\begin"]],3255,3255,20,16]],"time":1425280685938}
+{"patch":[[[[0,"m}\n\n\\sec"],[1,"iont"],[0,"\n\n\\begin"]],3255,3255,16,20]],"time":1425280685230}
+{"patch":[[[[0,"\n\\se"],[-1,"ciont"],[0,"\n\n\\b"]],3258,3258,13,8]],"time":1425280684443}
+{"patch":[[[[0,"rithm}\n\n"],[-1,"\\se"],[0,"\n\n\\begin"]],3251,3251,19,16]],"time":1425280683718}
+{"patch":[[[[0,"rithm}\n\n"],[-1,"\n\n"],[0,"\\begin{t"]],3251,3251,18,16]],"time":1425280682906}
+{"patch":[[[[0,"y Algori"],[-1,"thm"],[0,"}\n\n\\begi"]],3245,3245,19,16]],"time":1425280681403}
+{"patch":[[[[0,"rimary A"],[-1,"lgori"],[0,"}\n\n\\begi"]],3240,3240,21,16]],"time":1425280680572}
+{"patch":[[[[0,"rima"],[-1,"ry A"],[0,"}\n\n\\"]],3240,3240,12,8]],"time":1425280679834}
+{"patch":[[[[0,"ion{"],[-1,"Prima"],[0,"}\n\n\\"]],3235,3235,13,8]],"time":1425280679099}
+{"patch":[[[[0,"section{"],[1,"The "],[0,"}\n\n\\begi"]],3231,3231,16,20]],"time":1425280678319}
+{"patch":[[[[0,"section{"],[-1,"The "],[0,"}\n\n\\begi"]],3231,3231,20,16]],"time":1425280677528}
+{"patch":[[[[0,"\\section"],[-1,"{}"],[0,"\n\n\\begin"]],3230,3230,18,16]],"time":1425280676795}
+{"patch":[[[[0,"\n\\sectio"],[-1,"n"],[0,"\n\n\\begin"]],3229,3229,17,16]],"time":1425280676018}
+{"patch":[[[[0,"tion}\n\n\\"],[-1,"sectio"],[0,"\n\n\\begin"]],3223,3223,22,16]],"time":1425280675291}
+{"patch":[[[[0,"ation}\n\n"],[-1,"\\"],[0,"\n\n\\begin"]],3222,3222,17,16]],"time":1425280674581}
+{"patch":[[[[0,"tion}\n\n\n"],[-1,"\n"],[0,"\\begin{t"]],3223,3223,17,16]],"time":1425280673537}
+{"patch":[[[[0,"mulation"],[1,"{}"],[0,"}"],[-1,"\n"],[0,"\n\n\\begin"]],3219,3219,18,19]],"time":1425280672771}
+{"patch":[[[[0,"mulation"],[-1,"{}"],[0,"}\n\n\\begi"]],3219,3219,18,16]],"time":1425280670823}
+{"patch":[[[[0,"Formulat"],[-1,"ion"],[0,"}\n\n\\begi"]],3216,3216,19,16]],"time":1425280670082}
+{"patch":[[[[0,"l Formul"],[-1,"at"],[0,"}\n\n\\begi"]],3214,3214,18,16]],"time":1425280669310}
+{"patch":[[[[0," For"],[-1,"mul"],[0,"}\n\n\\"]],3215,3215,11,8]],"time":1425280668517}
+{"patch":[[[[0,"matical "],[-1,"For"],[0,"}\n\n\\begi"]],3208,3208,19,16]],"time":1425280667809}
+{"patch":[[[[0,"hema"],[-1,"tical "],[0,"}\n\n\\"]],3206,3206,14,8]],"time":1425280667062}
+{"patch":[[[[0,"Math"],[-1,"ema"],[0,"}\n\n\\"]],3203,3203,11,8]],"time":1425280666242}
+{"patch":[[[[0,"ection{M"],[-1,"ath"],[0,"}\n\n\\begi"]],3196,3196,19,16]],"time":1425280665590}
+{"patch":[[[[0,"section{"],[-1,"M"],[0,"}\n\n\\begi"]],3195,3195,17,16]],"time":1425280664735}
+{"patch":[[[[0,"\\section"],[-1,"{}"],[0,"\n\n\\begin"]],3194,3194,18,16]],"time":1425280660566}
+{"patch":[[[[0,"ns}\n\n\\se"],[-1,"ction"],[0,"\n\n\\begin"]],3189,3189,21,16]],"time":1425280659082}
+{"patch":[[[[0,"tions}\n\n"],[-1,"\\se"],[0,"\n\n\\begin"]],3186,3186,19,16]],"time":1425280658278}
+{"patch":[[[[0,"tions}\n\n"],[-1,"\n\n"],[0,"\\begin{t"]],3186,3186,18,16]],"time":1425280657550}
+{"patch":[[[[0,"Assu"],[-1,"mptions"],[0,"}\n\n\\"]],3180,3180,15,8]],"time":1425280656075}
+{"patch":[[[[0,"ing "],[-1,"Assu"],[0,"}\n\n\\"]],3176,3176,12,8]],"time":1425280655243}
+{"patch":[[[[0,"plif"],[-1,"ying "],[0,"}\n\n\\"]],3171,3171,13,8]],"time":1425280654463}
+{"patch":[[[[0,"on{Simpl"],[-1,"if"],[0,"}\n\n\\begi"]],3165,3165,18,16]],"time":1425280653731}
+{"patch":[[[[0,"on{Simpl"],[1,"yfying"],[0,"}\n\n\\begi"]],3165,3165,16,22]],"time":1425280652227}
+{"patch":[[[[0,"Simplyfy"],[-1,"ing"],[0,"}\n\n\\begi"]],3168,3168,19,16]],"time":1425280651434}
+{"patch":[[[[0,"{Simplyf"],[-1,"y"],[0,"}\n\n\\begi"]],3167,3167,17,16]],"time":1425280650723}
+{"patch":[[[[0,"{Simplyf"],[1,"i"],[0,"}\n\n\\begi"]],3167,3167,16,17]],"time":1425280649946}
+{"patch":[[[[0,"impl"],[-1,"yfi"],[0,"}\n\n\\"]],3169,3169,11,8]],"time":1425280649138}
+{"patch":[[[[0,"ion{"],[-1,"Simpl"],[0,"}\n\n\\"]],3164,3164,13,8]],"time":1425280648423}
+{"patch":[[[[0,"\\section"],[-1,"{}"],[0,"\n\n\\begin"]],3159,3159,18,16]],"time":1425280647668}
+{"patch":[[[[0,"ons\n\n\\se"],[-1,"ction"],[0,"\n\n\\begin"]],3154,3154,21,16]],"time":1425280646679}
+{"patch":[[[[0,"itions\n\n"],[-1,"\\se"],[0,"\n\n\\begin"]],3151,3151,19,16]],"time":1425280645912}
+{"patch":[[[[0,"tions\n\n\n"],[-1,"\n"],[0,"\\begin{t"]],3152,3152,17,16]],"time":1425280645198}
+{"patch":[[[[0,"itions\n\n"],[-1,"\n"],[0,"\\begin{t"]],3151,3151,17,16]],"time":1425280644401}
+{"patch":[[[[0," ``choas"],[-1,"''"],[0,", and sh"]],1423,1423,18,16]],"time":1425280504587}
+{"patch":[[[[0," ``choas"],[1,"//"],[0,", and sh"]],1423,1423,16,18]],"time":1425280503787}
+{"patch":[[[[0,"hoas"],[-1,"//"],[0,", an"]],1427,1427,10,8]],"time":1425280503039}
+{"patch":[[[[0," ``choas"],[1,"\""],[0,", and sh"]],1423,1423,16,17]],"time":1425280502295}
+{"patch":[[[[0,"nteers, "],[-1,"`"],[0,"`choas\","]],1416,1416,17,16]],"time":1425280500179}
+{"patch":[[[[0,"nteers, "],[-1,"`"],[0,"choas\", "]],1416,1416,17,16]],"time":1425280499192}
+{"patch":[[[[0,"nteers, "],[1,"\""],[0,"choas\", "]],1416,1416,16,17]],"time":1425280497425}
+{"patch":[[[[0,"ured"],[-1,"''"],[0," dan"]],3064,3064,10,8]],"time":1425280485914}
+{"patch":[[[[0,"featured"],[1,"\""],[0," dance e"]],3060,3060,16,17]],"time":1425280485163}
+{"patch":[[[[0,"s is on "],[-1,"`"],[0,"`full-fe"]],3045,3045,17,16]],"time":1425280483685}
+{"patch":[[[[0," on "],[-1,"`"],[0,"full"]],3049,3049,9,8]],"time":1425280482571}
+{"patch":[[[[0,"featured"],[-1,"\""],[0," dance e"]],3058,3058,17,16]],"time":1425280478467}
+{"patch":[[[[0,"ll-featu"],[-1,"red"],[0," dance e"]],3055,3055,19,16]],"time":1425280477690}
+{"patch":[[[[0,"full-fea"],[-1,"tu"],[0," dance e"]],3053,3053,18,16]],"time":1425280476939}
+{"patch":[[[[0,"full"],[-1,"-fea"],[0," dan"]],3053,3053,12,8]],"time":1425280476195}
+{"patch":[[[[0,"s is on "],[-1,"full"],[0," dance e"]],3045,3045,20,16]],"time":1425280475405}
+{"patch":[[[[0,"s is on "],[-1," "],[0,"dance ev"]],3045,3045,17,16]],"time":1425280474617}
+{"patch":[[[[0,"competit"],[-1,"ions"],[0,"\n\n\\begin"]],3125,3125,20,16]],"time":1425280469335}
+{"patch":[[[[0,"d compet"],[-1,"it"],[0,"\n\n\\begin"]],3123,3123,18,16]],"time":1425280468607}
+{"patch":[[[[0,"d compet"],[1,"tii"],[0,"\n\n\\begin"]],3123,3123,16,19]],"time":1425280467838}
+{"patch":[[[[0,"mpet"],[-1,"tii"],[0,"\n\n\\b"]],3127,3127,11,8]],"time":1425280467111}
+{"patch":[[[[0,"d compet"],[1,"t"],[0,"\n\n\\begin"]],3123,3123,16,17]],"time":1425280466355}
+{"patch":[[[[0,"nd c"],[-1,"ompett"],[0,"\n\n\\b"]],3122,3122,14,8]],"time":1425280465572}
+{"patch":[[[[0,"es, and "],[-1,"c"],[0,"\n\n\\begin"]],3117,3117,17,16]],"time":1425280464851}
+{"patch":[[[[0,"rmances,"],[-1," and "],[0,"\n\n\\begin"]],3112,3112,21,16]],"time":1425280464115}
+{"patch":[[[[0,", perfor"],[-1,"mances,"],[0,"\n\n\\begin"]],3105,3105,23,16]],"time":1425280463399}
+{"patch":[[[[0,"ances, p"],[-1,"erfor"],[0,"\n\n\\begin"]],3100,3100,21,16]],"time":1425280462579}
+{"patch":[[[[0," dances,"],[-1," p"],[0,"\n\n\\begin"]],3098,3098,18,16]],"time":1425280461786}
+{"patch":[[[[0,"ng dance"],[1,"e"],[0,"s"],[-1,","],[0,"\n\n\\begin"]],3096,3096,18,18]],"time":1425280461073}
+{"patch":[[[[0,"ng dance"],[-1,"e"],[0,"s"],[1,","],[0,"\n\n\\begin"]],3096,3096,18,18]],"time":1425280460294}
+{"patch":[[[[0,"ng dance"],[-1,"s,"],[0,"\n\n\\begin"]],3096,3096,18,16]],"time":1425280459565}
+{"patch":[[[[0,"evening "],[-1,"dance"],[0,"\n\n\\begin"]],3091,3091,21,16]],"time":1425280458748}
+{"patch":[[[[0,", evenin"],[1,"t"],[0,"g \n\n\\beg"]],3089,3089,16,17]],"time":1425280458051}
+{"patch":[[[[0,"even"],[-1,"intg "],[1,"t"],[0,"\n\n\\b"]],3091,3091,13,9]],"time":1425280457251}
+{"patch":[[[[0,"asses, e"],[-1,"vent"],[0,"\n\n\\begin"]],3084,3084,20,16]],"time":1425280456482}
+{"patch":[[[[0,"classes,"],[-1," e"],[0,"\n\n\\begin"]],3082,3082,18,16]],"time":1425280455787}
+{"patch":[[[[0," classes"],[-1,","],[1," an"],[0,"\n\n\\begin"]],3081,3081,17,19]],"time":1425280455027}
+{"patch":[[[[0,"asses an"],[1,"d evening"],[0,"\n\n\\begin"]],3084,3084,16,25]],"time":1425280454233}
+{"patch":[[[[0,"and even"],[-1,"ing"],[0,"\n\n\\begin"]],3090,3090,19,16]],"time":1425280453421}
+{"patch":[[[[0," and eve"],[-1,"n"],[0,"\n\n\\begin"]],3089,3089,17,16]],"time":1425280452727}
+{"patch":[[[[0,"classes "],[-1,"and eve"],[0,"\n\n\\begin"]],3082,3082,23,16]],"time":1425280451879}
+{"patch":[[[[0,"re class"],[-1,"es "],[0,"\n\n\\begin"]],3079,3079,19,16]],"time":1425280451162}
+{"patch":[[[[0,"re are c"],[-1,"lass"],[0,"\n\n\\begin"]],3075,3075,20,16]],"time":1425280450435}
+{"patch":[[[[0,"ther"],[-1,"e are c"],[0,"\n\n\\b"]],3072,3072,15,8]],"time":1425280449676}
+{"patch":[[[[0,"s wh"],[-1,"ere ther"],[0,"\n\n\\b"]],3064,3064,16,8]],"time":1425280448878}
+{"patch":[[[[0," eve"],[-1,"nts wh"],[0,"\n\n\\b"]],3058,3058,14,8]],"time":1425280448178}
+{"patch":[[[[0," dan"],[-1,"ce eve"],[0,"\n\n\\b"]],3052,3052,14,8]],"time":1425280447415}
+{"patch":[[[[0,"s is on "],[-1,"dan"],[0,"\n\n\\begin"]],3045,3045,19,16]],"time":1425280446611}
+{"patch":[[[[0,"s is on "],[1,"weekend ev"],[0,"\n\n\\begin"]],3045,3045,16,26]],"time":1425280445863}
+{"patch":[[[[0,"n weeken"],[-1,"d ev"],[0,"\n\n\\begin"]],3051,3051,20,16]],"time":1425280444358}
+{"patch":[[[[0,"s is on "],[-1,"weeken"],[0,"\n\n\\begin"]],3045,3045,22,16]],"time":1425280443621}
+{"patch":[[[[0," focus i"],[-1,"s on "],[0,"\n\n\\begin"]],3040,3040,21,16]],"time":1425280442914}
+{"patch":[[[[0,"r focus "],[-1,"i"],[0,"\n\n\\begin"]],3039,3039,17,16]],"time":1425280442091}
+{"patch":[[[[0,"r focus "],[1,"is "],[0,"\n\n\\begin"]],3039,3039,16,19]],"time":1425280438309}
+{"patch":[[[[0,"r focus "],[-1,"is "],[0,"\n\n\\begin"]],3039,3039,19,16]],"time":1425280437598}
+{"patch":[[[[0,"ur focus"],[1,"e"],[0," \n\n\\begi"]],3038,3038,16,17]],"time":1425280436798}
+{"patch":[[[[0,"r fo"],[-1,"cuse "],[0,"\n\n\\b"]],3039,3039,13,8]],"time":1425280436047}
+{"patch":[[[[0,"n}\nO"],[-1,"ur fo"],[0,"\n\n\\b"]],3034,3034,13,8]],"time":1425280435323}
+{"patch":[[[[0,"iption}\n"],[-1,"O"],[0,"\n\n\\begin"]],3029,3029,17,16]],"time":1425280434523}
+{"patch":[[[[0,"tion}\n\n\n"],[1,"\n"],[0,"\\begin{t"]],3031,3031,16,17]],"time":1425280348506}
+{"patch":[[[[0,"ion}\n\n\n\n"],[1,"\n"],[0,"\\begin{t"]],3032,3032,16,17]],"time":1425280347725}
+{"patch":[[[[0,"tion}\n\n\n"],[1,"\\subsection{Introductory Notions}\n\n\n\\subsection{Basic Definitions}\n\n\\begin{Def}\n\tBig O notation:\n\n\tLet $f$ and $g$ be functions defined on some subset of the real numbers.\n\tThen we say that $f(x) = O(g(x))$ iff there exists a positive real number C and a real number $x_0$ such that\n\t\\[|f(x)| \\leq C|g(x)|\\text{ for all } x \\geq x_0\\]\n\\end{Def}\n\n\\begin{Def}\n\tA \\textit{loop invariant} is a condition that is necessarily true at the very beginning and very end of each iteration in some loop.\n\\end{Def}\n\n\\subsection{Priority Queues}\nA priority queue is a part of a class of objects in computer science called abstract data types (ADT). \nReal implementations vary but ADTs are used to analyze space requirements and running time.\n\nIn general, a priority queue can be thought of as an emergency room.\nHigher priority data (objects, patients) gets dequeued (processed, treated) before those of a lower priority.\nTypically this means there is a least value that is set as the highest priority.\n\nThe most basic priority queue just has the following methods (equivically understood as functions, jobs, utilities, capabilities, or features):\n\\begin{enumerate}\n\t\\item Add(Item i): This tells the priority queue to \"enqueue\" Item i which is to instruct it to appropriately place Item i into the wait list based on its priority.\n\t\\item Extract\\_min(): This tells the priority queue to return the \n\\end{enumerate}\nThis allows the program to store items based on their priorty and retrieve the highest priority one.\n\nRunning time for each operation varies on the implementation, but we will assume a fibonacci heap in our case.\nThus Add and Update\\_priority will run in $O(1)$ time and Extract\\_min will run in $O(\\log n)$ time where $n$ is the number of items in the priority queue.\n\n\\subsection{Trees}\nFor these next two subsections, our starting novice may do well to read the introductory section on Graph Theory.\n\n\n\\subsection{Dijkstra}\nIn this section we introduce Dijkstra's a algorithm for shortest path on general graphs with non-negative edge weights as we will emulate it in our main result.\n\nThe idea behind Disjkstra's algorithm is to mark all nodes that aren't the source node to initiailly to have a distance (denoted $d[v]$) equal to infinity. \nThen, as we traverse the graph from the source node, we update the shortest path to each v until we have traversed the entire graph.\n\nWhen implemented with a fibbonacci heap, Disjkstra's algorithm runs in $O (m + n\\log n)$ time where m is the number of edges and n is the number of vertices.\nWe will not prove its correctness or running time here as it can be found in any introductory text on algorithms. \n\n\\begin{algorithm}[H]\n\\DontPrintSemicolon\ndist[$source$] := 0\\;\n\\ForEach{vertex $v$ in Graph}{\n\t\\If{$v \\neq source$}{\n\t\tdist[$v$] := infinity\\;\n\t\tprevious[$v$] := undefined\\;\n\t}\n\tPQ.add($v$, dist[$v$])\\;\n}\n\\While{PQ is not empty}{\nu := PQ.extract\\_min()\\;\n\\ForEach{neighbor v of u}{\n\talt = dist[u] + length(u,v)\\;\n\t\\If{$\\text{alt} < \\text{dist}[v]$}{\n\t\tdist[v] := alt\\;\n\t\tprevious[v] := u\\;\n\t\tPQ.decrease\\_priority(v,alt)\\;\n\t}\n}\n}\n\\caption{Dijkstra's algorithm}\n\\end{algorithm}\n"],[0,"\n\n\\begin"]],3031,3031,16,3149]],"time":1425280345800}
+{"patch":[[[[0,"Descript"],[-1,"ion"],[0,"}\n\n\n\\sub"]],3024,3024,19,16]],"time":1425280332872}
+{"patch":[[[[0,"m Descri"],[-1,"pt"],[1,"o"],[0,"}\n\n\n\\sub"]],3022,3022,18,17]],"time":1425280332179}
+{"patch":[[[[0,"m Descri"],[1,"t"],[0,"o}\n\n\n\\su"]],3022,3022,16,17]],"time":1425280331387}
+{"patch":[[[[0,"m Descri"],[-1,"to"],[0,"}\n\n\n\\sub"]],3022,3022,18,16]],"time":1425280330607}
+{"patch":[[[[0,"m De"],[-1,"scri"],[0,"}\n\n\n"]],3022,3022,12,8]],"time":1425280329844}
+{"patch":[[[[0,"{Problem"],[-1," De"],[0,"}\n\n\n\\sub"]],3015,3015,19,16]],"time":1425280329074}
+{"patch":[[[[0,"on{P"],[-1,"roblem"],[0,"}\n\n\n"]],3013,3013,14,8]],"time":1425280328330}
+{"patch":[[[[0,"section{"],[-1,"P"],[1,"Computer Science Reference"],[0,"}\n\n\n\\sub"]],3008,3008,17,42]],"time":1425280327533}
+{"patch":[[[[0,"t prefer"],[-1,"ences."],[0,"\n\\end{ab"]],1441,1441,22,16]],"time":1425279883227}
+{"patch":[[[[0,"hift pre"],[-1,"fer"],[0,"\n\\end{ab"]],1438,1438,19,16]],"time":1425279882522}
+{"patch":[[[[0,"nd shift"],[-1," pre"],[0,"\n\\end{ab"]],1434,1434,20,16]],"time":1425279881702}
+{"patch":[[[[0,", and sh"],[-1,"ift"],[1,"ef"],[0,"\n\\end{ab"]],1431,1431,19,18]],"time":1425279880980}
+{"patch":[[[[0,"nd s"],[-1,"hef"],[0,"\n\\en"]],1434,1434,11,8]],"time":1425279880255}
+{"patch":[[[[0,"s\", and "],[-1,"s"],[0,"\n\\end{ab"]],1429,1429,17,16]],"time":1425279879503}
+{"patch":[[[[0," \"choas\""],[1," of the schedule"],[0,", and \n\\"]],1423,1423,16,32]],"time":1425279824655}
+{"patch":[[[[0,"optimize"],[-1,"d"],[0," for wor"]],1374,1374,17,16]],"time":1425279814183}
+{"patch":[[[[0,"unteers "],[-1,"that "],[0,"optimize"]],1361,1361,21,16]],"time":1425279812496}
+{"patch":[[[[0,"f volunt"],[-1,"eers"],[0," optimiz"]],1356,1356,20,16]],"time":1425279811772}
+{"patch":[[[[0,"ule of v"],[-1,"olunt"],[0," optimiz"]],1351,1351,21,16]],"time":1425279811027}
+{"patch":[[[[0,"dule of "],[-1,"v"],[0," optimiz"]],1350,1350,17,16]],"time":1425279810241}
+{"patch":[[[[0,"chedule "],[-1,"of "],[0," optimiz"]],1347,1347,19,16]],"time":1425279808455}
+{"patch":[[[[0,"sche"],[-1,"dule "],[0," opt"]],1346,1346,13,8]],"time":1425279807519}
+{"patch":[[[[0,"rn a sch"],[-1,"e"],[1,"u"],[0," optimiz"]],1341,1341,17,17]],"time":1425279806713}
+{"patch":[[[[0,"n a schu"],[1,"l"],[0," optimiz"]],1342,1342,16,17]],"time":1425279805951}
+{"patch":[[[[0,"n a "],[-1,"schul"],[0," opt"]],1342,1342,13,8]],"time":1425279805248}
+{"patch":[[[[0,"nd retur"],[-1,"n a "],[0," optimiz"]],1334,1334,20,16]],"time":1425279804442}
+{"patch":[[[[0,"bs, and "],[-1,"retur"],[0," optimiz"]],1329,1329,21,16]],"time":1425279803691}
+{"patch":[[[[0,"bs, and "],[-1," "],[0,"optimize"]],1329,1329,17,16]],"time":1425279802987}
+{"patch":[[[[0,"ule, and"],[-1," "],[0,"\n\\end{ab"]],1406,1406,17,16]],"time":1425279678611}
+{"patch":[[[[0,"ule, and"],[1," "],[0,"\n\\end{ab"]],1406,1406,16,17]],"time":1425279677859}
+{"patch":[[[[0,"hedule, "],[-1,"and "],[0,"\n\\end{ab"]],1403,1403,20,16]],"time":1425279649523}
+{"patch":[[[[0,"schedule"],[-1,", "],[0,"\n\\end{ab"]],1401,1401,18,16]],"time":1425279648774}
+{"patch":[[[[0,"sche"],[-1,"dule"],[1,"u"],[0,"\n\\en"]],1401,1401,12,9]],"time":1425279648050}
+{"patch":[[[[0,"the sche"],[-1,"u"],[0,"\n\\end{ab"]],1397,1397,17,16]],"time":1425279647217}
+{"patch":[[[[0,"f th"],[-1,"e sche"],[0,"\n\\en"]],1395,1395,14,8]],"time":1425279646593}
+{"patch":[[[[0,"\"choas\" "],[-1,"of th"],[0,"\n\\end{ab"]],1386,1386,21,16]],"time":1425279645832}
+{"patch":[[[[0," \"choas\""],[-1," "],[0,"\n\\end{ab"]],1385,1385,17,16]],"time":1425279645101}
+{"patch":[[[[0,", \"choas"],[-1,"\""],[0,"\n\\end{ab"]],1384,1384,17,16]],"time":1425279641715}
+{"patch":[[[[0,"s, \"choa"],[-1,"s"],[0,"\n\\end{ab"]],1383,1383,17,16]],"time":1425279640119}
+{"patch":[[[[0,", \"c"],[-1,"hoa"],[0,"\n\\en"]],1384,1384,11,8]],"time":1425279639396}
+{"patch":[[[[0,"teers, \""],[-1,"c"],[0,"\n\\end{ab"]],1379,1379,17,16]],"time":1425279638667}
+{"patch":[[[[0,"nteers, "],[-1,"\""],[0,"\n\\end{ab"]],1378,1378,17,16]],"time":1425279637923}
+{"patch":[[[[0,"olunteer"],[-1,"s, "],[0,"\n\\end{ab"]],1375,1375,19,16]],"time":1425279631987}
+{"patch":[[[[0," volunte"],[-1,"er"],[0,"\n\\end{ab"]],1373,1373,18,16]],"time":1425279631202}
+{"patch":[[[[0," of volu"],[-1,"nte"],[0,"\n\\end{ab"]],1370,1370,19,16]],"time":1425279630466}
+{"patch":[[[[0,"mber of "],[-1,"volu"],[0,"\n\\end{ab"]],1366,1366,20,16]],"time":1425279629731}
+{"patch":[[[[0,"umber of"],[-1," "],[0,"\n\\end{ab"]],1365,1365,17,16]],"time":1425279628943}
+{"patch":[[[[0,"consider"],[-1,"ed"],[0," such as"]],1138,1138,18,16]],"time":1425279613292}
+{"patch":[[[[0,"be c"],[-1,"onsider"],[0," suc"]],1135,1135,15,8]],"time":1425279612595}
+{"patch":[[[[0,"ould be "],[-1,"c"],[1,"optimized for"],[0," such as"]],1130,1130,17,29]],"time":1425279611764}
+{"patch":[[[[0,"nimize t"],[-1,"he "],[0,"number o"]],1193,1193,19,16]],"time":1425279602491}
+{"patch":[[[[0,"inimize "],[-1,"t"],[0,"number o"]],1192,1192,17,16]],"time":1425279601727}
+{"patch":[[[[0,"d minimi"],[-1,"ze "],[1,"e"],[0,"number o"]],1189,1189,19,17]],"time":1425279600428}
+{"patch":[[[[0,"d minimi"],[-1,"e"],[0,"number o"]],1189,1189,17,16]],"time":1425279599642}
+{"patch":[[[[0,"and mini"],[-1,"mi"],[0,"number o"]],1187,1187,18,16]],"time":1425279598894}
+{"patch":[[[[0,"and mini"],[1,"z"],[0,"number o"]],1187,1187,16,17]],"time":1425279598150}
+{"patch":[[[[0,"nd miniz"],[1,"mis"],[0,"number o"]],1188,1188,16,19]],"time":1425279597395}
+{"patch":[[[[0," minizmi"],[-1,"s"],[0,"number o"]],1190,1190,17,16]],"time":1425279596572}
+{"patch":[[[[0,"nd miniz"],[-1,"mi"],[0,"number o"]],1188,1188,18,16]],"time":1425279595823}
+{"patch":[[[[0,"nd m"],[-1,"iniz"],[0,"numb"]],1188,1188,12,8]],"time":1425279595095}
+{"patch":[[[[0,"ces and "],[-1,"m"],[0,"number o"]],1183,1183,17,16]],"time":1425279594318}
+{"patch":[[[[0,"umber of"],[1," "],[0,"\n\\end{ab"]],1355,1355,16,17]],"time":1425279584944}
+{"patch":[[[[0," number "],[-1,"of "],[0,"\n\\end{ab"]],1353,1353,19,16]],"time":1425279583341}
+{"patch":[[[[0,"lance, n"],[-1,"umber "],[0,"\n\\end{ab"]],1347,1347,22,16]],"time":1425279582643}
+{"patch":[[[[0,"alance, "],[-1,"n"],[0,"\n\\end{ab"]],1346,1346,17,16]],"time":1425279581887}
+{"patch":[[[[0," balance"],[-1,", "],[0,"\n\\end{ab"]],1344,1344,18,16]],"time":1425279569380}
+{"patch":[[[[0,"rk b"],[-1,"alance"],[0,"\n\\en"]],1342,1342,14,8]],"time":1425279568139}
+{"patch":[[[[0,"r wo"],[-1,"rk b"],[0,"\n\\en"]],1338,1338,12,8]],"time":1425279567277}
+{"patch":[[[[0,"ze f"],[-1,"or wo"],[0,"\n\\en"]],1333,1333,13,8]],"time":1425279566537}
+{"patch":[[[[0,"ptim"],[-1,"ize f"],[0,"\n\\en"]],1328,1328,13,8]],"time":1425279565764}
+{"patch":[[[[0,"bs, and "],[-1,"optim"],[0,"\n\\end{ab"]],1319,1319,21,16]],"time":1425279564959}
+{"patch":[[[[0,"d jobs, "],[-1,"and "],[0,"\n\\end{ab"]],1315,1315,20,16]],"time":1425279564204}
+{"patch":[[[[0,"nd jobs,"],[-1," "],[0,"\n\\end{ab"]],1314,1314,17,16]],"time":1425279563470}
+{"patch":[[[[0,"and jobs"],[-1,","],[0,"\n\\end{ab"]],1313,1313,17,16]],"time":1425279562747}
+{"patch":[[[[0,"ers "],[-1,"used."],[0," Our"]],1208,1208,13,8]],"time":1425279544798}
+{"patch":[[[[0,"of volun"],[-1,"teers "],[0," Our obj"]],1198,1198,22,16]],"time":1425279543985}
+{"patch":[[[[0,"ber of v"],[-1,"olun"],[0," Our obj"]],1194,1194,20,16]],"time":1425279543266}
+{"patch":[[[[0," number "],[-1,"of v"],[0," Our obj"]],1190,1190,20,16]],"time":1425279542498}
+{"patch":[[[[0,"es and n"],[-1,"umber "],[0," Our obj"]],1184,1184,22,16]],"time":1425279541758}
+{"patch":[[[[0,"ces and "],[-1,"n"],[0," Our obj"]],1183,1183,17,16]],"time":1425279541002}
+{"patch":[[[[0,"rences a"],[-1,"nd "],[0," Our obj"]],1180,1180,19,16]],"time":1425279536554}
+{"patch":[[[[0,"fere"],[-1,"nces a"],[0," Our"]],1178,1178,14,8]],"time":1425279535862}
+{"patch":[[[[0," time pr"],[-1,"efere"],[0," Our obj"]],1169,1169,21,16]],"time":1425279534962}
+{"patch":[[[[0,"er t"],[-1,"ime pr"],[0," Our"]],1167,1167,14,8]],"time":1425279534295}
+{"patch":[[[[0,"voluntee"],[-1,"r t"],[0," Our obj"]],1160,1160,19,16]],"time":1425279533575}
+{"patch":[[[[0,"h as vol"],[-1,"untee"],[0," Our obj"]],1155,1155,21,16]],"time":1425279532754}
+{"patch":[[[[0,"such as "],[-1,"vol"],[0," Our obj"]],1152,1152,19,16]],"time":1425279531974}
+{"patch":[[[[0,"or such "],[-1,"as "],[0," Our obj"]],1149,1149,19,16]],"time":1425279531260}
+{"patch":[[[[0,"zed for "],[-1,"such "],[0," Our obj"]],1144,1144,21,16]],"time":1425279530440}
+{"patch":[[[[0,"zed "],[-1,"for  "],[0,"Our "]],1144,1144,13,8]],"time":1425279529713}
+{"patch":[[[[0,"optimize"],[-1,"d"],[1," "],[0," Our obj"]],1138,1138,17,17]],"time":1425279529018}
+{"patch":[[[[0,"d be opt"],[-1,"imize "],[0," Our obj"]],1133,1133,22,16]],"time":1425279528223}
+{"patch":[[[[0,"ld b"],[-1,"e opt"],[0," Our"]],1132,1132,13,8]],"time":1425279527379}
+{"patch":[[[[0," cou"],[-1,"ld b"],[0," Our"]],1128,1128,12,8]],"time":1425279526734}
+{"patch":[[[[0,"es t"],[-1,"hat cou"],[0," Our"]],1121,1121,15,8]],"time":1425279526018}
+{"patch":[[[[0,"vari"],[-1,"ables t"],[0," Our"]],1114,1114,15,8]],"time":1425279525163}
+{"patch":[[[[0,"nt many "],[-1,"vari"],[0," Our obj"]],1106,1106,20,16]],"time":1425279524457}
+{"patch":[[[[0,"unt "],[-1,"many "],[0," Our"]],1105,1105,13,8]],"time":1425279523663}
+{"patch":[[[[0,"account "],[1,"a "],[0," Our obj"]],1101,1101,16,18]],"time":1425279522858}
+{"patch":[[[[0,"account "],[-1,"a "],[0," Our obj"]],1101,1101,18,16]],"time":1425279521619}
+{"patch":[[[[0,"o ac"],[-1,"count "],[0," Our"]],1099,1099,14,8]],"time":1425279520787}
+{"patch":[[[[0,"nto "],[-1,"ac "],[0,"Our "]],1097,1097,11,8]],"time":1425279520115}
+{"patch":[[[[0,"t ta"],[-1,"ke into"],[0," Our"]],1089,1089,15,8]],"time":1425279519314}
+{"patch":[[[[0,"oes not "],[-1,"ta"],[0," Our obj"]],1083,1083,18,16]],"time":1425279518510}
+{"patch":[[[[0," and doe"],[-1,"s not "],[0," Our obj"]],1077,1077,22,16]],"time":1425279517765}
+{"patch":[[[[0,"and "],[-1,"doe"],[0," Our"]],1078,1078,11,8]],"time":1425279517046}
+{"patch":[[[[0,"nts and "],[1,"curren"],[0," Our obj"]],1074,1074,16,22]],"time":1425279515485}
+{"patch":[[[[0,"d curren"],[1,"tly does"],[0," Our obj"]],1080,1080,16,24]],"time":1425279514776}
+{"patch":[[[[0,"ly does "],[1," "],[0,"Our obje"]],1089,1089,16,17]],"time":1425279514014}
+{"patch":[[[[0,"tly "],[-1,"does "],[0," Our"]],1088,1088,13,8]],"time":1425279502519}
+{"patch":[[[[0,"d curren"],[-1,"tly "],[0," Our obj"]],1080,1080,20,16]],"time":1425279501816}
+{"patch":[[[[0,"ts and c"],[-1,"urren"],[0," Our obj"]],1075,1075,21,16]],"time":1425279501055}
+{"patch":[[[[0,"nts and "],[-1,"c"],[0," Our obj"]],1074,1074,17,16]],"time":1425279500257}
+{"patch":[[[[0," events "],[-1,"and "],[0," Our obj"]],1070,1070,20,16]],"time":1425279498329}
+{"patch":[[[[0,"larger e"],[-1,"vents "],[0," Our obj"]],1064,1064,22,16]],"time":1425279497735}
+{"patch":[[[[0," larger "],[-1,"e"],[0," Our obj"]],1063,1063,17,16]],"time":1425279496919}
+{"patch":[[[[0," lar"],[-1,"ger "],[0," Our"]],1063,1063,12,8]],"time":1425279493564}
+{"patch":[[[[0,"ith "],[-1,"lar"],[1,"m"],[0," Our"]],1060,1060,11,9]],"time":1425279492839}
+{"patch":[[[[0,"r with m"],[1,"ore"],[0," Our obj"]],1057,1057,16,19]],"time":1425279492045}
+{"patch":[[[[0," with mo"],[-1,"re"],[0," Our obj"]],1058,1058,18,16]],"time":1425279491303}
+{"patch":[[[[0,"r wi"],[-1,"th mo"],[0," Our"]],1057,1057,13,8]],"time":1425279490646}
+{"patch":[[[[0,"hard"],[-1,"er wi"],[0," Our"]],1052,1052,13,8]],"time":1425279489775}
+{"patch":[[[[0,"come"],[-1,"s hard"],[0," Our"]],1046,1046,14,8]],"time":1425279488989}
+{"patch":[[[[0,"ut b"],[-1,"ecome"],[0," Our"]],1041,1041,13,8]],"time":1425279488282}
+{"patch":[[[[0,"nd, but "],[-1,"b"],[1,"with larger and larger events, scheduling volunteers optimally becomes more of a head ache."],[0," Our obj"]],1036,1036,17,107]],"time":1425279487615}
+{"patch":[[[[0,"and jobs"],[1," "],[0,"\n\\end{ab"]],1231,1231,16,17]],"time":1425279473283}
+{"patch":[[[[0,"fts and "],[-1,"jobs "],[0,"\n\\end{ab"]],1227,1227,21,16]],"time":1425279406306}
+{"patch":[[[[0," of shif"],[-1,"ts and "],[0,"\n\\end{ab"]],1220,1220,23,16]],"time":1425279405547}
+{"patch":[[[[0," of "],[-1,"shif"],[0,"\n\\en"]],1220,1220,12,8]],"time":1425279404758}
+{"patch":[[[[0," set of "],[1,"sch"],[0,"\n\\end{ab"]],1216,1216,16,19]],"time":1425279404039}
+{"patch":[[[[0,"t of sch"],[1,"e"],[0,"\n\\end{ab"]],1219,1219,16,17]],"time":1425279403216}
+{"patch":[[[[0," set of "],[-1,"sche"],[0,"\n\\end{ab"]],1216,1216,20,16]],"time":1425279402505}
+{"patch":[[[[0,"rs and s"],[-1,"et of "],[0,"\n\\end{ab"]],1210,1210,22,16]],"time":1425279401767}
+{"patch":[[[[0,"ers and "],[-1,"s"],[0,"\n\\end{ab"]],1209,1209,17,16]],"time":1425279400994}
+{"patch":[[[[0,"unteers "],[-1,"and "],[0,"\n\\end{ab"]],1205,1205,20,16]],"time":1425279400123}
+{"patch":[[[[0,"lunteers"],[-1," "],[0,"\n\\end{ab"]],1204,1204,17,16]],"time":1425279399363}
+{"patch":[[[[0,"lunteers"],[1," "],[0,"\n\\end{ab"]],1204,1204,16,17]],"time":1425279393528}
+{"patch":[[[[0,"f volunt"],[-1,"eers "],[0,"\n\\end{ab"]],1200,1200,21,16]],"time":1425279391458}
+{"patch":[[[[0,"ol of vo"],[-1,"lunt"],[1,"9"],[0,"\n\\end{ab"]],1196,1196,20,17]],"time":1425279390651}
+{"patch":[[[[0,"of v"],[-1,"o9"],[0,"\n\\en"]],1199,1199,10,8]],"time":1425279389906}
+{"patch":[[[[0," poo"],[-1,"l of v"],[0,"\n\\en"]],1193,1193,14,8]],"time":1425279389190}
+{"patch":[[[[0,"take a p"],[-1,"oo"],[1,"p"],[0,"\n\\end{ab"]],1187,1187,18,17]],"time":1425279388423}
+{"patch":[[[[0,"take a p"],[-1,"p"],[0,"\n\\end{ab"]],1187,1187,17,16]],"time":1425279387622}
+{"patch":[[[[0,"d take a"],[-1," p"],[0,"\n\\end{ab"]],1185,1185,18,16]],"time":1425279386926}
+{"patch":[[[[0," wou"],[-1,"ld take a"],[0,"\n\\en"]],1180,1180,17,8]],"time":1425279386154}
+{"patch":[[[[0,"whic"],[-1,"h wou"],[0,"\n\\en"]],1175,1175,13,8]],"time":1425279385361}
+{"patch":[[[[0,"program "],[-1,"whic"],[0,"\n\\end{ab"]],1167,1167,20,16]],"time":1425279384631}
+{"patch":[[[[0,"program "],[1,"given volun"],[0,"\n\\end{ab"]],1167,1167,16,27]],"time":1425279383082}
+{"patch":[[[[0,"en volun"],[1,"teers an"],[0,"\n\\end{ab"]],1178,1178,16,24]],"time":1425279382360}
+{"patch":[[[[0,"teers an"],[1,"d"],[0,"\n\\end{ab"]],1186,1186,16,17]],"time":1425279381615}
+{"patch":[[[[0,"eers and"],[1," th"],[0,"\n\\end{ab"]],1187,1187,16,19]],"time":1425279378591}
+{"patch":[[[[0,"lunteers"],[-1," and th"],[0,"\n\\end{ab"]],1183,1183,23,16]],"time":1425279377812}
+{"patch":[[[[0,"en volun"],[-1,"teers"],[0,"\n\\end{ab"]],1178,1178,21,16]],"time":1425279377039}
+{"patch":[[[[0," given v"],[-1,"olun"],[0,"\n\\end{ab"]],1174,1174,20,16]],"time":1425279376330}
+{"patch":[[[[0,"m given "],[-1,"v"],[0,"\n\\end{ab"]],1173,1173,17,16]],"time":1425279375525}
+{"patch":[[[[0,"rogram g"],[-1,"iven "],[0,"\n\\end{ab"]],1168,1168,21,16]],"time":1425279374094}
+{"patch":[[[[0,"program "],[-1,"g"],[0,"\n\\end{ab"]],1167,1167,17,16]],"time":1425279373317}
+{"patch":[[[[0,"program "],[1,"t"],[0,"\n\\end{ab"]],1167,1167,16,17]],"time":1425279371587}
+{"patch":[[[[0,"rogram t"],[1,"hat"],[0,"\n\\end{ab"]],1168,1168,16,19]],"time":1425279370846}
+{"patch":[[[[0,"ram that"],[1," "],[0,"\n\\end{ab"]],1171,1171,16,17]],"time":1425279370067}
+{"patch":[[[[0," program"],[-1," that "],[0,"\n\\end{ab"]],1166,1166,22,16]],"time":1425279366726}
+{"patch":[[[[0,"vide a p"],[-1,"rogram"],[0,"\n\\end{ab"]],1160,1160,22,16]],"time":1425279365877}
+{"patch":[[[[0,"ovide a "],[-1,"p"],[1,"schedu"],[0,"\n\\end{ab"]],1159,1159,17,22]],"time":1425279364398}
+{"patch":[[[[0,"a schedu"],[1,"ling "],[0,"\n\\end{ab"]],1165,1165,16,21]],"time":1425279363558}
+{"patch":[[[[0," schedul"],[-1,"ing "],[0,"\n\\end{ab"]],1166,1166,20,16]],"time":1425279362771}
+{"patch":[[[[0,"a schedu"],[-1,"l"],[1,"u"],[0,"\n\\end{ab"]],1165,1165,17,17]],"time":1425279361250}
+{"patch":[[[[0,"a schedu"],[-1,"u"],[0,"\n\\end{ab"]],1165,1165,17,16]],"time":1425279360517}
+{"patch":[[[[0,"a schedu"],[1,"d"],[0,"\n\\end{ab"]],1165,1165,16,17]],"time":1425279359814}
+{"patch":[[[[0,"a schedu"],[-1,"d"],[0,"\n\\end{ab"]],1165,1165,17,16]],"time":1425279358997}
+{"patch":[[[[0,"vide a s"],[-1,"chedu"],[0,"\n\\end{ab"]],1160,1160,21,16]],"time":1425279354678}
+{"patch":[[[[0,"ovid"],[-1,"e a s"],[0,"\n\\en"]],1159,1159,13,8]],"time":1425279353818}
+{"patch":[[[[0,"to p"],[-1,"rovid"],[0,"\n\\en"]],1154,1154,13,8]],"time":1425279353079}
+{"patch":[[[[0,"ve was t"],[-1,"o p"],[0,"\n\\end{ab"]],1147,1147,19,16]],"time":1425279352359}
+{"patch":[[[[0,"ive was "],[-1,"t"],[0,"\n\\end{ab"]],1146,1146,17,16]],"time":1425279351554}
+{"patch":[[[[0,"ive "],[-1,"was "],[0,"\n\\en"]],1146,1146,12,8]],"time":1425279349367}
+{"patch":[[[[0,"r object"],[-1,"ive "],[0,"\n\\end{ab"]],1138,1138,20,16]],"time":1425279348611}
+{"patch":[[[[0,"e. Our o"],[-1,"bject"],[0,"\n\\end{ab"]],1133,1133,21,16]],"time":1425279347784}
+{"patch":[[[[0,"e. O"],[-1,"ur o"],[0,"\n\\en"]],1133,1133,12,8]],"time":1425279347019}
+{"patch":[[[[0,"d ache. "],[-1,"O"],[0,"\n\\end{ab"]],1128,1128,17,16]],"time":1425279346334}
+{"patch":[[[[0,"ad ache."],[-1," "],[0,"\n\\end{ab"]],1127,1127,17,16]],"time":1425279337639}
+{"patch":[[[[0,"ead ache"],[-1,"."],[0,"\n\\end{ab"]],1126,1126,17,16]],"time":1425279336655}
+{"patch":[[[[0,"ead ache"],[1," "],[0,"\n\\end{ab"]],1126,1126,16,17]],"time":1425279335377}
+{"patch":[[[[0," head ac"],[-1,"he "],[0,"\n\\end{ab"]],1124,1124,19,16]],"time":1425279334604}
+{"patch":[[[[0,"f a head"],[-1," ac"],[0,"\n\\end{ab"]],1121,1121,19,16]],"time":1425279333845}
+{"patch":[[[[0," of "],[-1,"a head"],[0,"\n\\en"]],1119,1119,14,8]],"time":1425279333157}
+{"patch":[[[[0,"es more "],[-1,"of"],[1,"a"],[0," \n\\end{a"]],1112,1112,18,17]],"time":1425279332364}
+{"patch":[[[[0,"s mo"],[-1,"re a "],[0,"\n\\en"]],1113,1113,13,8]],"time":1425279331558}
+{"patch":[[[[0," bec"],[-1,"omes mo"],[0,"\n\\en"]],1106,1106,15,8]],"time":1425279330847}
+{"patch":[[[[0,"ally bec"],[1,"eome"],[0,"\n\\end{ab"]],1102,1102,16,20]],"time":1425279330086}
+{"patch":[[[[0,"y beceom"],[-1,"e"],[0,"\n\\end{ab"]],1105,1105,17,16]],"time":1425279329362}
+{"patch":[[[[0," bec"],[-1,"eom"],[0,"\n\\en"]],1106,1106,11,8]],"time":1425279328537}
+{"patch":[[[[0,"lly "],[-1,"bec"],[0,"\n\\en"]],1103,1103,11,8]],"time":1425279327807}
+{"patch":[[[[0,"rs optim"],[-1,"ally "],[0,"\n\\end{ab"]],1094,1094,21,16]],"time":1425279327060}
+{"patch":[[[[0,"teers op"],[1,"i"],[0,"t"],[-1,"im"],[0,"\n\\end{ab"]],1091,1091,19,18]],"time":1425279326257}
+{"patch":[[[[0,"ers "],[-1,"opit"],[0,"\n\\en"]],1093,1093,12,8]],"time":1425279325582}
+{"patch":[[[[0,"g volunt"],[-1,"eers "],[0,"\n\\end{ab"]],1084,1084,21,16]],"time":1425279324783}
+{"patch":[[[[0,"duling v"],[-1,"olunt"],[0,"\n\\end{ab"]],1079,1079,21,16]],"time":1425279323985}
+{"patch":[[[[0,"hedu"],[-1,"ling v"],[0,"\n\\en"]],1077,1077,14,8]],"time":1425279323258}
+{"patch":[[[[0,"vents, s"],[-1,"chedu"],[0,"\n\\end{ab"]],1068,1068,21,16]],"time":1425279322531}
+{"patch":[[[[0,"events, "],[-1,"s"],[0,"\n\\end{ab"]],1067,1067,17,16]],"time":1425279321807}
+{"patch":[[[[0," events,"],[-1," "],[0,"\n\\end{ab"]],1066,1066,17,16]],"time":1425279315749}
+{"patch":[[[[0,"ger "],[-1,"events,"],[0,"\n\\en"]],1063,1063,15,8]],"time":1425279314953}
+{"patch":[[[[0,"and larg"],[-1,"er "],[0,"\n\\end{ab"]],1056,1056,19,16]],"time":1425279314215}
+{"patch":[[[[0,"er a"],[-1,"nd larg"],[0,"\n\\en"]],1053,1053,15,8]],"time":1425279313567}
+{"patch":[[[[0,"ith larg"],[-1,"er a"],[0,"\n\\end{ab"]],1045,1045,20,16]],"time":1425279312676}
+{"patch":[[[[0,"ut w"],[-1,"ith larg"],[0,"\n\\en"]],1041,1041,16,8]],"time":1425279311965}
+{"patch":[[[[0," hand, b"],[-1,"ut w"],[0,"\n\\end{ab"]],1033,1033,20,16]],"time":1425279311164}
+{"patch":[[[[0," hand, b"],[1,"ut "],[0,"\n\\end{ab"]],1033,1033,16,19]],"time":1425279310063}
+{"patch":[[[[0," by hand"],[-1,", but "],[0,"\n\\end{ab"]],1030,1030,22,16]],"time":1425279309261}
+{"patch":[[[[0," by hand"],[1," b"],[0,"\n\\end{ab"]],1030,1030,16,18]],"time":1425279308589}
+{"patch":[[[[0,"by hand "],[-1,"b"],[0,"\n\\end{ab"]],1031,1031,17,16]],"time":1425279307760}
+{"patch":[[[[0,"e by"],[-1," hand "],[0,"\n\\en"]],1029,1029,14,8]],"time":1425279306935}
+{"patch":[[[[0,"lly "],[-1,"done by"],[0,"\n\\en"]],1022,1022,15,8]],"time":1425279306245}
+{"patch":[[[[0,"s us"],[-1,"ually "],[0,"\n\\en"]],1016,1016,14,8]],"time":1425279305499}
+{"patch":[[[[0,"ing "],[-1,"is us"],[0,"\n\\en"]],1011,1011,13,8]],"time":1425279304751}
+{"patch":[[[[0,"hedu"],[-1,"ling "],[0,"\n\\en"]],1006,1006,13,8]],"time":1425279303991}
+{"patch":[[[[0," sch"],[-1,"edu"],[1,"o"],[0,"\n\\en"]],1003,1003,11,9]],"time":1425279303299}
+{"patch":[[[[0,"lunteer "],[-1,"scho"],[0,"\n\\end{ab"]],996,996,20,16]],"time":1425279302454}
+{"patch":[[[[0,"t. Volun"],[-1,"teer "],[0,"\n\\end{ab"]],991,991,21,16]],"time":1425279301696}
+{"patch":[[[[0," event. "],[-1,"Volun"],[0,"\n\\end{ab"]],986,986,21,16]],"time":1425279300982}
+{"patch":[[[[0," event. "],[1,"Eve"],[0,"\n\\end{ab"]],986,986,16,19]],"time":1425279300235}
+{"patch":[[[[0,"ent. Eve"],[1,"nt sc"],[0,"\n\\end{ab"]],989,989,16,21]],"time":1425279299555}
+{"patch":[[[[0,"t. Event"],[-1," sc"],[0,"\n\\end{ab"]],991,991,19,16]],"time":1425279298675}
+{"patch":[[[[0,"event. E"],[-1,"vent"],[0,"\n\\end{ab"]],987,987,20,16]],"time":1425279297952}
+{"patch":[[[[0," event. "],[-1,"E"],[0,"\n\\end{ab"]],986,986,17,16]],"time":1425279297199}
+{"patch":[[[[0," event. "],[1,"Cu"],[0,"\n\\end{ab"]],986,986,16,18]],"time":1425279294256}
+{"patch":[[[[0,"vent. Cu"],[1,"r"],[0,"\n\\end{ab"]],988,988,16,17]],"time":1425279293552}
+{"patch":[[[[0,"event. C"],[-1,"ur"],[0,"\n\\end{ab"]],987,987,18,16]],"time":1425279282711}
+{"patch":[[[[0,"e event."],[-1," C"],[0,"\n\\end{ab"]],985,985,18,16]],"time":1425279281950}
+{"patch":[[[[0,"he event"],[-1,"."],[0,"\n\\end{ab"]],984,984,17,16]],"time":1425279281210}
+{"patch":[[[[0,"he event"],[1," "],[0,"\n\\end{ab"]],984,984,16,17]],"time":1425279280463}
+{"patch":[[[[0,"the even"],[-1,"t "],[0,"\n\\end{ab"]],983,983,18,16]],"time":1425279270155}
+{"patch":[[[[0,"n th"],[-1,"e even"],[0,"\n\\en"]],981,981,14,8]],"time":1425279269389}
+{"patch":[[[[0,"o run th"],[1,"e"],[0,"\n\\end{ab"]],977,977,16,17]],"time":1425279268699}
+{"patch":[[[[0," run the"],[1," "],[0,"\n\\end{ab"]],978,978,16,17]],"time":1425279267884}
+{"patch":[[[[0,"s to run"],[-1," the "],[0,"\n\\end{ab"]],974,974,21,16]],"time":1425279267130}
+{"patch":[[[[0,"rs t"],[-1,"o run"],[0,"\n\\en"]],973,973,13,8]],"time":1425279266406}
+{"patch":[[[[0,"unteers "],[-1,"t"],[0,"\n\\end{ab"]],968,968,17,16]],"time":1425279265655}
+{"patch":[[[[0," volunte"],[-1,"ers "],[0,"\n\\end{ab"]],964,964,20,16]],"time":1425279263855}
+{"patch":[[[[0,"ire volu"],[-1,"nte"],[1,"i"],[0,"\n\\end{ab"]],961,961,19,17]],"time":1425279263232}
+{"patch":[[[[0,"e vo"],[-1,"lui"],[0,"\n\\en"]],963,963,11,8]],"time":1425279262398}
+{"patch":[[[[0,"require "],[-1,"vo"],[0,"\n\\end{ab"]],957,957,18,16]],"time":1425279261582}
+{"patch":[[[[0," req"],[-1,"uire "],[0,"\n\\en"]],956,956,13,8]],"time":1425279260883}
+{"patch":[[[[0,"ll event"],[-1,"s req"],[0,"\n\\end{ab"]],947,947,21,16]],"time":1425279260071}
+{"patch":[[[[0,"All even"],[-1,"t"],[0,"\n\\end{ab"]],946,946,17,16]],"time":1425279259325}
+{"patch":[[[[0,"ea. All "],[-1,"even"],[1,"d"],[0,"\n\\end{ab"]],942,942,20,17]],"time":1425279258596}
+{"patch":[[[[0,"ea. "],[-1,"All d"],[0,"\n\\en"]],942,942,13,8]],"time":1425279257818}
+{"patch":[[[[0,"e area. "],[1,"Larg"],[0,"\n\\end{ab"]],938,938,16,20]],"time":1425279257060}
+{"patch":[[[[0,"ea. Larg"],[1,"e events"],[0,"\n\\end{ab"]],942,942,16,24]],"time":1425279256431}
+{"patch":[[[[0,"e events"],[1," "],[0,"\n\\end{ab"]],950,950,16,17]],"time":1425279255562}
+{"patch":[[[[0," events "],[1,"typically"],[0,"\n\\end{ab"]],951,951,16,25]],"time":1425279253469}
+{"patch":[[[[0,"ypically"],[1," require"],[0,"\n\\end{ab"]],960,960,16,24]],"time":1425279252855}
+{"patch":[[[[0," require"],[1," "],[0,"\n\\end{ab"]],968,968,16,17]],"time":1425279251927}
+{"patch":[[[[0,"require "],[1,"a "],[0,"\n\\end{ab"]],969,969,16,18]],"time":1425279249826}
+{"patch":[[[[0,"y requir"],[-1,"e a "],[0,"\n\\end{ab"]],967,967,20,16]],"time":1425279249081}
+{"patch":[[[[0,"cally re"],[-1,"quir"],[0,"\n\\end{ab"]],963,963,20,16]],"time":1425279248367}
+{"patch":[[[[0," typical"],[-1,"ly re"],[0,"\n\\end{ab"]],958,958,21,16]],"time":1425279247568}
+{"patch":[[[[0,"ents typ"],[-1,"ical"],[1,"c"],[0,"\n\\end{ab"]],954,954,20,17]],"time":1425279246837}
+{"patch":[[[[0,"nts typc"],[1,"ia"],[0,"\n\\end{ab"]],955,955,16,18]],"time":1425279246109}
+{"patch":[[[[0,"s typcia"],[1,"ll"],[0,"\n\\end{ab"]],957,957,16,18]],"time":1425279245403}
+{"patch":[[[[0,"s ty"],[-1,"pciall"],[0,"\n\\en"]],957,957,14,8]],"time":1425279244589}
+{"patch":[[[[0," events "],[-1,"ty"],[0,"\n\\end{ab"]],951,951,18,16]],"time":1425279243858}
+{"patch":[[[[0,"Large ev"],[-1,"ents "],[0,"\n\\end{ab"]],946,946,21,16]],"time":1425279243056}
+{"patch":[[[[0,". Large "],[-1,"ev"],[0,"\n\\end{ab"]],944,944,18,16]],"time":1425279242290}
+{"patch":[[[[0,"a. L"],[-1,"arge "],[0,"\n\\en"]],943,943,13,8]],"time":1425279241588}
+{"patch":[[[[0,"e area. "],[-1,"L"],[0,"\n\\end{ab"]],938,938,17,16]],"time":1425279240827}
+{"patch":[[[[0,"le a"],[-1,"rea. "],[0,"\n\\en"]],937,937,13,8]],"time":1425279218547}
+{"patch":[[[[0,"ater Sea"],[-1,"ttle a"],[0,"\n\\end{ab"]],927,927,22,16]],"time":1425279217872}
+{"patch":[[[[0,"he great"],[-1,"er Sea"],[0,"\n\\end{ab"]],921,921,22,16]],"time":1425279217003}
+{"patch":[[[[0," in the "],[-1,"great"],[0,"\n\\end{ab"]],916,916,21,16]],"time":1425279216275}
+{"patch":[[[[0,"schools "],[-1,"in the "],[0,"\n\\end{ab"]],909,909,23,16]],"time":1425279215578}
+{"patch":[[[[0,"high sch"],[-1,"ools "],[0,"\n\\end{ab"]],904,904,21,16]],"time":1425279214863}
+{"patch":[[[[0," and hig"],[-1,"h sch"],[0,"\n\\end{ab"]],899,899,21,16]],"time":1425279214020}
+{"patch":[[[[0,"hools an"],[-1,"d hig"],[0,"\n\\end{ab"]],894,894,21,16]],"time":1425279213310}
+{"patch":[[[[0,"schools "],[-1,"an"],[0,"\n\\end{ab"]],892,892,18,16]],"time":1425279212474}
+{"patch":[[[[0,"e sc"],[-1,"hools "],[0,"\n\\en"]],890,890,14,8]],"time":1425279211828}
+{"patch":[[[[0," mid"],[-1,"dle sc"],[0,"\n\\en"]],884,884,14,8]],"time":1425279211094}
+{"patch":[[[[0,"rams to "],[-1,"mid"],[0,"\n\\end{ab"]],877,877,19,16]],"time":1425279210231}
+{"patch":[[[[0,"rams to "],[1,"m"],[0,"\n\\end{ab"]],877,877,16,17]],"time":1425279209607}
+{"patch":[[[[0,"rams to "],[-1,"m"],[0,"\n\\end{ab"]],877,877,17,16]],"time":1425279208594}
+{"patch":[[[[0,"rograms "],[-1,"to "],[0,"\n\\end{ab"]],874,874,19,16]],"time":1425279206899}
+{"patch":[[[[0,"h pr"],[-1,"ograms "],[0,"\n\\en"]],871,871,15,8]],"time":1425279206047}
+{"patch":[[[[0,"trea"],[-1,"ch pr"],[0,"\n\\en"]],866,866,13,8]],"time":1425279205202}
+{"patch":[[[[0," has out"],[-1,"rea"],[0,"\n\\end{ab"]],859,859,19,16]],"time":1425279204672}
+{"patch":[[[[0,"nd h"],[-1,"as out"],[0,"\n\\en"]],857,857,14,8]],"time":1425279203731}
+{"patch":[[[[0,"lic and "],[-1,"h"],[0,"\n\\end{ab"]],852,852,17,16]],"time":1425279202992}
+{"patch":[[[[0,"ublic an"],[-1,"d "],[0,"\n\\end{ab"]],850,850,18,16]],"time":1425279199737}
+{"patch":[[[[0,"ubli"],[-1,"c an"],[0,"\n\\en"]],850,850,12,8]],"time":1425279198971}
+{"patch":[[[[0,"ral publ"],[-1,"i"],[1,"c"],[0,"\n\\end{ab"]],845,845,17,17]],"time":1425279198286}
+{"patch":[[[[0,"ral publ"],[-1,"c"],[0,"\n\\end{ab"]],845,845,17,16]],"time":1425279197467}
+{"patch":[[[[0,"al p"],[-1,"ubl"],[0,"\n\\en"]],846,846,11,8]],"time":1425279196712}
+{"patch":[[[[0,"gene"],[-1,"ral p"],[0,"\n\\en"]],841,841,13,8]],"time":1425279195964}
+{"patch":[[[[0,"or the g"],[-1,"ene"],[0,"\n\\end{ab"]],834,834,19,16]],"time":1425279195206}
+{"patch":[[[[0,"for the "],[-1,"g"],[0,"\n\\end{ab"]],833,833,17,16]],"time":1425279194415}
+{"patch":[[[[0,"ends for the"],[-1," "],[0,"\n\\end{abstra"]],828,828,25,24]],"time":1425279191122}
+{"patch":[[[[0," for the"],[1," "],[0,"\n\\end{ab"]],832,832,16,17]],"time":1425279190088}
+{"patch":[[[[0,"profit t"],[-1,"hat"],[0," organiz"]],796,796,19,16]],"time":1425279176359}
+{"patch":[[[[0,"-profit "],[-1,"t"],[0," organiz"]],795,795,17,16]],"time":1425279175547}
+{"patch":[[[[0,"-profit "],[-1," "],[0,"organize"]],795,795,17,16]],"time":1425279172817}
+{"patch":[[[[0," non-profit "],[1," "],[0,"organizes da"]],791,791,24,25]],"time":1425279171357}
+{"patch":[[[[0,"on-profi"],[-1,"t "],[0," organiz"]],793,793,18,16]],"time":1425279170603}
+{"patch":[[[[0,"non-prof"],[-1,"i"],[0," organiz"]],792,792,17,16]],"time":1425279169833}
+{"patch":[[[[0,"a non-pr"],[-1,"of"],[0," organiz"]],790,790,18,16]],"time":1425279164471}
+{"patch":[[[[0,"s a non-"],[-1,"pr"],[0," organiz"]],788,788,18,16]],"time":1425279163667}
+{"patch":[[[[0,"is a non"],[-1,"-"],[0," organiz"]],787,787,17,16]],"time":1425279162874}
+{"patch":[[[[0,"s a "],[-1,"non "],[0,"orga"]],788,788,12,8]],"time":1425279162131}
+{"patch":[[[[0,", WA is "],[-1,"a"],[0," organiz"]],782,782,17,16]],"time":1425279161359}
+{"patch":[[[[0,"tle, WA "],[-1,"is "],[0," organiz"]],779,779,19,16]],"time":1425279160171}
+{"patch":[[[[0,"tle, WA "],[-1," "],[0,"organize"]],779,779,17,16]],"time":1425279159403}
+{"patch":[[[[0,"ds for t"],[-1,"he "],[0,"\n\\end{ab"]],809,809,19,16]],"time":1425279155529}
+{"patch":[[[[0,"kend"],[-1,"s for t"],[0,"\n\\en"]],806,806,15,8]],"time":1425279154684}
+{"patch":[[[[0," dance w"],[-1,"eekend"],[0,"\n\\end{ab"]],796,796,22,16]],"time":1425279153926}
+{"patch":[[[[0,"anizes d"],[-1,"ance w"],[0,"\n\\end{ab"]],790,790,22,16]],"time":1425279153215}
+{"patch":[[[[0,"ganizes "],[-1,"d"],[0,"\n\\end{ab"]],789,789,17,16]],"time":1425279152524}
+{"patch":[[[[0,"rganizes"],[-1," "],[0,"\n\\end{ab"]],788,788,17,16]],"time":1425279145323}
+{"patch":[[[[0,"gani"],[-1,"zes"],[0,"\n\\en"]],789,789,11,8]],"time":1425279144583}
+{"patch":[[[[0,"le, WA o"],[-1,"rgani"],[0,"\n\\end{ab"]],780,780,21,16]],"time":1425279143860}
+{"patch":[[[[0,"tle, WA "],[-1,"o"],[0,"\n\\end{ab"]],779,779,17,16]],"time":1425279143115}
+{"patch":[[[[0,"ttle, WA"],[-1," "],[0,"\n\\end{ab"]],778,778,17,16]],"time":1425279133499}
+{"patch":[[[[0,"ttle, WA"],[1,"S"],[0,"\n\\end{ab"]],778,778,16,17]],"time":1425279132788}
+{"patch":[[[[0,"le, "],[-1,"WAS"],[0,"\n\\en"]],780,780,11,8]],"time":1425279132006}
+{"patch":[[[[0,"n Seattl"],[-1,"e, "],[0,"\n\\end{ab"]],773,773,19,16]],"time":1425279131259}
+{"patch":[[[[0,"SC) in S"],[-1,"eattl"],[0,"\n\\end{ab"]],768,768,21,16]],"time":1425279130594}
+{"patch":[[[[0,"SSC) in "],[-1,"S"],[0,"\n\\end{ab"]],767,767,17,16]],"time":1425279129771}
+{"patch":[[[[0,"b (SSC) "],[-1,"in "],[0,"\n\\end{ab"]],764,764,19,16]],"time":1425279128928}
+{"patch":[[[[0,"ub (SSC)"],[-1," "],[0,"\n\\end{ab"]],763,763,17,16]],"time":1425279128155}
+{"patch":[[[[0,"g Club ("],[-1,"SSC"],[0,")\n\\end{a"]],759,759,19,16]],"time":1425279127444}
+{"patch":[[[[0,"Club"],[-1," ()"],[0,"\n\\en"]],761,761,11,8]],"time":1425279126687}
+{"patch":[[[[0," Swing C"],[-1,"lub"],[0,"\n\\end{ab"]],754,754,19,16]],"time":1425279125884}
+{"patch":[[[[0,"oy Swing"],[-1," C"],[0,"\n\\end{ab"]],752,752,18,16]],"time":1425279125174}
+{"patch":[[[[0,"e Savoy "],[-1,"Swing"],[0,"\n\\end{ab"]],747,747,21,16]],"time":1425279124356}
+{"patch":[[[[0,"The Savo"],[1,"i"],[0,"y"],[-1," "],[0,"\n\\end{ab"]],745,745,18,18]],"time":1425279123695}
+{"patch":[[[[0,"e Sa"],[-1,"voiy"],[0,"\n\\en"]],747,747,12,8]],"time":1425279122926}
+{"patch":[[[[0,"\n\tTh"],[-1,"e Sa"],[0,"\n\\en"]],743,743,12,8]],"time":1425279122117}
+{"patch":[[[[0,"tract}\n\t"],[-1,"Th"],[0,"\n\\end{ab"]],737,737,18,16]],"time":1425279121359}
+{"patch":[[[[0,"tract}\n\t"],[1,"T"],[0,"\n\\end{ab"]],737,737,16,17]],"time":1425279120571}
+{"patch":[[[[0,"tract}\n\t"],[-1,"T"],[0,"\n\\end{ab"]],737,737,17,16]],"time":1425279119848}
+{"patch":[[[[0,"tract}\n\t"],[1,"S"],[0,"\n\\end{ab"]],737,737,16,17]],"time":1425279116747}
+{"patch":[[[[0,"tract}\n\t"],[-1,"S"],[0,"\n\\end{ab"]],737,737,17,16]],"time":1425279115937}
+{"patch":[[[[0,"tract}\n\t"],[1,"Yay"],[0,"\n\\end{ab"]],737,737,16,19]],"time":1425278825523}
+{"patch":[[[[0,"ct}\n\tYay"],[1," "],[0,"\n\\end{ab"]],740,740,16,17]],"time":1425278824795}
