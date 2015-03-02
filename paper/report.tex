@@ -1,0 +1,142 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+
+\title{Optimizing Volunteer Shifts for Dance Weekends}
+\author{John Jeng, Samvel Stepanyan}
+\date{January 22nd, 2015}
+\pagestyle{myheadings}
+\markright{}
+
+% Custom commands
+\newcommand{\sumleft}{\sum\limits_{i=1}^n i^3}
+\newcommand{\sumright}{\left(\sum\limits_{i=1}^n i \right)^2}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\pem}{$ (\pi, E) $~}
+
+\newtheorem{PF}{Proof}
+\theoremstyle{definition}
+\newtheorem{Def}{Definition}
+\newtheorem{Thm}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+\begin{document}
+%Begin Formalities========
+%=========================
+\maketitle
+\begin{abstract}
+	Yay 
+\end{abstract}
+\newpage
+\tableofcontents
+\newpage
+%End Formalities=========
+%========================
+
+\section{Introduction}
+
+Savoy Swing Club (SSC) is local non-profit organization that currently seeks to teach swing dancing to middle and high school kids in the greater Seattle area.
+They are also heavily involved with 2 “dance weekends”: Seattle Lindy Exchange (SLX) and Killerdiller Weekend (KDW).
+
+The format of dance weekends includes live bands, classe, performances, and competitions. All of these activities requires volunteers to make the weekend go smoothly.
+Each volunteer has a set of capabilities (sound, driving, door management, etc) and preferences for which hours (and possibly how many) they are volunteering.
+Volunteers are compensated based on the number of hours they work and the type of work.
+For example, 8 hours of volunteering might mean “full pass” (access to all classes and evening dances) while fewer hours of volunteering might just mean a “dance pass” (only access to evening dances) or a “partial full pass” (eg. classes and evening dances on Saturday only).
+A technician however, might receive a full weekend pass and additional cash compensation for just 6 hours of work.
+
+Given hourly requirements for various jobs and a set of volunteers, SSC would like to minimize the total compensation payout while adhering as much as possible to the volunteers’ preferences. As a side note, SSC would like to pay out in passes as much as possible over cash since the realized expense is much lower than raw cash expenses.
+
+\section{Computer Science Reference}
+
+
+\subsection{Introductory Notions}
+
+
+\subsection{Basic Definitions}
+
+\begin{Def}
+	Big O notation:
+
+	Let $f$ and $g$ be functions defined on some subset of the real numbers.
+	Then we say that $f(x) = O(g(x))$ iff there exists a positive real number C and a real number $x_0$ such that
+	\[|f(x)| \leq C|g(x)|\text{ for all } x \geq x_0\]
+\end{Def}
+
+\begin{Def}
+	A \textit{loop invariant} is a condition that is necessarily true at the very beginning and very end of each iteration in some loop.
+\end{Def}
+
+\subsection{Priority Queues}
+A priority queue is a part of a class of objects in computer science called abstract data types (ADT). 
+Real implementations vary but ADTs are used to analyze space requirements and running time.
+
+In general, a priority queue can be thought of as an emergency room.
+Higher priority data (objects, patients) gets dequeued (processed, treated) before those of a lower priority.
+Typically this means there is a least value that is set as the highest priority.
+
+The most basic priority queue just has the following methods (equivically understood as functions, jobs, utilities, capabilities, or features):
+\begin{enumerate}
+	\item Add(Item i): This tells the priority queue to "enqueue" Item i which is to instruct it to appropriately place Item i into the wait list based on its priority.
+	\item Extract\_min(): This tells the priority queue to return the 
+\end{enumerate}
+This allows the program to store items based on their priorty and retrieve the highest priority one.
+
+Running time for each operation varies on the implementation, but we will assume a fibonacci heap in our case.
+Thus Add and Update\_priority will run in $O(1)$ time and Extract\_min will run in $O(\log n)$ time where $n$ is the number of items in the priority queue.
+
+\subsection{Trees}
+For these next two subsections, our starting novice may do well to read the introductory section on Graph Theory.
+
+
+\subsection{Dijkstra}
+In this section we introduce Dijkstra's a algorithm for shortest path on general graphs with non-negative edge weights as we will emulate it in our main result.
+
+The idea behind Disjkstra's algorithm is to mark all nodes that aren't the source node to initiailly to have a distance (denoted $d[v]$) equal to infinity. 
+Then, as we traverse the graph from the source node, we update the shortest path to each v until we have traversed the entire graph.
+
+When implemented with a fibbonacci heap, Disjkstra's algorithm runs in $O (m + n\log n)$ time where m is the number of edges and n is the number of vertices.
+We will not prove its correctness or running time here as it can be found in any introductory text on algorithms. 
+
+\begin{algorithm}[H]
+\DontPrintSemicolon
+dist[$source$] := 0\;
+\ForEach{vertex $v$ in Graph}{
+	\If{$v \neq source$}{
+		dist[$v$] := infinity\;
+		previous[$v$] := undefined\;
+	}
+	PQ.add($v$, dist[$v$])\;
+}
+\While{PQ is not empty}{
+u := PQ.extract\_min()\;
+\ForEach{neighbor v of u}{
+	alt = dist[u] + length(u,v)\;
+	\If{$\text{alt} < \text{dist}[v]$}{
+		dist[v] := alt\;
+		previous[v] := u\;
+		PQ.decrease\_priority(v,alt)\;
+	}
+}
+}
+\caption{Dijkstra's algorithm}
+\end{algorithm}
+
+
+\begin{thebibliography}{9}
+\bibitem{Fed87}
+	Greg N Federickson.
+	Fast algorithms for shortest paths in planar graphs, with applications.
+	SIAM Journal on Computing, 16(6):1004-1022,
+	1987
+
+\bibitem{Klein13}
+	Monika R. Henzinger, Philip Klein, Satish Rao, Sairam Subramanian.
+	Faster Shortest-Path Algorithms for Planar Graphs
+	Journal of Computer and System Sciences Article NO. SS971493
+	1997
+
+\end{thebibliography}
+
+\end{document}
