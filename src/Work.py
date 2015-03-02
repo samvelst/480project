@@ -19,6 +19,7 @@ class Volunteer:
         self.current_capacity = 0
         self.jobs = []
         self.is_used = False
+        self.job_id_count = [0 for _ in xrange(10)]
 
     def __cmp__(self, other):
         return -cmp(self.current_capacity, other.current_capacity)
@@ -30,6 +31,7 @@ class Volunteer:
         self.jobs.append(a_job)
         if not a_job.name.startswith("UNAVAILABLE"):
             self.current_capacity += a_job.length
+            self.job_id_count[a_job.id] += 1
             self.is_used = True
 
     def can_take_job(self, a_job):
@@ -41,6 +43,9 @@ class Volunteer:
             return False
 
         return True
+
+    def get_weight(self):
+        return sum([x**2 for x in self.job_id_count])
 
     def print_schedule(self):
         self.jobs = sorted(self.jobs, key=lambda x: x.start)
@@ -63,11 +68,12 @@ class JobShift:
     [Int] interval - all hours covered by this shift
     Int length - total number of hours for this shift
     """
-    def __init__(self, a_name, a_time_interval):
+    def __init__(self, a_name, a_time_interval, an_id):
         self.name = a_name
         self.start, self.end  = a_time_interval
         self.interval = set(range(self.start, self.end+1))
         self.length = self.end - self.start
+        self.id = an_id
 
     def __cmp__(self, other):
         return -cmp(self.length, other.length)

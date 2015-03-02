@@ -22,19 +22,23 @@ def make_random_volunteers(num_of_volunteers, hour_range):
         capacity = random.randint(hour_range[0], hour_range[1])
         volunteer = SS.Volunteer(name, capacity)
         available_start = random.randint(0,18)
-        volunteer.add_job(SS.JobShift("UNAVAILABLE", (0, available_start)))
-        volunteer.add_job(SS.JobShift("UNAVAILABLE", (available_start+capacity, 24)))
+        volunteer.add_job(SS.JobShift("UNAVAILABLE", (0, available_start), -1))
+        volunteer.add_job(SS.JobShift("UNAVAILABLE", (available_start+capacity, 24), -1))
         V.append(volunteer)
     return V
 
 
-def make_random_jobs(num_of_jobs):
+def make_random_jobs():
     J = []
-    for y in xrange(1, num_of_jobs+1):
-        name = "Shift " + str(y)
-        time_interval = rand_time_interval(0, 21, random.randint(1,3))
-        job = SS.JobShift(name, time_interval)
-        J.append(job)
+    for x in xrange(1, 11):
+        id = x-1
+        num_of_shifts = random.randint(1,5)
+        start_time = random.randint(0, 21-num_of_shifts)
+        for y in xrange(1, num_of_shifts+1):
+            name = "Shift " + str(x) + "." + str(y)
+            time_interval = (start_time+y-1, start_time+y)
+            job = SS.JobShift(name, time_interval, id)
+            J.append(job)
     return J
 
 
@@ -61,7 +65,7 @@ def assign_jobs(jobs, volunteers):
 
 
 volunteers = make_random_volunteers(60, (2,6))
-jobs = make_random_jobs(30)
+jobs = make_random_jobs()
 
 total_job_hours = sum([j.length for j in jobs])
 avg_vol_capacity = sum([v.capacity for v in volunteers])/float(len(volunteers))
