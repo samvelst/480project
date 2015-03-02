@@ -1,6 +1,5 @@
 import random
 
-
 class Volunteer:
     def __init__(self, a_name="", a_capacity=4):
         self.name = a_name
@@ -37,6 +36,11 @@ class Volunteer:
         for j in self.jobs:
             print "\t%s :: %s - %s" % (j.name, j.start, j.end)
 
+    def clear_all(self):
+        self.jobs = filter(lambda x: x.name.startswith('UNAVAILABLE'), self.jobs)
+        self.current_capacity = 0
+        self.is_used = False
+
 
 class Job:
     def __init__(self, a_name, a_time_interval):
@@ -56,10 +60,9 @@ class Job:
 
 
 # Helper Functions
-def rand_time_interval(a_min, a_max):
-    a = random.randint(a_min, a_max-1)
-    # b = random.randint(a+1, a_max)
-    return (a, a+1)
+def rand_time_interval(a_min, a_max, a_length):
+    a = random.randint(a_min, a_max - a_length)
+    return (a, a+a_length)
 
 def show_schedule(volunteers):
     for v in volunteers:
