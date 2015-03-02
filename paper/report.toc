@@ -1,7 +1,7 @@
 \contentsline {section}{\numberline {1}Introduction}{3}
-\contentsline {section}{\numberline {2}Computer Science Reference}{3}
-\contentsline {subsection}{\numberline {2.1}Introductory Notions}{3}
-\contentsline {subsection}{\numberline {2.2}Basic Definitions}{3}
-\contentsline {subsection}{\numberline {2.3}Priority Queues}{4}
-\contentsline {subsection}{\numberline {2.4}Trees}{4}
-\contentsline {subsection}{\numberline {2.5}Dijkstra}{4}
+\contentsline {section}{\numberline {2}Problem Description}{3}
+\contentsline {section}{\numberline {3}Simplifying Assumptions}{4}
+\contentsline {subsection}{\numberline {3.1}Notes from Data}{4}
+\contentsline {section}{\numberline {4}Mathematical Formulation}{4}
+\contentsline {section}{\numberline {5}Primary Algorithm}{4}
+\contentsline {section}{\numberline {6}Results}{4}
