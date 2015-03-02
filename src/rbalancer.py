@@ -1,5 +1,6 @@
 # Implementation of the BFD with randomization and balance.
 
+import time
 import random
 import math
 import copy
@@ -52,33 +53,39 @@ def assign_jobs(jobs, volunteers):
 volunteers = make_random_volunteers(60, (2,6))
 jobs = make_random_jobs(30)
 
-min_vol_list = []
-best_vol_schedule = []
-smallest = 100
-biggest = 0
+for i in xrange(5):
+    factor = 10**i
+    min_vol_list = []
+    best_vol_schedule = []
+    smallest = 100
+    biggest = 0
 
-for x in xrange(100):
-    j = jobs[:]
-    V, uj = assign_jobs(j, volunteers)
+    start = time.time()
+    print "Running %s..." % factor
+    for x in xrange(factor):
+        j = jobs[:]
+        V, uj = assign_jobs(j, volunteers)
 
-    if len(uj) == 0:
-        min_v = sum([1 for x in V if x.is_used])
-        if min_v > biggest:
-            biggest = min_v
-        elif min_v < smallest:
-            smallest = min_v
+        if len(uj) == 0:
+            min_v = sum([1 for x in V if x.is_used])
+            if min_v > biggest:
+                biggest = min_v
+            if min_v < smallest:
+                smallest = min_v
+            if len(best_vol_schedule) == 0 or min_v < sum([1 for x in best_vol_schedule if x.is_used]):
+                best_vol_schedule = copy.deepcopy(V)
 
-        if len(best_vol_schedule) == 0 or min_v < sum([1 for x in best_vol_schedule if x.is_used]):
-            best_vol_schedule = copy.deepcopy(V)
+        map(lambda x: x.clear_all(), volunteers)
+        random.shuffle(volunteers)
 
-    map(lambda x: x.clear_all(), volunteers)
-    random.shuffle(volunteers)
+    end = time.time()
 
+    print "DONE in %s" % (end-start)
+    print "Smallest: %s" % smallest
+    print "Biggest: %s" % biggest
+    print "\n"
 
-print "DONE"
-print "Smallest: %s" % smallest
-print "Biggest: %s" % biggest
-#SS.show_schedule(best_vol_schedule)
+    #SS.show_schedule(best_vol_schedule)
 
 
 # Now need to find an optimal way to balance the schedule
