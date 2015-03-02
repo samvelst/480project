@@ -35,21 +35,26 @@
 %End Formalities=========
 %========================
 
-\section{Introduction}
+\section{Problem Description}
 
 Savoy Swing Club (SSC) is local non-profit organization that currently seeks to teach swing dancing to middle and high school kids in the greater Seattle area.
 They are also heavily involved with 2 “dance weekends”: Seattle Lindy Exchange (SLX) and Killerdiller Weekend (KDW).
 
-The format of dance weekends includes live bands, classe, performances, and competitions. All of these activities requires volunteers to make the weekend go smoothly.
-Each volunteer has a set of capabilities (sound, driving, door management, etc) and preferences for which hours (and possibly how many) they are volunteering.
+Our focus is on ``full-featured'' dance events where there are classes, evening dances, performances, and competitions.
+At each of these events, volunteers are required to make the weekend go smoothly.
+
+Each volunteer has different jobs they are able (or allowed) to perform and preferences for which hours and possibly how many they are volunteering.
 Volunteers are compensated based on the number of hours they work and the type of work.
 For example, 8 hours of volunteering might mean “full pass” (access to all classes and evening dances) while fewer hours of volunteering might just mean a “dance pass” (only access to evening dances) or a “partial full pass” (eg. classes and evening dances on Saturday only).
 A technician however, might receive a full weekend pass and additional cash compensation for just 6 hours of work.
 
-Given hourly requirements for various jobs and a set of volunteers, SSC would like to minimize the total compensation payout while adhering as much as possible to the volunteers’ preferences. As a side note, SSC would like to pay out in passes as much as possible over cash since the realized expense is much lower than raw cash expenses.
+Given hourly requirements for various jobs and a set of volunteers, SSC would like to minimize the total compensation payout while adhering as much as possible to the volunteers’ preferences.
 
-\section{Problem Description}
-Our focus is on ``full-featured'' dance events where there are classes, evening dances, performances, and competitions
+One of our primary objectives was to allow volunteers to input times that they would be unavailable to work.
+Typically, volunteers do not know exactly what hours they will be working until at most a few days before the event.
+This means that volunteers must commit their entire weekends even though they may only be working 6 to 8 hours over 2 days.
+
+
 
 \section{Simplifying Assumptions}
 
