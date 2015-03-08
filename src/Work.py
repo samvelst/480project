@@ -79,6 +79,10 @@ class JobShift:
         self.length = self.end - self.start
         self.id = an_id
 
+    """Sort by start time then by job
+        An earlier start time in a different job would conflict with the shift before it.
+        Assume shift times include break and travel times so shifts are always directly back to back.
+        was (self.length, other.length) (self.start, other.start)"""
     def __cmp__(self, other):
         return -cmp(self.length, other.length)
 

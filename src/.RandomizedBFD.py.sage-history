@@ -1,4 +1,259 @@
-"import sys\nimport random\nimport copy\nimport Work as SS\n\n\ndef rand_time_interval(a_min, a_max, a_length):\n    start = random.randint(a_min, a_max - a_length)\n    return (start, start+a_length)\n\n\ndef show_schedule(volunteers):\n    for v in volunteers:\n        if v.is_used:\n            v.print_schedule()\n\n\ndef make_random_volunteers(num_of_volunteers, capacity_range):\n    V = []\n    for x in xrange(1, num_of_volunteers+1):\n        name = \"Volunteer \" + str(x)\n        capacity = random.randint(capacity_range[0], capacity_range[1])\n        volunteer = SS.Volunteer(name, capacity)\n        available_start = random.randint(0, 24-capacity)\n        volunteer.add_job(SS.JobShift(\"UNAVAILABLE\", (0, available_start), -1))\n        volunteer.add_job(SS.JobShift(\"UNAVAILABLE\", (available_start+capacity, 24), -1))\n        V.append(volunteer)\n    return V\n\n\ndef make_random_jobs(num_of_jobs):\n    J = []\n    for x in xrange(1, num_of_jobs+1):\n        id = x-1\n        num_of_shifts = random.randint(1,6)\n        start_time = random.randint(0, 21-num_of_shifts)\n        for y in xrange(1, num_of_shifts+1):\n            name = \"Shift \" + str(x) + \".\" + str(y)\n            time_interval = (start_time+y-1, start_time+y)\n            job = SS.JobShift(name, time_interval, id)\n            J.append(job)\n    return J\n\n# BFD Algo: put largest item into bin with most stuff\ndef assign_jobs(jobs, volunteers):\n    unassigned_jobs = []\n    current_jobs = sorted(jobs)\n    current_volunteers = volunteers\n\n    while len(current_jobs) > 0:\n        job = current_jobs.pop(0)\n        current_volunteers = sorted(current_volunteers) # This makes it a BFD instead of an FFD algo\n        job_assigned = False\n\n        for volunteer in current_volunteers:\n            if volunteer.can_take_job(job):\n                volunteer.add_job(job)\n                job_assigned = True\n                break\n\n        if not job_assigned:\n            unassigned_jobs.append(job)\n\n    return (current_volunteers, unassigned_jobs)\n\n\nNUM_OF_JOBS = 15\nNUM_OF_VOLUNTEERS = 60\nvolunteers = make_random_volunteers(NUM_OF_VOLUNTEERS, (2,6))\njobs = make_random_jobs(NUM_OF_JOBS)\n\n# estimating lower bound by dividing sum of shifts by average volunteer capacity\ntotal_job_hours = sum([j.length for j in jobs])\navg_vol_capacity = sum([v.capacity for v in volunteers])/float(len(volunteers))\nestimated_lower_bound = int((total_job_hours/avg_vol_capacity)+1)\n\ncurrent_best_schedule = []\nmin_volunteers_needed = 60\n\nprint \"Estimated Lower Bound: %s...\" % estimated_lower_bound\n\n# Here we start randomizing the volunteer set to get different solutions\n# we keep track of the smallest solution and store it\n# we can choose to terminate before the optimal sol is found\n# we will either get the current most optimal solution\n# or an unfeasible, partial solution, with a list of anassignable jobs.\nwhile(min_volunteers_needed > estimated_lower_bound):\n    try:\n        volunteers, unassigned_jobs = assign_jobs(jobs, volunteers)\n\n        if len(unassigned_jobs) == 0:\n            current_min = sum([1 for x in volunteers if x.is_used])\n            if current_min < min_volunteers_needed:\n                min_volunteers_needed = current_min\n                current_best_schedule = copy.deepcopy(volunteers)\n                print \"Current min volunteers needed: %s\" % min_volunteers_needed\n\n        map(lambda x: x.clear_all(), volunteers)\n        random.shuffle(volunteers)\n\n    except KeyboardInterrupt:\n        print \"Terminating...\\n\\n\"\n        if len(unassigned_jobs) == 0:\n            print \"Min # of volunteers found so far: %s\" % min_volunteers_needed\n            print \"Schedule: \"\n            show_schedule(current_best_schedule)\n            print \"\\n\"\n        else:\n            print \"Not able to find feasible solution\"\n            print \"Unassigned jobs: %s\" % unassigned_jobs\n            print \"Current best schedule: \"\n            show_schedule(volunteers)\n        sys.exit()\n\nprint \"Finished with optimal (%s) number of volunteers.\" % min_volunteers_needed\nshow_schedule(current_best_schedule)\n"
+"import sys\nimport random\nimport copy\nimport Work as SS\n\n\ndef rand_time_interval(a_min, a_max, a_length):\n    start = random.randint(a_min, a_max - a_length)\n    return (start, start+a_length)\n\n\ndef show_schedule(volunteers):\n    for v in volunteers:\n        if v.is_used:\n            v.print_schedule()\n\n\ndef make_random_volunteers(num_of_volunteers, capacity_range):\n    V = []\n    for x in xrange(1, num_of_volunteers+1):\n        name = \"Volunteer \" + str(x)\n        capacity = random.randint(capacity_range[0], capacity_range[1])\n        volunteer = SS.Volunteer(name, capacity)\n        available_start = random.randint(0, 24-capacity)\n        volunteer.add_job(SS.JobShift(\"UNAVAILABLE\", (0, available_start), -1))\n        volunteer.add_job(SS.JobShift(\"UNAVAILABLE\", (available_start+capacity, 24), -1))\n        V.append(volunteer)\n    return V\n\n\ndef make_random_jobs(num_of_jobs):\n    J = []\n    for x in xrange(1, num_of_jobs+1):\n        id = x-1\n        num_of_shifts = random.randint(1,6)\n        start_time = random.randint(0, 21-num_of_shifts)\n        for y in xrange(1, num_of_shifts+1):\n            name = \"Shift \" + str(x) + \".\" + str(y)\n            time_interval = (start_time+y-1, start_time+y)\n            job = SS.JobShift(name, time_interval, id)\n            J.append(job)\n    return J\n\n# BFD Algo: put largest item into bin with most stuff\ndef assign_jobs(jobs, volunteers):\n    unassigned_jobs = []\n    current_jobs = sorted(jobs)\n    current_volunteers = volunteers\n\n    while len(current_jobs) > 0:\n        job = current_jobs.pop(0)\n        current_volunteers = sorted(current_volunteers) # This makes it a BFD instead of an FFD algo\n        job_assigned = False\n\n        for volunteer in current_volunteers:\n            if volunteer.can_take_job(job):\n                volunteer.add_job(job)\n                job_assigned = True\n                break\n\n        if not job_assigned:\n            unassigned_jobs.append(job)\n\n    return (current_volunteers, unassigned_jobs)\n\n\nNUM_OF_JOBS = 15\nNUM_OF_VOLUNTEERS = 60\nvolunteers = make_random_volunteers(NUM_OF_VOLUNTEERS, (2,6))\njobs = make_random_jobs(NUM_OF_JOBS)\n\n# estimating lower bound by dividing sum of shifts by average volunteer capacity\ntotal_job_hours = sum([j.length for j in jobs])\navg_vol_capacity = sum([v.capacity for v in volunteers])/float(len(volunteers))\nestimated_lower_bound = int((total_job_hours/avg_vol_capacity)+1)\n\ncurrent_best_schedule = []\nmin_volunteers_needed = 60\n\nprint \"Estimated Lower Bound: %s...\" % estimated_lower_bound\n\n#CALCULATE EXACT LOWER BOUND FROM INTERVAL PARTITIONING VIEW\n'''\nmin_volunteers = 0\nopen_volunteers = []\njobss = sorted(jobs)\nfor job in jobss:\n    for volunteer in open_volunteers:\n        if volunteer.can_take_job(job):\n            volunteer.add_job(job)\n            filled = True\n    if not filled:\n        min_volunteers += 1\n        open_volunteers.append(SS.Volunteer(\"Bob\", 24))\n'''\n\n# Here we start randomizing the volunteer set to get different solutions\n# we keep track of the smallest solution and store it\n# we can choose to terminate before the optimal sol is found\n# we will either get the current most optimal solution\n# or an unfeasible, partial solution, with a list of anassignable jobs.\nwhile(min_volunteers_needed > estimated_lower_bound):\n    try:\n        volunteers, unassigned_jobs = assign_jobs(jobs, volunteers)\n\n        if len(unassigned_jobs) == 0:\n            current_min = sum([1 for x in volunteers if x.is_used])\n            if current_min < min_volunteers_needed:\n                min_volunteers_needed = current_min\n                current_best_schedule = copy.deepcopy(volunteers)\n                print \"Current min volunteers needed: %s\" % min_volunteers_needed\n\n        map(lambda x: x.clear_all(), volunteers)\n        random.shuffle(volunteers)\n\n    except KeyboardInterrupt:\n        print \"Terminating...\\n\\n\"\n        if len(unassigned_jobs) == 0:\n            print \"Min # of volunteers found so far: %s\" % min_volunteers_needed\n            print \"Schedule: \"\n            show_schedule(current_best_schedule)\n            print \"\\n\"\n        else:\n            print \"Not able to find feasible solution\"\n            print \"Unassigned jobs: %s\" % unassigned_jobs\n            print \"Current best schedule: \"\n            show_schedule(volunteers)\n        sys.exit()\n\nprint \"Finished with optimal (%s) number of volunteers.\" % min_volunteers_needed\nshow_schedule(current_best_schedule)\n"
+{"patch":[[[[0,"ING "],[-1,"VIEW"],[0,"\n'''"]],2580,2580,12,8]],"time":1425852879347}
+{"patch":[[[[0,"ITIONING"],[-1," "],[0,"\n'''\nmin"]],2575,2575,17,16]],"time":1425852877799}
+{"patch":[[[[0,"ITIO"],[-1,"NING"],[0,"\n'''"]],2575,2575,12,8]],"time":1425852877083}
+{"patch":[[[[0,"ARTI"],[-1,"TIO"],[0,"\n'''"]],2572,2572,11,8]],"time":1425852876286}
+{"patch":[[[[0,"AL P"],[-1,"ARTI"],[0,"\n'''"]],2568,2568,12,8]],"time":1425852875531}
+{"patch":[[[[0,"TERV"],[-1,"AL P"],[0,"\n'''"]],2564,2564,12,8]],"time":1425852874768}
+{"patch":[[[[0,"OM INTER"],[-1,"V"],[0,"\n'''\nmin"]],2559,2559,17,16]],"time":1425852874038}
+{"patch":[[[[0,"OM I"],[-1,"NTER"],[0,"\n'''"]],2559,2559,12,8]],"time":1425852872518}
+{"patch":[[[[0,"ND FROM "],[-1,"I"],[0,"\n'''\nmin"]],2554,2554,17,16]],"time":1425852871770}
+{"patch":[[[[0," FRO"],[-1,"M "],[0,"\n'''"]],2556,2556,10,8]],"time":1425852869092}
+{"patch":[[[[0,"UND "],[-1,"FRO"],[0,"\n'''"]],2553,2553,11,8]],"time":1425852868368}
+{"patch":[[[[0,"ER BOUND"],[-1," "],[0,"\n'''\nmin"]],2548,2548,17,16]],"time":1425852867582}
+{"patch":[[[[0,"4))\n'''\n"],[-1,"\n"],[0,"# Here w"]],2878,2878,17,16]],"time":1425852865568}
+{"patch":[[[[0,"24))\n'''"],[1,"''"],[0,"\n# Here "]],2877,2877,16,18]],"time":1425852864622}
+{"patch":[[[[0,"))\n'''''"],[1,"'"],[0,"\n# Here "]],2879,2879,16,17]],"time":1425852863808}
+{"patch":[[[[0," 24))\n''"],[-1,"''''"],[0,"\n# Here "]],2876,2876,20,16]],"time":1425852862582}
+{"patch":[[[[0,"\", 24))\n"],[-1,"''"],[0,"\n# Here "]],2874,2874,18,16]],"time":1425852861870}
+{"patch":[[[[0,"OUND\n'''"],[1,"'''"],[0,"\nmin_vol"]],2552,2552,16,19]],"time":1425852859788}
+{"patch":[[[[0,"UND\n"],[-1,"''''''"],[0,"\nmin"]],2553,2553,14,8]],"time":1425852857227}
+{"patch":[[[[0,"R BOUND\n"],[-1,"\n"],[0,"min_volu"]],2549,2549,17,16]],"time":1425852856429}
+{"patch":[[[[0,"ed(jobs)"],[1,"\\"],[0,"\nfor job"]],2609,2609,16,17]],"time":1425800943424}
+{"patch":[[[[0,"ed(jobs)"],[-1,"\\"],[1,"\nopen_volunteers.append([])\nopen_volunteers[0].append(jobss[0])"],[0,"\nfor job"]],2609,2609,17,79]],"time":1425800942449}
+{"patch":[[[[0,"r(\"Bob\","],[-1," 24"],[0,"))\n\n# He"]],2927,2927,19,16]],"time":1425800361948}
+{"patch":[[[[0,"er(\"Bob\""],[-1,","],[0,"))\n\n# He"]],2926,2926,17,16]],"time":1425800361173}
+{"patch":[[[[0,"er(\"Bob\""],[1,", 2"],[0,"))\n\n# He"]],2926,2926,16,19]],"time":1425800348283}
+{"patch":[[[[0,"\"Bob\", 2"],[1,"4"],[0,"))\n\n# He"]],2929,2929,16,17]],"time":1425800347531}
+{"patch":[[[[0,"\"Bob\", 2"],[-1,"4"],[0,"))\n\n# He"]],2929,2929,17,16]],"time":1425800341326}
+{"patch":[[[[0,"(\"Bob\", "],[-1,"2"],[0,"))\n\n# He"]],2928,2928,17,16]],"time":1425800340351}
+{"patch":[[[[0,"r(\"Bob\","],[-1," "],[0,"))\n\n# He"]],2927,2927,17,16]],"time":1425800331288}
+{"patch":[[[[0,"er(\"Bob\""],[-1,","],[0,"))\n\n# He"]],2926,2926,17,16]],"time":1425800330358}
+{"patch":[[[[0,"eer(\"Bob"],[1,":"],[0,"\"))\n\n# H"]],2925,2925,16,17]],"time":1425800329638}
+{"patch":[[[[0,"(\"Bo"],[-1,"b:"],[0,"\"))\n"]],2928,2928,10,8]],"time":1425800328897}
+{"patch":[[[[0,"unteer(\""],[-1,"Bo"],[0,"\"))\n\n# H"]],2922,2922,18,16]],"time":1425800328027}
+{"patch":[[[[0,"eer("],[-1,"\"\""],[0,"))\n\n"]],2925,2925,10,8]],"time":1425800327237}
+{"patch":[[[[0,"ntee"],[-1,"r()"],[0,")\n\n#"]],2923,2923,11,8]],"time":1425800308177}
+{"patch":[[[[0,"S.Volunt"],[-1,"ee"],[0,")\n\n# Her"]],2917,2917,18,16]],"time":1425800307480}
+{"patch":[[[[0,"nd(SS.Vo"],[-1,"lunt"],[0,")\n\n# Her"]],2913,2913,20,16]],"time":1425800306723}
+{"patch":[[[[0,"pend(SS."],[-1,"Vo"],[0,")\n\n# Her"]],2911,2911,18,16]],"time":1425800305960}
+{"patch":[[[[0,"ppend(SS"],[-1,"."],[0,")\n\n# Her"]],2910,2910,17,16]],"time":1425800305168}
+{"patch":[[[[0,".append("],[-1,"SS"],[0,")\n\n# Her"]],2908,2908,18,16]],"time":1425800304455}
+{"patch":[[[[0,"s.append"],[-1,"()"],[0,"\n\n# Here"]],2907,2907,18,16]],"time":1425800303705}
+{"patch":[[[[0,"ers.appe"],[-1,"nd"],[0,"\n\n# Here"]],2905,2905,18,16]],"time":1425800301417}
+{"patch":[[[[0,"lunteers"],[-1,".appe"],[0,"\n\n# Here"]],2900,2900,21,16]],"time":1425800300673}
+{"patch":[[[[0,"n_volunt"],[-1,"eers"],[0,"\n\n# Here"]],2896,2896,20,16]],"time":1425800299953}
+{"patch":[[[[0,"  open_v"],[-1,"olunt"],[0,"\n\n# Here"]],2891,2891,21,16]],"time":1425800299242}
+{"patch":[[[[0,"    open"],[-1,"_v"],[0,"\n\n# Here"]],2889,2889,18,16]],"time":1425800298410}
+{"patch":[[[[0,"       o"],[-1,"pen"],[0,"\n\n# Here"]],2886,2886,19,16]],"time":1425800297694}
+{"patch":[[[[0,"        "],[-1,"o"],[0,"\n\n# Here"]],2885,2885,17,16]],"time":1425800296947}
+{"patch":[[[[0,"= 1\n    "],[-1,"    "],[0,"\n\n# Here"]],2881,2881,20,16]],"time":1425800295212}
+{"patch":[[[[0,"= 1\n    "],[1,"   "],[0,"\n\n# Here"]],2881,2881,16,19]],"time":1425800293295}
+{"patch":[[[[0,"ers += 1"],[-1,"\n       "],[0,"\n\n# Here"]],2876,2876,24,16]],"time":1425800292562}
+{"patch":[[[[0,"eers += "],[-1,"1"],[0,"\n\n# Here"]],2875,2875,17,16]],"time":1425800291654}
+{"patch":[[[[0,"ers "],[-1,"+= "],[0,"\n\n# "]],2876,2876,11,8]],"time":1425800290904}
+{"patch":[[[[0,"unteers "],[1,"="],[0,"\n\n# Here"]],2872,2872,16,17]],"time":1425800290192}
+{"patch":[[[[0,"unteers "],[-1,"="],[0,"\n\n# Here"]],2872,2872,17,16]],"time":1425800289414}
+{"patch":[[[[0,"lunteers"],[-1," "],[0,"\n\n# Here"]],2871,2871,17,16]],"time":1425800288652}
+{"patch":[[[[0,"olunteer"],[-1,"s"],[0,"\n\n# Here"]],2870,2870,17,16]],"time":1425800287941}
+{"patch":[[[[0," min_vol"],[-1,"unteer"],[0,"\n\n# Here"]],2864,2864,22,16]],"time":1425800287075}
+{"patch":[[[[0,"     min"],[-1,"_vol"],[0,"\n\n# Here"]],2860,2860,20,16]],"time":1425800286350}
+{"patch":[[[[0,"       m"],[-1,"in"],[0,"\n\n# Here"]],2858,2858,18,16]],"time":1425800285636}
+{"patch":[[[[0,"        "],[-1,"m"],[0,"\n\n# Here"]],2857,2857,17,16]],"time":1425800284889}
+{"patch":[[[[0," filled:"],[-1,"\n        "],[0,"\n\n# Here"]],2848,2848,25,16]],"time":1425800279638}
+{"patch":[[[[0,"t filled"],[-1,":"],[0,"\n\n# Here"]],2847,2847,17,16]],"time":1425800278654}
+{"patch":[[[[0,"if not f"],[-1,"illed"],[0,"\n\n# Here"]],2842,2842,21,16]],"time":1425800276693}
+{"patch":[[[[0,"if n"],[-1,"ot f"],[0,"\n\n# "]],2842,2842,12,8]],"time":1425800275972}
+{"patch":[[[[0,"\n    if "],[-1,"n"],[0,"\n\n# Here"]],2837,2837,17,16]],"time":1425800275171}
+{"patch":[[[[0,"   filled = "],[-1,"True"],[0,"\n    if \n\n# "]],2821,2821,28,24]],"time":1425800271791}
+{"patch":[[[[0," filled "],[-1,"= "],[0,"\n    if "]],2823,2823,18,16]],"time":1425800270348}
+{"patch":[[[[0," fil"],[-1,"led "],[0,"\n   "]],2823,2823,12,8]],"time":1425800269553}
+{"patch":[[[[0,"       f"],[-1,"il"],[0,"\n    if "]],2817,2817,18,16]],"time":1425800268839}
+{"patch":[[[[0,"        "],[-1,"f"],[0,"\n    if "]],2816,2816,17,16]],"time":1425800268048}
+{"patch":[[[[0,"        "],[1,"brea"],[0,"\n    if "]],2816,2816,16,20]],"time":1425800266809}
+{"patch":[[[[0,"    brea"],[1,"k"],[0,"\n    if "]],2820,2820,16,17]],"time":1425800265992}
+{"patch":[[[[0,"ak\n    i"],[-1,"f "],[0,"\n\n# Here"]],2827,2827,18,16]],"time":1425800263207}
+{"patch":[[[[0,"eak\n    "],[-1,"i"],[0,"\n\n# Here"]],2826,2826,17,16]],"time":1425800262424}
+{"patch":[[[[0,"eak\n    "],[1,"f"],[0,"\n\n# Here"]],2826,2826,16,17]],"time":1425800257103}
+{"patch":[[[[0,"eak\n    "],[-1,"f"],[0,"\n\n# Here"]],2826,2826,17,16]],"time":1425800256300}
+{"patch":[[[[0,"eak\n    "],[1," "],[0,"\n\n# Here"]],2826,2826,16,17]],"time":1425800252191}
+{"patch":[[[[0,"ak\n     "],[1,"  "],[0,"\n\n# Here"]],2827,2827,16,18]],"time":1425800251256}
+{"patch":[[[[0,"\n       "],[1,"  "],[0,"\n\n# Here"]],2829,2829,16,18]],"time":1425800250470}
+{"patch":[[[[0,"        "],[1," "],[0,"\n\n# Here"]],2831,2831,16,17]],"time":1425800249538}
+{"patch":[[[[0,"        "],[1,"  "],[0,"\n\n# Here"]],2832,2832,16,18]],"time":1425800248817}
+{"patch":[[[[0,"   break"],[-1,"\n            "],[0,"\n\n# Here"]],2821,2821,29,16]],"time":1425800248021}
+{"patch":[[[[0,"       b"],[-1,"reak"],[0,"\n\n# Here"]],2817,2817,20,16]],"time":1425800247134}
+{"patch":[[[[0,"        "],[-1,"b"],[0,"\n\n# Here"]],2816,2816,17,16]],"time":1425800246342}
+{"patch":[[[[0,"job(job)"],[-1,"\n            "],[0,"\n\n# Here"]],2803,2803,29,16]],"time":1425800244222}
+{"patch":[[[[0,"add_job("],[-1,"job"],[0,")\n\n# Her"]],2799,2799,19,16]],"time":1425800242432}
+{"patch":[[[[0,"add_job("],[1,"b"],[0,")\n\n# Her"]],2799,2799,16,17]],"time":1425800241448}
+{"patch":[[[[0,"_job"],[-1,"(b)"],[0,"\n\n# "]],2802,2802,11,8]],"time":1425800240647}
+{"patch":[[[[0,"eer.add_"],[-1,"job"],[0,"\n\n# Here"]],2795,2795,19,16]],"time":1425800239940}
+{"patch":[[[[0,"teer.add"],[-1,"_"],[0,"\n\n# Here"]],2794,2794,17,16]],"time":1425800239182}
+{"patch":[[[[0,"lunteer."],[-1,"add"],[0,"\n\n# Here"]],2791,2791,19,16]],"time":1425800237843}
+{"patch":[[[[0,"   volun"],[-1,"teer."],[0,"\n\n# Here"]],2786,2786,21,16]],"time":1425800237072}
+{"patch":[[[[0,"       v"],[-1,"olun"],[0,"\n\n# Here"]],2782,2782,20,16]],"time":1425800236366}
+{"patch":[[[[0,"        "],[-1,"v"],[0,"\n\n# Here"]],2781,2781,17,16]],"time":1425800235579}
+{"patch":[[[[0,"ob(job):"],[-1,"\n            "],[0,"\n\n# Here"]],2768,2768,29,16]],"time":1425800233567}
+{"patch":[[[[0,"job(job)"],[-1,":"],[0,"\n\n# Here"]],2767,2767,17,16]],"time":1425800200388}
+{"patch":[[[[0,"ake_job("],[-1,"job"],[0,")\n\n# Her"]],2763,2763,19,16]],"time":1425800195495}
+{"patch":[[[[0,"e_jo"],[-1,"b()"],[0,"\n\n# "]],2765,2765,11,8]],"time":1425800193951}
+{"patch":[[[[0,"can_take"],[-1,"_jo"],[0,"\n\n# Here"]],2758,2758,19,16]],"time":1425800193240}
+{"patch":[[[[0,"teer.can"],[-1,"_take"],[0,"\n\n# Here"]],2753,2753,21,16]],"time":1425800191702}
+{"patch":[[[[0,"lunteer."],[-1,"can"],[0,"\n\n# Here"]],2750,2750,19,16]],"time":1425800190991}
+{"patch":[[[[0,"olunteer"],[-1,"."],[0,"\n\n# Here"]],2749,2749,17,16]],"time":1425800190198}
+{"patch":[[[[0,"olunteer"],[1," "],[0,"\n\n# Here"]],2749,2749,16,17]],"time":1425800171627}
+{"patch":[[[[0,"olunteer"],[-1," "],[0,"\n\n# Here"]],2749,2749,17,16]],"time":1425800170759}
+{"patch":[[[[0,"or volunteer"],[1,"s"],[0," in open_vol"]],2704,2704,24,25]],"time":1425800167988}
+{"patch":[[[[0,"f volunt"],[-1,"eer"],[0,"\n\n# Here"]],2747,2747,19,16]],"time":1425800166579}
+{"patch":[[[[0,"    if v"],[-1,"olunt"],[0,"\n\n# Here"]],2742,2742,21,16]],"time":1425800165800}
+{"patch":[[[[0,"    if v"],[1,"v"],[0,"\n\n# Here"]],2742,2742,16,17]],"time":1425800163561}
+{"patch":[[[[0," if "],[-1,"vv"],[0,"\n\n# "]],2745,2745,10,8]],"time":1425800162788}
+{"patch":[[[[0,"       i"],[-1,"f "],[0,"\n\n# Here"]],2739,2739,18,16]],"time":1425800162128}
+{"patch":[[[[0,"        "],[-1,"i"],[0,"\n\n# Here"]],2738,2738,17,16]],"time":1425800161285}
+{"patch":[[[[0,"unteers:"],[-1,"\n        "],[0,"\n\n# Here"]],2729,2729,25,16]],"time":1425799956282}
+{"patch":[[[[0,"lunteers"],[-1,":"],[0,"\n\n# Here"]],2728,2728,17,16]],"time":1425799955311}
+{"patch":[[[[0,"voluntee"],[-1,"rs"],[0,"\n\n# Here"]],2726,2726,18,16]],"time":1425799952347}
+{"patch":[[[[0,"open_vol"],[-1,"untee"],[0,"\n\n# Here"]],2721,2721,21,16]],"time":1425799951566}
+{"patch":[[[[0," in open"],[-1,"_vol"],[0,"\n\n# Here"]],2717,2717,20,16]],"time":1425799950842}
+{"patch":[[[[0,"ers in o"],[-1,"pen"],[0,"\n\n# Here"]],2714,2714,19,16]],"time":1425799949346}
+{"patch":[[[[0,"eers in "],[-1,"o"],[0,"\n\n# Here"]],2713,2713,17,16]],"time":1425799948590}
+{"patch":[[[[0,"unteers "],[-1,"in "],[0,"\n\n# Here"]],2710,2710,19,16]],"time":1425799947838}
+{"patch":[[[[0,"lunteers"],[-1," "],[0,"\n\n# Here"]],2709,2709,17,16]],"time":1425799947087}
+{"patch":[[[[0,"or volun"],[-1,"teers"],[0,"\n\n# Here"]],2704,2704,21,16]],"time":1425799945541}
+{"patch":[[[[0,"   for v"],[-1,"olun"],[0,"\n\n# Here"]],2700,2700,20,16]],"time":1425799944830}
+{"patch":[[[[0,"    for "],[-1,"v"],[0,"\n\n# Here"]],2699,2699,17,16]],"time":1425799944047}
+{"patch":[[[[0,"s:\n    f"],[-1,"or "],[0,"\n\n# Here"]],2696,2696,19,16]],"time":1425799942601}
+{"patch":[[[[0,"ss:\n    "],[-1,"f"],[0,"\n\n# Here"]],2695,2695,17,16]],"time":1425799941834}
+{"patch":[[[[0,"ss:\n    "],[1,"if "],[0,"\n\n# Here"]],2695,2695,16,19]],"time":1425799939450}
+{"patch":[[[[0,"\n    if "],[1,"job.conflicts_with()"],[0,"\n\n# Here"]],2698,2698,16,36]],"time":1425799938699}
+{"patch":[[[[0,"nd(jobss"],[-1,"[0]"],[0,")\nfor jo"]],2668,2668,19,16]],"time":1425799906187}
+{"patch":[[[[0,"pend(job"],[-1,"ss"],[0,")\nfor jo"]],2666,2666,18,16]],"time":1425799905400}
+{"patch":[[[[0,"append(j"],[-1,"ob"],[0,")\nfor jo"]],2664,2664,18,16]],"time":1425799904438}
+{"patch":[[[[0,".append("],[-1,"j"],[0,")\nfor jo"]],2663,2663,17,16]],"time":1425799903648}
+{"patch":[[[[0,"].append"],[-1,"()"],[0,"\nfor job"]],2662,2662,18,16]],"time":1425799900947}
+{"patch":[[[[0,"s[0].app"],[-1,"end"],[0,"\nfor job"]],2659,2659,19,16]],"time":1425799900200}
+{"patch":[[[[0,"eers[0]."],[-1,"app"],[0,"\nfor job"]],2656,2656,19,16]],"time":1425799899448}
+{"patch":[[[[0,"teers[0]"],[-1,"."],[0,"\nfor job"]],2655,2655,17,16]],"time":1425799898659}
+{"patch":[[[[0,"lunteers"],[-1,"[0]"],[0,"\nfor job"]],2652,2652,19,16]],"time":1425799897943}
+{"patch":[[[[0,"lunteers"],[1,"."],[0,"\nfor job"]],2652,2652,16,17]],"time":1425799897149}
+{"patch":[[[[0,"lunteers"],[-1,"."],[0,"\nfor job"]],2652,2652,17,16]],"time":1425799896206}
+{"patch":[[[[0,"olunteer"],[-1,"s"],[0,"\nfor job"]],2651,2651,17,16]],"time":1425799895379}
+{"patch":[[[[0,"open_vol"],[-1,"unteer"],[0,"\nfor job"]],2645,2645,22,16]],"time":1425799894657}
+{"patch":[[[[0,"])\nopen_"],[-1,"vol"],[0,"\nfor job"]],2642,2642,19,16]],"time":1425799893943}
+{"patch":[[[[0,"[])\nopen"],[-1,"_"],[0,"\nfor job"]],2641,2641,17,16]],"time":1425799893191}
+{"patch":[[[[0,"([])\nope"],[-1,"n"],[0,"\nfor job"]],2640,2640,17,16]],"time":1425799892239}
+{"patch":[[[[0,"end([])\n"],[-1,"ope"],[0,"\nfor job"]],2637,2637,19,16]],"time":1425799891299}
+{"patch":[[[[0,"end([])\n"],[-1,"\n"],[0,"for job "]],2637,2637,17,16]],"time":1425799889085}
+{"patch":[[[[0,".append("],[-1,"[]"],[0,")\nfor jo"]],2633,2633,18,16]],"time":1425799881254}
+{"patch":[[[[0,"s.append"],[-1,"()"],[0,"\nfor job"]],2632,2632,18,16]],"time":1425799790553}
+{"patch":[[[[0,"eers.app"],[-1,"end"],[0,"\nfor job"]],2629,2629,19,16]],"time":1425799789797}
+{"patch":[[[[0,"unteers."],[-1,"app"],[0,"\nfor job"]],2626,2626,19,16]],"time":1425799789085}
+{"patch":[[[[0,"lunteers"],[-1,"."],[0,"\nfor job"]],2625,2625,17,16]],"time":1425799788343}
+{"patch":[[[[0,"olunteer"],[-1,"s"],[0,"\nfor job"]],2624,2624,17,16]],"time":1425799786019}
+{"patch":[[[[0,"en_volun"],[-1,"teer"],[0,"\nfor job"]],2620,2620,20,16]],"time":1425799785291}
+{"patch":[[[[0,")\nopen_v"],[-1,"olun"],[0,"\nfor job"]],2616,2616,20,16]],"time":1425799784579}
+{"patch":[[[[0,"s)\nopen_"],[-1,"v"],[0,"\nfor job"]],2615,2615,17,16]],"time":1425799783788}
+{"patch":[[[[0,"bs)\nopen"],[-1,"_"],[0,"\nfor job"]],2614,2614,17,16]],"time":1425799781971}
+{"patch":[[[[0,"(jobs)\no"],[-1,"pen"],[0,"\nfor job"]],2611,2611,19,16]],"time":1425799781271}
+{"patch":[[[[0,"d(jobs)\n"],[-1,"o"],[0,"\nfor job"]],2610,2610,17,16]],"time":1425799780469}
+{"patch":[[[[0,"d(jobs)\n"],[-1,"\n"],[0,"for job "]],2610,2610,17,16]],"time":1425799779014}
+{"patch":[[[[0,"cts_with"],[-1,"()"],[0,"\n\n# Here"]],2653,2653,18,16]],"time":1425799766068}
+{"patch":[[[[0,"nflicts_"],[-1,"with"],[0,"\n\n# Here"]],2649,2649,20,16]],"time":1425799765378}
+{"patch":[[[[0,"onflicts"],[-1,"_"],[0,"\n\n# Here"]],2648,2648,17,16]],"time":1425799764604}
+{"patch":[[[[0,".conflic"],[-1,"ts"],[0,"\n\n# Here"]],2646,2646,18,16]],"time":1425799758567}
+{"patch":[[[[0,"b.confli"],[-1,"c"],[0,"\n\n# Here"]],2645,2645,17,16]],"time":1425799757711}
+{"patch":[[[[0,".con"],[-1,"fli"],[0,"\n\n# "]],2646,2646,11,8]],"time":1425799756977}
+{"patch":[[[[0,"f job.co"],[-1,"n"],[1,"mp"],[0,"\n\n# Here"]],2641,2641,17,18]],"time":1425799756259}
+{"patch":[[[[0,"job.comp"],[1,"a"],[0,"\n\n# Here"]],2643,2643,16,17]],"time":1425799755527}
+{"patch":[[[[0,"ob.c"],[-1,"ompa"],[0,"\n\n# "]],2644,2644,12,8]],"time":1425799751872}
+{"patch":[[[[0," if job."],[-1,"c"],[0,"\n\n# Here"]],2639,2639,17,16]],"time":1425799751184}
+{"patch":[[[[0,"  if job"],[-1,"."],[0,"\n\n# Here"]],2638,2638,17,16]],"time":1425799750368}
+{"patch":[[[[0,"    if j"],[-1,"ob"],[0,"\n\n# Here"]],2636,2636,18,16]],"time":1425799747562}
+{"patch":[[[[0,"\n    if "],[-1,"j"],[0,"\n\n# Here"]],2635,2635,17,16]],"time":1425799746806}
+{"patch":[[[[0,"s:\n    i"],[-1,"f "],[0,"\n\n# Here"]],2633,2633,18,16]],"time":1425799741955}
+{"patch":[[[[0,"ss:\n    "],[-1,"i"],[0,"\n\n# Here"]],2632,2632,17,16]],"time":1425799741212}
+{"patch":[[[[0," in jobs"],[-1,"s"],[0,":\n    \n\n"]],2625,2625,17,16]],"time":1425799611776}
+{"patch":[[[[0,"rted(job"],[-1,"s"],[0,")\nfor jo"]],2607,2607,17,16]],"time":1425799610355}
+{"patch":[[[[0," sorted("],[-1,"job"],[0,")\nfor jo"]],2604,2604,19,16]],"time":1425799609423}
+{"patch":[[[[0,"sort"],[-1,"ed()"],[0,"\nfor"]],2605,2605,12,8]],"time":1425799608666}
+{"patch":[[[[0,"obss = s"],[-1,"ort"],[0,"\nfor job"]],2598,2598,19,16]],"time":1425799607870}
+{"patch":[[[[0,"]\njobss "],[-1,"= s"],[0,"\nfor job"]],2595,2595,19,16]],"time":1425799607132}
+{"patch":[[[[0," []\njobs"],[-1,"s "],[0,"\nfor job"]],2593,2593,18,16]],"time":1425799606457}
+{"patch":[[[[0,"= []\njob"],[-1,"s"],[0,"\nfor job"]],2592,2592,17,16]],"time":1425799605538}
+{"patch":[[[[0,"= []\njob"],[1,"s "],[0,"\nfor job"]],2592,2592,16,18]],"time":1425799604602}
+{"patch":[[[[0,"s = []\nj"],[-1,"obs "],[0,"\nfor job"]],2590,2590,20,16]],"time":1425799603064}
+{"patch":[[[[0,"rs = []\n"],[-1,"j"],[0,"\nfor job"]],2589,2589,17,16]],"time":1425799602355}
+{"patch":[[[[0,"rs = []\n"],[-1,"\n"],[0,"for job "]],2589,2589,17,16]],"time":1425799601587}
+{"patch":[[[[0,"nteers ="],[-1," []"],[0,"\nfor job"]],2585,2585,19,16]],"time":1425799549839}
+{"patch":[[[[0,"lunteers"],[-1," ="],[0,"\nfor job"]],2583,2583,18,16]],"time":1425799549042}
+{"patch":[[[[0,"n_volunt"],[-1,"eers"],[0,"\nfor job"]],2579,2579,20,16]],"time":1425799548335}
+{"patch":[[[[0,"0\nopen_v"],[-1,"olunt"],[0,"\nfor job"]],2574,2574,21,16]],"time":1425799547512}
+{"patch":[[[[0,"= 0\nopen"],[-1,"_v"],[0,"\nfor job"]],2572,2572,18,16]],"time":1425799546786}
+{"patch":[[[[0,"rs = 0\no"],[-1,"pen"],[0,"\nfor job"]],2569,2569,19,16]],"time":1425799546071}
+{"patch":[[[[0,"ers = 0\n"],[-1,"o"],[0,"\nfor job"]],2568,2568,17,16]],"time":1425799545280}
+{"patch":[[[[0,"ers = 0\n"],[-1,"\n"],[0,"for job "]],2568,2568,17,16]],"time":1425799538889}
+{"patch":[[[[0,"unteers "],[-1,"= 0"],[0,"\nfor job"]],2564,2564,19,16]],"time":1425799518067}
+{"patch":[[[[0,"lunteers"],[-1," "],[0,"\nfor job"]],2563,2563,17,16]],"time":1425799517335}
+{"patch":[[[[0,"_volunte"],[-1,"ers"],[0,"\nfor job"]],2560,2560,19,16]],"time":1425799515204}
+{"patch":[[[[0,"\nmin_vol"],[-1,"unte"],[0,"\nfor job"]],2556,2556,20,16]],"time":1425799514420}
+{"patch":[[[[0,"UND\nmin_"],[-1,"vol"],[0,"\nfor job"]],2553,2553,19,16]],"time":1425799513711}
+{"patch":[[[[0,"OUND\nmin"],[-1,"_"],[0,"\nfor job"]],2552,2552,17,16]],"time":1425799512911}
+{"patch":[[[[0," BOUND\nm"],[-1,"in"],[0,"\nfor job"]],2550,2550,18,16]],"time":1425799510931}
+{"patch":[[[[0,"R BOUND\n"],[-1,"m"],[0,"\nfor job"]],2549,2549,17,16]],"time":1425799510167}
+{"patch":[[[[0,"R BOUND\n"],[-1,"\n"],[0,"for job "]],2549,2549,17,16]],"time":1425799508045}
+{"patch":[[[[0,"bs:\n    "],[1,"if"],[0,"\n\n# Here"]],2570,2570,16,18]],"time":1425799496439}
+{"patch":[[[[0,":\n    if"],[1," "],[0,"\n\n# Here"]],2572,2572,16,17]],"time":1425799495650}
+{"patch":[[[[0,"\n    if "],[1,"jo"],[0,"\n\n# Here"]],2573,2573,16,18]],"time":1425799398091}
+{"patch":[[[[0,"   if jo"],[1,"b"],[0,"\n\n# Here"]],2575,2575,16,17]],"time":1425799397339}
+{"patch":[[[[0,"    if j"],[-1,"ob"],[0,"\n\n# Here"]],2574,2574,18,16]],"time":1425799393058}
+{"patch":[[[[0,"\n    if "],[-1,"j"],[0,"\n\n# Here"]],2573,2573,17,16]],"time":1425799392347}
+{"patch":[[[[0," job in "],[-1,"jobs"],[0,":\n    if"]],2560,2560,20,16]],"time":1425799390148}
+{"patch":[[[[0,"or j"],[-1,"ob in "],[0,":\n  "]],2558,2558,14,8]],"time":1425799389443}
+{"patch":[[[[0,"UND\nfor "],[-1,"j"],[1,"len(jobs)"],[0,":\n    if"]],2553,2553,17,25]],"time":1425799388649}
+{"patch":[[[[0,"):\n    i"],[-1,"f "],[0,"\n\n# Here"]],2569,2569,18,16]],"time":1425799364000}
+{"patch":[[[[0,"s):\n    "],[-1,"i"],[0,"\n\n# Here"]],2568,2568,17,16]],"time":1425799363015}
+{"patch":[[[[0,"n(jobs):"],[-1,"\n    "],[0,"\n\n# Here"]],2563,2563,21,16]],"time":1425799362209}
+{"patch":[[[[0,"en(jobs)"],[-1,":"],[0,"\n\n# Here"]],2562,2562,17,16]],"time":1425799361268}
+{"patch":[[[[0,"or len(j"],[-1,"obs"],[0,")\n\n# Her"]],2558,2558,19,16]],"time":1425799359987}
+{"patch":[[[[0,"for len("],[-1,"j"],[0,")\n\n# Her"]],2557,2557,17,16]],"time":1425799359208}
+{"patch":[[[[0,"\nfor len"],[-1,"()"],[0,"\n\n# Here"]],2556,2556,18,16]],"time":1425799358084}
+{"patch":[[[[0,"ND\nfor l"],[-1,"en"],[0,"\n\n# Here"]],2554,2554,18,16]],"time":1425799357379}
+{"patch":[[[[0,"UND\nfor "],[-1,"l"],[0,"\n\n# Here"]],2553,2553,17,16]],"time":1425799356582}
+{"patch":[[[[0," BOUND\nf"],[-1,"or "],[0,"\n\n# Here"]],2550,2550,19,16]],"time":1425799352675}
+{"patch":[[[[0,"R BOUND\n"],[-1,"f"],[0,"\n\n# Here"]],2549,2549,17,16]],"time":1425799351928}
+{"patch":[[[[0,"R BOUND\n"],[1,"fo"],[0,"\n\n# Here"]],2549,2549,16,18]],"time":1425799326495}
+{"patch":[[[[0,"BOUND\nfo"],[1,"r "],[0,"\n\n# Here"]],2551,2551,16,18]],"time":1425799325709}
+{"patch":[[[[0," BOUND\nf"],[-1,"or "],[0,"\n\n# Here"]],2550,2550,19,16]],"time":1425799324995}
+{"patch":[[[[0,"R BOUND\n"],[-1,"f"],[0,"\n\n# Here"]],2549,2549,17,16]],"time":1425799324206}
+{"patch":[[[[0,"ALCULATE"],[-1," "],[0,"EXACT LO"]],2530,2530,17,16]],"time":1425799264594}
+{"patch":[[[[0,"#CALCULA"],[-1,"TE"],[0,"EXACT LO"]],2528,2528,18,16]],"time":1425799263612}
+{"patch":[[[[0,"\n\n#CALCU"],[-1,"LA"],[0,"EXACT LO"]],2526,2526,18,16]],"time":1425799262848}
+{"patch":[[[[0,"\n\n#CALCU"],[1,"KATE"],[0,"EXACT LO"]],2526,2526,16,20]],"time":1425799262107}
+{"patch":[[[[0,"CALC"],[-1,"UKATE"],[0,"EXAC"]],2529,2529,13,8]],"time":1425799261347}
+{"patch":[[[[0,"d\n\n#CALC"],[1,"YK"],[0,"EXACT LO"]],2525,2525,16,18]],"time":1425799260557}
+{"patch":[[[[0,"\n\n#CALCY"],[-1,"K"],[0,"EXACT LO"]],2526,2526,17,16]],"time":1425799259607}
+{"patch":[[[[0,"CALC"],[-1,"Y"],[0,"EXAC"]],2529,2529,9,8]],"time":1425799258855}
+{"patch":[[[[0,"nd\n\n#CAL"],[-1,"C"],[0,"EXACT LO"]],2524,2524,17,16]],"time":1425799257951}
+{"patch":[[[[0,"\n\n#C"],[-1,"AL"],[0,"EXAC"]],2526,2526,10,8]],"time":1425799257158}
+{"patch":[[[[0,"bound\n\n#"],[-1,"C"],[0,"EXACT LO"]],2521,2521,17,16]],"time":1425799256412}
+{"patch":[[[[0," BOUND\n\n"],[-1,"\n"],[0,"# Here w"]],2540,2540,17,16]],"time":1425799246711}
+{"patch":[[[[0,"ER BOUND"],[1," S"],[0,"\n\n# Here"]],2538,2538,16,18]],"time":1425799245998}
+{"patch":[[[[0,"R BOUND "],[-1,"S"],[0,"\n\n# Here"]],2539,2539,17,16]],"time":1425799245247}
+{"patch":[[[[0,"WER BOUN"],[-1,"D"],[0," \n\n# Her"]],2537,2537,17,16]],"time":1425799244458}
+{"patch":[[[[0," BOU"],[-1,"N "],[0,"\n\n# "]],2540,2540,10,8]],"time":1425799243743}
+{"patch":[[[[0,"LOWER BO"],[-1,"U"],[1,"WN"],[0,"\n\n# Here"]],2535,2535,17,18]],"time":1425799242948}
+{"patch":[[[[0,"ER B"],[-1,"OWN"],[0,"\n\n# "]],2538,2538,11,8]],"time":1425799242201}
+{"patch":[[[[0,"T LO"],[-1,"WER B"],[0,"\n\n# "]],2533,2533,13,8]],"time":1425799241507}
+{"patch":[[[[0,"XACT"],[-1," LO"],[0,"\n\n# "]],2530,2530,11,8]],"time":1425799239964}
+{"patch":[[[[0,"\n\n#E"],[-1,"XACT"],[0,"\n\n# "]],2526,2526,12,8]],"time":1425799239246}
+{"patch":[[[[0,"bound\n\n#"],[-1,"E"],[0,"\n\n# Here"]],2521,2521,17,16]],"time":1425799238444}
+{"patch":[[[[0,"bound\n\n#"],[1," "],[0,"\n\n# Here"]],2521,2521,16,17]],"time":1425799236963}
+{"patch":[[[[0,"bound\n\n#"],[-1," "],[0,"\n\n# Here"]],2521,2521,17,16]],"time":1425799236189}
+{"patch":[[[[0,"_bound\n\n"],[-1,"#"],[0,"\n\n# Here"]],2520,2520,17,16]],"time":1425799235164}
+{"patch":[[[[0,"_bound\n\n"],[1,"c"],[0,"\n\n# Here"]],2520,2520,16,17]],"time":1425799234492}
+{"patch":[[[[0,"_bound\n\n"],[-1,"c"],[0,"\n\n# Here"]],2520,2520,17,16]],"time":1425799233668}
+{"patch":[[[[0,"_bound\n\n"],[-1,"\n\n"],[0,"# Here w"]],2520,2520,18,16]],"time":1425799231497}
 {"patch":[[[[0,"S = "],[-1,"15"],[1,"3"],[0,"\nNUM"]],2005,2005,10,9]],"time":1425300366702}
 {"patch":[[[[0,"JOBS = 3"],[1,"0"],[0,"\nNUM_OF_"]],2002,2002,16,17]],"time":1425300365953}
 {"patch":[[[[0,"S = "],[-1,"30"],[1,"1"],[0,"\nNUM"]],2005,2005,10,9]],"time":1425300334494}

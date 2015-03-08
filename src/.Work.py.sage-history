@@ -1,4 +1,142 @@
-"#!/usr/bin/python\n#\n# Work objects\n#\n\n\nclass Volunteer:\n    \"\"\"\n    Represents a single volunteer\n    String name - Name of the volunteer\n    Int capacity - How many hours this volunteer has available\n    Int current_capacity - How many available hours the volunteer current has\n    [Job] jobs - Current list of jobs assigned to volunteer\n    Boolean is_used - True if the volunteer's job list is not empty\n    \"\"\"\n    def __init__(self, a_name=\"\", a_capacity=4):\n        self.name = a_name\n        self.capacity = a_capacity\n        self.current_capacity = 0\n        self.jobs = []\n        self.is_used = False\n\n    def __cmp__(self, other):\n        return -cmp(self.current_capacity, other.current_capacity)\n\n    def __repr__(self):\n        return self.name\n\n    def add_job(self, a_job):\n        self.jobs.append(a_job)\n        if not a_job.name.startswith(\"UNAVAILABLE\"):\n            self.current_capacity += a_job.length\n            self.is_used = True\n\n    def can_take_job(self, a_job):\n        for current_job in self.jobs:\n            if a_job.conflicts_with(current_job):\n                return False\n\n        if (self.current_capacity + a_job.length) > self.capacity:\n            return False\n\n        return True\n\n    def print_schedule(self):\n        self.jobs = sorted(self.jobs, key=lambda x: x.start)\n        print \"Name: %s :: Hours %s\" % (self.name, self.capacity)\n        for j in self.jobs:\n            print \"\\t%s :: %s - %s\" % (j.name, j.start, j.end)\n\n    def clear_all(self):\n        self.jobs = filter(lambda x: x.name.startswith('UNAVAILABLE'), self.jobs)\n        self.current_capacity = 0\n        self.is_used = False\n\n\nclass JobShift:\n    \"\"\"\n    Represents a single shift\n    String name - name of the shift\n    Int start - shift's start time\n    Int end - shift's end time\n    [Int] interval - all hours covered by this shift\n    Int length - total number of hours for this shift\n    \"\"\"\n    def __init__(self, a_name, a_time_interval):\n        self.name = a_name\n        self.start, self.end  = a_time_interval\n        self.interval = set(range(self.start, self.end+1))\n        self.length = self.end - self.start\n\n    def __cmp__(self, other):\n        return -cmp(self.length, other.length)\n\n    def __repr__(self):\n        return \"%s :: %s - %s\" % (self.name, self.start, self.end)\n\n    def conflicts_with(self, another_job):\n        return len(self.interval & another_job.interval) > 1\n"
+"#!/usr/bin/python\n#\n# Work objects\n#\n\n\nclass Volunteer:\n    \"\"\"\n    Represents a single volunteer\n    String name - Name of the volunteer\n    Int capacity - How many hours this volunteer has available\n    Int current_capacity - How many available hours the volunteer current has\n    [Job] jobs - Current list of jobs assigned to volunteer\n    Boolean is_used - True if the volunteer's job list is not empty\n    [Int] job_id_count - keeps count of how many shifts of each job ID a volunteer has\n    \"\"\"\n    def __init__(self, a_name=\"\", a_capacity=4):\n        self.name = a_name\n        self.capacity = a_capacity\n        self.current_capacity = 0\n        self.jobs = []\n        self.is_used = False\n        self.job_id_count = [0 for _ in xrange(15)] # this is a bad thing to do :-(\n\n    def __cmp__(self, other):\n        return -cmp(self.current_capacity, other.current_capacity)\n\n    def __repr__(self):\n        return self.name\n\n    def add_job(self, a_job):\n        \"\"\"Adds a job and updates state only if job is not a pseudo job\"\"\"\n        self.jobs.append(a_job)\n        if not a_job.name.startswith(\"UNAVAILABLE\"):\n            self.current_capacity += a_job.length\n            self.job_id_count[a_job.id] += 1\n            self.is_used = True\n\n    def can_take_job(self, a_job):\n        \"\"\"Will return true as long as volunteer has space and no conflicting jobs\"\"\"\n        for current_job in self.jobs:\n            if a_job.conflicts_with(current_job):\n                return False\n\n        if (self.current_capacity + a_job.length) > self.capacity:\n            return False\n\n        return True\n\n    def get_weight(self):\n        return sum([x**2 for x in self.job_id_count])\n\n    def print_schedule(self):\n        self.jobs = sorted(self.jobs, key=lambda x: x.start)\n        print \"Name: %s :: Hours %s\" % (self.name, self.capacity)\n        for j in self.jobs:\n            print \"\\t%s :: %s - %s\" % (j.name, j.start, j.end)\n\n    def clear_all(self):\n        self.jobs = filter(lambda x: x.name.startswith('UNAVAILABLE'), self.jobs)\n        self.current_capacity = 0\n        self.is_used = False\n\n\nclass JobShift:\n    \"\"\"\n    Represents a single shift\n    String name - name of the shift\n    Int start - shift's start time\n    Int end - shift's end time\n    [Int] interval - all hours covered by this shift\n    Int length - total number of hours for this shift\n    Int id - represents this shifts job ID\n    \"\"\"\n    def __init__(self, a_name, a_time_interval, an_id):\n        self.name = a_name\n        self.start, self.end  = a_time_interval\n        self.interval = set(range(self.start, self.end+1))\n        self.length = self.end - self.start\n        self.id = an_id\n\n    \"\"\"Sort by start time then by job\n        An earlier start time in a different job would conflict with the shift before it.\n        Assume shift times include break and travel times so shifts are always directly back to back.\n        was (self.length, other.length) (self.start, other.start)\"\"\"\n    def __cmp__(self, other):\n        return -cmp(self.length, other.length)\n\n    def __repr__(self):\n        return \"%s :: %s - %s\" % (self.name, self.start, self.end)\n\n    def conflicts_with(self, another_job):\n        return len(self.interval & another_job.interval) > 1\n"
+{"patch":[[[[0,"        "],[-1,"w"],[0,"as (self"]],2908,2908,17,16]],"time":1425850741251}
+{"patch":[[[[0,"        "],[1,"("],[0,"as (self"]],2908,2908,16,17]],"time":1425850740036}
+{"patch":[[[[0,"       ("],[1,"W"],[0,"as (self"]],2909,2909,16,17]],"time":1425850739076}
+{"patch":[[[[0,"   (Was "],[-1,"("],[0,"self.len"]],2913,2913,17,16]],"time":1425850738110}
+{"patch":[[[[0,"length) "],[-1,"("],[0,"self.sta"]],2940,2940,17,16]],"time":1425850734375}
+{"patch":[[[[0,".length)"],[1,"s"],[0,"\n\n    de"]],3044,3044,16,17]],"time":1425850733044}
+{"patch":[[[[0,"length)s"],[1,"elf.start, other.start)"],[0,"\n\n    de"]],3045,3045,16,39]],"time":1425850732271}
+{"patch":[[[[0,"th) "],[-1,"self.start, other.start)"],[0,"\"\"\"\n"]],2944,2944,32,8]],"time":1425850730511}
+{"patch":[[[[0,".length)"],[-1," "],[0,"\"\"\"\n    "]],2939,2939,17,16]],"time":1425850729755}
+{"patch":[[[[0,"elf."],[-1,"length, other.length)self."],[0,"star"]],3002,3002,34,8]],"time":1425850723343}
+{"patch":[[[[0," = an_id"],[1,"\n        self.conflicts = []"],[0,"\n\n    \"\""]],2668,2668,16,44]],"time":1425799480962}
+{"patch":[[[[0,"cts = []"],[1,"''"],[0,"\n\n    \"\""]],2696,2696,16,18]],"time":1425799468244}
+{"patch":[[[[0,"= []"],[-1,"''"],[0,"\n\n  "]],2700,2700,10,8]],"time":1425799466349}
+{"patch":[[[[0,"licts = "],[-1,"[]"],[0,"\n\n    \"\""]],2694,2694,18,16]],"time":1425799465599}
+{"patch":[[[[0,"nflicts "],[-1,"= "],[0,"\n\n    \"\""]],2692,2692,18,16]],"time":1425799463131}
+{"patch":[[[[0,"onflicts"],[-1," "],[0,"\n\n    \"\""]],2691,2691,17,16]],"time":1425799462425}
+{"patch":[[[[0,"f.confli"],[1,"x"],[0,"c"],[-1,"ts"],[0,"\n\n    \"\""]],2688,2688,19,18]],"time":1425799461589}
+{"patch":[[[[0,"nfli"],[-1,"xc"],[1,"d"],[0,"\n\n  "]],2692,2692,10,9]],"time":1425799460830}
+{"patch":[[[[0,".con"],[-1,"flid"],[0,"\n\n  "]],2689,2689,12,8]],"time":1425799460131}
+{"patch":[[[[0," self.co"],[-1,"n"],[0,"\n\n    \"\""]],2684,2684,17,16]],"time":1425799459370}
+{"patch":[[[[0,"    self"],[-1,".co"],[0,"\n\n    \"\""]],2681,2681,19,16]],"time":1425799458575}
+{"patch":[[[[0,"       s"],[-1,"elf"],[0,"\n\n    \"\""]],2678,2678,19,16]],"time":1425799457840}
+{"patch":[[[[0,"        "],[-1,"s"],[0,"\n\n    \"\""]],2677,2677,17,16]],"time":1425799457115}
+{"patch":[[[[0," = an_id"],[-1,"\n        "],[0,"\n\n    \"\""]],2668,2668,25,16]],"time":1425799456227}
+{"patch":[[[[0,"her.leng"],[-1,"th"],[0,")\"\"\"\n   "]],2936,2936,18,16]],"time":1425799288190}
+{"patch":[[[[0,", other."],[-1,"leng"],[0,")\"\"\"\n   "]],2932,2932,20,16]],"time":1425799287427}
+{"patch":[[[[0,"gth, oth"],[-1,"er."],[0,")\"\"\"\n   "]],2929,2929,19,16]],"time":1425799286676}
+{"patch":[[[[0,"length, "],[-1,"oth"],[0,")\"\"\"\n   "]],2926,2926,19,16]],"time":1425799285893}
+{"patch":[[[[0,"f.length"],[-1,","],[0," )\"\"\"\n  "]],2924,2924,17,16]],"time":1425799285175}
+{"patch":[[[[0,".length "],[1,"v"],[0,")\"\"\"\n   "]],2925,2925,16,17]],"time":1425799284433}
+{"patch":[[[[0,"length v"],[1,"s "],[0,")\"\"\"\n   "]],2926,2926,16,18]],"time":1425799283631}
+{"patch":[[[[0,"gth "],[-1,"vs "],[0,")\"\"\""]],2929,2929,11,8]],"time":1425799282935}
+{"patch":[[[[0,"f.length"],[-1," "],[0,")\"\"\"\n   "]],2924,2924,17,16]],"time":1425799282128}
+{"patch":[[[[0,"s self.l"],[-1,"ength"],[0,")\"\"\"\n   "]],2919,2919,21,16]],"time":1425799281231}
+{"patch":[[[[0,"as self."],[-1,"l"],[0,")\"\"\"\n   "]],2918,2918,17,16]],"time":1425799280441}
+{"patch":[[[[0,"Was self"],[-1,"."],[0,")\"\"\"\n   "]],2917,2917,17,16]],"time":1425799277743}
+{"patch":[[[[0,"(Was sel"],[-1,"f"],[0,")\"\"\"\n   "]],2916,2916,17,16]],"time":1425799276209}
+{"patch":[[[[0,"   (Was "],[-1,"sel"],[0,")\"\"\"\n   "]],2913,2913,19,16]],"time":1425799275496}
+{"patch":[[[[0,"    (Was"],[-1," "],[0,")\"\"\"\n   "]],2912,2912,17,16]],"time":1425799274716}
+{"patch":[[[[0,"      (W"],[-1,"as"],[0,")\"\"\"\n   "]],2910,2910,18,16]],"time":1425799273980}
+{"patch":[[[[0,"       ("],[-1,"W"],[0,")\"\"\"\n   "]],2909,2909,17,16]],"time":1425799273259}
+{"patch":[[[[0,"    "],[-1,"()"],[0,"\"\"\"\n"]],2912,2912,10,8]],"time":1425799272458}
+{"patch":[[[[0,"to back."],[-1,"\n        "],[0,"\"\"\"\n    "]],2899,2899,25,16]],"time":1425799271219}
+{"patch":[[[[0," to back"],[-1,"."],[0,"\"\"\"\n    "]],2898,2898,17,16]],"time":1425799067571}
+{"patch":[[[[0,"back to "],[-1,"back"],[0,"\"\"\"\n    "]],2894,2894,20,16]],"time":1425799066619}
+{"patch":[[[[0,"y ba"],[-1,"ck to "],[0,"\"\"\"\n"]],2892,2892,14,8]],"time":1425799065847}
+{"patch":[[[[0,"irec"],[-1,"tly ba"],[0,"\"\"\"\n"]],2886,2886,14,8]],"time":1425799065085}
+{"patch":[[[[0,"ays "],[-1,"direc"],[0,"\"\"\"\n"]],2881,2881,13,8]],"time":1425799064299}
+{"patch":[[[[0,"re a"],[-1,"lways "],[0,"\"\"\"\n"]],2875,2875,14,8]],"time":1425799063596}
+{"patch":[[[[0,"fts "],[-1,"are a"],[0,"\"\"\"\n"]],2870,2870,13,8]],"time":1425799062802}
+{"patch":[[[[0,"mes so s"],[-1,"hifts "],[0,"\"\"\"\n    "]],2860,2860,22,16]],"time":1425799062049}
+{"patch":[[[[0,"imes"],[-1," so s"],[1,"."],[0,"\"\"\"\n"]],2859,2859,13,9]],"time":1425799061342}
+{"patch":[[[[0,"l times."],[1," "],[0,"\"\"\"\n    "]],2856,2856,16,17]],"time":1425799060545}
+{"patch":[[[[0,"l times."],[-1," "],[0,"\"\"\"\n    "]],2856,2856,17,16]],"time":1425799059540}
+{"patch":[[[[0," Assume "],[-1,"s"],[0,"hift tim"]],2813,2813,17,16]],"time":1425799058332}
+{"patch":[[[[0," Assume "],[1,"S"],[0,"hift tim"]],2813,2813,16,17]],"time":1425799057398}
+{"patch":[[[[0,"vel time"],[-1,"s."],[0,"\"\"\"\n    "]],2854,2854,18,16]],"time":1425799055363}
+{"patch":[[[[0,"d travel"],[-1," time"],[0,"\"\"\"\n    "]],2849,2849,21,16]],"time":1425799054574}
+{"patch":[[[[0,"nd t"],[-1,"ravel"],[0,"\"\"\"\n"]],2848,2848,13,8]],"time":1425799053832}
+{"patch":[[[[0,"eak "],[-1,"and t"],[0,"\"\"\"\n"]],2843,2843,13,8]],"time":1425799053103}
+{"patch":[[[[0,"de break"],[-1," "],[0,"\"\"\"\n    "]],2838,2838,17,16]],"time":1425799052308}
+{"patch":[[[[0,"de break"],[1," "],[0,"\"\"\"\n    "]],2838,2838,16,17]],"time":1425799050547}
+{"patch":[[[[0,"e br"],[-1,"eak "],[0,"\"\"\"\n"]],2839,2839,12,8]],"time":1425799049790}
+{"patch":[[[[0,"nclude b"],[-1,"r"],[1,"e"],[0,"\"\"\"\n    "]],2834,2834,17,17]],"time":1425799049034}
+{"patch":[[[[0,"nclu"],[-1,"de be"],[0,"\"\"\"\n"]],2834,2834,13,8]],"time":1425799048285}
+{"patch":[[[[0,"es inclu"],[1,"e"],[0,"\"\"\"\n    "]],2830,2830,16,17]],"time":1425799047497}
+{"patch":[[[[0,"es i"],[-1,"nclue"],[0,"\"\"\"\n"]],2830,2830,13,8]],"time":1425799046798}
+{"patch":[[[[0,"ift "],[-1,"times i"],[0,"\"\"\"\n"]],2823,2823,15,8]],"time":1425799045958}
+{"patch":[[[[0,"ume "],[-1,"Shift "],[0,"\"\"\"\n"]],2817,2817,14,8]],"time":1425799045238}
+{"patch":[[[[0,"  As"],[-1,"sume "],[0,"\"\"\"\n"]],2812,2812,13,8]],"time":1425799044537}
+{"patch":[[[[0,"    "],[-1,"As"],[0,"\"\"\"\n"]],2810,2810,10,8]],"time":1425799043781}
+{"patch":[[[[0,"fore it."],[-1,"\n        "],[1," As"],[0,"\"\"\"\n    "]],2797,2797,25,19]],"time":1425799043001}
+{"patch":[[[[0,"e it. As"],[1,"sume"],[0,"\"\"\"\n    "]],2800,2800,16,20]],"time":1425799042267}
+{"patch":[[[[0,". Assume"],[1," "],[0,"\"\"\"\n    "]],2804,2804,16,17]],"time":1425799041511}
+{"patch":[[[[0," Assume "],[1,"Shift ti"],[0,"\"\"\"\n    "]],2805,2805,16,24]],"time":1425799040735}
+{"patch":[[[[0," Shift t"],[-1,"i"],[0,"\"\"\"\n    "]],2812,2812,17,16]],"time":1425799040023}
+{"patch":[[[[0,"e Sh"],[-1,"ift t"],[0,"\"\"\"\n"]],2811,2811,13,8]],"time":1425799039267}
+{"patch":[[[[0," Assume "],[-1,"Sh"],[0,"\"\"\"\n    "]],2805,2805,18,16]],"time":1425799038483}
+{"patch":[[[[0,". As"],[-1,"sume "],[0,"\"\"\"\n"]],2804,2804,13,8]],"time":1425799036971}
+{"patch":[[[[0,"re it. A"],[-1,"s"],[0,"\"\"\"\n    "]],2799,2799,17,16]],"time":1425799036222}
+{"patch":[[[[0,"ore it. "],[-1,"A"],[0,"\"\"\"\n    "]],2798,2798,17,16]],"time":1425799035520}
+{"patch":[[[[0,"fore it."],[-1," "],[0,"\"\"\"\n    "]],2797,2797,17,16]],"time":1425799034723}
+{"patch":[[[[0,"fore it."],[1," "],[0,"\"\"\"\n    "]],2797,2797,16,17]],"time":1425799029583}
+{"patch":[[[[0,"fore it."],[-1," "],[0,"\"\"\"\n    "]],2797,2797,17,16]],"time":1425798998042}
+{"patch":[[[[0,"efore it"],[-1,"."],[0,"\"\"\"\n    "]],2796,2796,17,16]],"time":1425798997068}
+{"patch":[[[[0," bef"],[-1,"ore it"],[0,"\"\"\"\n"]],2794,2794,14,8]],"time":1425798996311}
+{"patch":[[[[0,"shif"],[-1,"t bef"],[0,"\"\"\"\n"]],2789,2789,13,8]],"time":1425798995555}
+{"patch":[[[[0,"ith the "],[-1,"shif"],[0,"\"\"\"\n    "]],2781,2781,20,16]],"time":1425798994770}
+{"patch":[[[[0,"ct w"],[-1,"ith the "],[0,"\"\"\"\n"]],2777,2777,16,8]],"time":1425798994087}
+{"patch":[[[[0,"onflict "],[-1,"w"],[0,"\"\"\"\n    "]],2772,2772,17,16]],"time":1425798993272}
+{"patch":[[[[0,"onfl"],[-1,"ict "],[0,"\"\"\"\n"]],2772,2772,12,8]],"time":1425798992522}
+{"patch":[[[[0," would c"],[-1,"onfl"],[0,"\"\"\"\n    "]],2764,2764,20,16]],"time":1425798991807}
+{"patch":[[[[0,"b wo"],[-1,"uld c"],[0,"\"\"\"\n"]],2763,2763,13,8]],"time":1425798991023}
+{"patch":[[[[0,"ent "],[-1,"job wo"],[0,"\"\"\"\n"]],2757,2757,14,8]],"time":1425798990298}
+{"patch":[[[[0,"diff"],[-1,"erent "],[0,"\"\"\"\n"]],2751,2751,14,8]],"time":1425798989547}
+{"patch":[[[[0,"n a "],[-1,"diff"],[0,"\"\"\"\n"]],2747,2747,12,8]],"time":1425798988758}
+{"patch":[[[[0,"ime "],[-1,"in a "],[0,"\"\"\"\n"]],2742,2742,13,8]],"time":1425798988052}
+{"patch":[[[[0,"start ti"],[-1,"me "],[0,"\"\"\"\n    "]],2735,2735,19,16]],"time":1425798986516}
+{"patch":[[[[0,"rlier st"],[-1,"art ti"],[0,"\"\"\"\n    "]],2729,2729,22,16]],"time":1425798985771}
+{"patch":[[[[0,"earlier "],[-1,"st"],[0,"\"\"\"\n    "]],2727,2727,18,16]],"time":1425798985039}
+{"patch":[[[[0,"earl"],[-1,"ier "],[0,"\"\"\"\n"]],2727,2727,12,8]],"time":1425798984243}
+{"patch":[[[[0," An "],[-1,"earl"],[0,"\"\"\"\n"]],2723,2723,12,8]],"time":1425798983557}
+{"patch":[[[[0,"       A"],[-1,"n "],[0,"\"\"\"\n    "]],2717,2717,18,16]],"time":1425798982733}
+{"patch":[[[[0,"    "],[-1,"    A"],[0,"\"\"\"\n"]],2716,2716,13,8]],"time":1425798981991}
+{"patch":[[[[0,"n by job"],[-1,"\n    "],[0,"\"\"\"\n    "]],2707,2707,21,16]],"time":1425798980370}
+{"patch":[[[[0,"hen by j"],[-1,"ob"],[0,"\"\"\"\n    "]],2705,2705,18,16]],"time":1425798939834}
+{"patch":[[[[0,"then by "],[-1,"j"],[0,"\"\"\"\n    "]],2704,2704,17,16]],"time":1425798939045}
+{"patch":[[[[0,"rt time "],[1,"nam "],[0,"then by "]],2696,2696,16,20]],"time":1425798935144}
+{"patch":[[[[0,"time nam"],[1,"e"],[0," then by"]],2699,2699,16,17]],"time":1425798934374}
+{"patch":[[[[0," by star"],[-1,"t time"],[0," name th"]],2689,2689,22,16]],"time":1425798932720}
+{"patch":[[[[0,"Sort by "],[-1,"star"],[0," name th"]],2685,2685,20,16]],"time":1425798931912}
+{"patch":[[[[0,"Sort by "],[-1," "],[0,"name the"]],2685,2685,17,16]],"time":1425798931193}
+{"patch":[[[[0," then by"],[-1," "],[0,"\"\"\"\n    "]],2697,2697,17,16]],"time":1425798927399}
+{"patch":[[[[0,"ame "],[-1,"then by"],[0,"\"\"\"\n"]],2694,2694,15,8]],"time":1425798926639}
+{"patch":[[[[0,"Sort by "],[-1,"name "],[0,"\"\"\"\n    "]],2685,2685,21,16]],"time":1425798925912}
+{"patch":[[[[0,"\"\"So"],[-1,"rt by "],[0,"\"\"\"\n"]],2683,2683,14,8]],"time":1425798925154}
+{"patch":[[[[0," \"\"\""],[-1,"So"],[0,"\"\"\"\n"]],2681,2681,10,8]],"time":1425798924392}
+{"patch":[[[[0,"    "],[-1,"\"\"\"\"\"\""],[0,"\n   "]],2678,2678,14,8]],"time":1425798923635}
+{"patch":[[[[0,"id\n\n    "],[1,"''"],[0,"\n    def"]],2674,2674,16,18]],"time":1425798922915}
+{"patch":[[[[0,"\n\n    ''"],[1,"'S'''"],[0,"\n    def"]],2676,2676,16,21]],"time":1425798921917}
+{"patch":[[[[0,"\n    '''"],[-1,"S"],[0,"'''\n    "]],2677,2677,17,16]],"time":1425798921117}
+{"patch":[[[[0,"\n\n    ''"],[-1,"''''"],[0,"\n    def"]],2676,2676,20,16]],"time":1425798920407}
+{"patch":[[[[0,"    "],[-1,"''"],[0,"\n   "]],2678,2678,10,8]],"time":1425798919616}
+{"patch":[[[[0," an_id\n\n"],[-1,"    "],[0,"\n    def"]],2670,2670,20,16]],"time":1425798917514}
+{"patch":[[[[0," an_id\n\n"],[1,"    "],[0,"\n    def"]],2670,2670,16,20]],"time":1425798916722}
+{"patch":[[[[0,"id\n\n    "],[1,"   "],[0,"\n    def"]],2674,2674,16,19]],"time":1425798915975}
+{"patch":[[[[0,"\n       "],[1," "],[0,"\n    def"]],2677,2677,16,17]],"time":1425798915262}
+{"patch":[[[[0,"id\n\n"],[-1,"        \n"],[0,"    "]],2674,2674,17,8]],"time":1425798914475}
+{"patch":[[[[0,"ther.sta"],[-1,"rt"],[0,")\n\n    d"]],2741,2741,18,16]],"time":1425798660056}
+{"patch":[[[[0,", other."],[-1,"sta"],[1,"l"],[0,")\n\n    d"]],2738,2738,19,17]],"time":1425798659261}
+{"patch":[[[[0," other.l"],[1,"engt"],[0,")\n\n    d"]],2739,2739,16,20]],"time":1425798658501}
+{"patch":[[[[0,"er.lengt"],[1,"h"],[0,")\n\n    d"]],2743,2743,16,17]],"time":1425798657745}
+{"patch":[[[[0,"elf.star"],[-1,"t"],[0,", other."]],2729,2729,17,16]],"time":1425798654385}
+{"patch":[[[[0,"mp(self."],[-1,"star"],[0,", other."]],2725,2725,20,16]],"time":1425798653681}
+{"patch":[[[[0,"mp(self."],[1,"l"],[0,", other."]],2725,2725,16,17]],"time":1425798652913}
+{"patch":[[[[0,"p(self.l"],[1,"engt"],[0,", other."]],2726,2726,16,20]],"time":1425798651938}
+{"patch":[[[[0,"lf.lengt"],[1,"h"],[0,", other."]],2730,2730,16,17]],"time":1425798651134}
+{"patch":[[[[0,"    "],[-1,"[Int] job_id_count - keeps count of how many shifts of each job ID a volunteer has\n    "],[0,""],[1,""],[0,"\"\"\"\n"]],407,407,95,8],[[[0,"alse"],[-1,"\n        self.job_id_count = [0 for _ in xrange(15)] # this is a bad thing to do :-("],[0,"\n\n  "]],607,607,92,8],[[[0,"b):\n"],[-1,"        \"\"\"Adds a job and updates state only if job is not a pseudo job\"\"\"\n"],[0,"    "]],787,787,83,8],[[[0,"gth\n"],[-1,"            self.job_id_count[a_job.id] += 1\n"],[0,"    "]],922,922,53,8],[[[0,"b):\n"],[-1,"        \"\"\"Will return true as long as volunteer has space and no conflicting jobs\"\"\"\n"],[0,"    "]],990,990,94,8],[[[0,"ue\n\n"],[-1,"    def get_weight(self):\n        return sum([x**2 for x in self.job_id_count])\n\n"],[0,"    "]],1222,1222,89,8],[[[0,"ift\n"],[-1,"    Int id - represents this shifts job ID\n"],[0,"    "]],1906,1906,51,8],[[[0,"rval"],[-1,", an_id"],[0,"):\n "]],1960,1960,15,8],[[[0,"tart"],[-1,"\n        self.id = an_id"],[0,""],[1,""],[0,"\n\n  "]],2140,2140,32,8]],"time":1425797876121}
 {"patch":[[[[0,"t empty\n    \"\"\"\n"],[1,"\n"],[0,"    def __init__"]],399,399,32,33]],"time":1425289621379}
 {"patch":[[[[0,"\n    \"\"\""],[1,"\n   "],[0,"\n\n    de"]],406,406,16,20]],"time":1425289619771}
 {"patch":[[[[0," \"\"\"\n   "],[1," "],[0,"\n\n    de"]],410,410,16,17]],"time":1425289619023}

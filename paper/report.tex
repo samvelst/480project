@@ -1,4 +1,4 @@
-\documentclass[12pt]{article}
+\documentclass[11pt]{article}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{graphicx}
 \usepackage[ruled,vlined,linesnumbered]{algorithm2e}
@@ -42,6 +42,10 @@
 \markright{}
 
 % Custom commands
+\newif\ifcomment
+\commentfalse % Show comments
+\newcommand{\comment}[1]{\ifcomment#1\fi}
+
 \newcommand{\sumleft}{\sum\limits_{i=1}^n i^3}
 \newcommand{\sumright}{\left(\sum\limits_{i=1}^n i \right)^2}
 \newcommand{\Z}{\mathbb{Z}}
@@ -67,6 +71,9 @@
 %End Formalities=========
 %========================
 \noindent\makebox[\linewidth]{\rule{\textwidth}{0.4pt}}
+%====================================================
+% Setting the Problem
+%====================================================
 \section{Problem Description}
 \begin{multicols}{2}
 Savoy Swing Club (SSC) is local non-profit organization that currently seeks to teach swing dancing to middle and high school kids in the greater Seattle area.
@@ -99,6 +106,15 @@ Even though we have volunteer schedules from real events from around the United 
 This poses a problem since we don't have each event's potential volunteer pool and we for many cases, we don't know what the initial schedule was.
 We are also missing data concerning the times that its volunteers would prefer to have worked or not worked.
 
+%====================================================
+% Data Collection & Assumptions
+% Game plan for this section (and subsections):
+% Description of the data we were able to collect.
+% How the data was collected
+%
+% ASSUMPTIONS AND CONSTRAINTS
+%
+%====================================================
 \section{Data Collection}
 We were able to make some observations about the structure of volunteer schedules by inspecting events in North America that ranged from ones with fewer than 100 people to the largest event in North America, Lindy Focus, that spanned 5 days and had over 1000 people to its name.
 \begin{itemize}\itemsep0pt
@@ -109,15 +125,6 @@ We were able to make some observations about the structure of volunteer schedule
 Through some surveys, we were able to learn that most people who volunteer at events really would like to know their schedules sooner and be able to guarantee that they won't be working certain times or certain shifts.
 Though we were already planning to implement this feature, it was good to know that it was actually desired in the community.
 
-From previous volunteer schedules and discussions with event planners, were able to make the following initial simplifying assumptions:
-\begin{itemize}\itemsep0pt
-\item All volunteers can do all jobs. This assumption is also equivalent to assuming that all volunteers are preassigned a job type.
-\item Each job consists of 1 - 12 shifts
-\item Each volunteer can get from shift to shift in very little time
-\item There are no breaks
-\item All shifts for the day can be contained in a 24 hour period
-\item Each volunteer has a maximum daily work time of 4 hours
-\end{itemize}
 We would like to note that each of these assumptions could also be valid conditions in a ``real'' problem.
 Most of the majority of volunteering jobs do not require any special skill to accomplish.
 Checking people off at registration and making sure non-paying people don't get into classes is not particularly difficult.
@@ -134,8 +141,46 @@ We assume disjoint days because no one we talked to were aware of any Lindy Hop 
 
 The last assumption is actually available as input in the final program but for our test purposes, we limited daily work time to 4 hours because that also happened to be the most any one person worked in a day at Lindy Focus.
 
-\section{The Approach}
-After considering chromatic numbers on graphs of jobs and integer programming on times slots, we settled on describing the problem using the bin packing problem.
+\subsection{Simplifying Assumptions}
+From previous volunteer schedules and discussions with event planners, were able to make the following initial simplifying assumptions:
+\begin{itemize}\itemsep0pt
+\item All volunteers can do all jobs. This assumption is also equivalent to assuming that all volunteers are preassigned a job type.
+\item Each job consists of 1 - 12 shifts
+\item Each volunteer can get from shift to shift in very little time
+\item There are no breaks
+\item All shifts for the day can be contained in a 24 hour period
+\item Each volunteer has a maximum daily work time of 4 hours
+\end{itemize}
+%====================================================
+% FORMULATION OF PROBLEM
+% Game plan for this section (and subsections):
+% Introduce Model Archetype
+% - Include common algorithms?
+% Describe differences between Archetype(s) and our problem
+% - (But NOT how we tackled them. Just like ``We had these different/extra constraints'')
+%
+% ADJUSTMENTS
+% Describe our specific procedure.
+% Explain how the (all?) various constraints are accounted for.
+% Describe compared approaches if there are more than one.
+%
+% CORRECTNESS
+% How close is our specific algorithm close to optimal?
+% Acceptable Error?
+% Proof?
+%====================================================
+\section{Formulation}
+Our problem can be approached multiple ways.
+Considering chromatic numbers on graphs of jobs, integer programming on time slots, and the bin packing problem are all viable approaches.
+Our problem is specifically a variation on the \textit{interval partitioning} problem which is a specific case of the bin packing problem.
+
+The general bin packing problem asks ``Given some numbers $a_1, \ldots, a_n$, what is the least number of bins with capacity $c$ that I need to store all numbers $a_i''$?''
+An immediate absolute minimum to this problem is $\big(\sum_{i = 1}^{n}\;a_i\big)/c$.
+
+The interval partitioning problem asks ``Given a set of tuples $\{(s_1, f_1), (s_2, f_2), \ldots, (s_n, f_n)\}$, what is the minimum number of containers needed for
+
+% BEGIN COMMENT OF OLD MATERIAL
+\comment{After considering chromatic numbers on graphs of jobs and integer programming on times slots, we settled on describing the problem using the bin packing problem.
 The bin packing problem states, "Given some numbers $a_1, \ldots, a_n$, what is the least number of bins with capacity $c$ that I need to store all numbers $a_i$?
 An obvious absolute minimum on this problem is $\big(\sum_{i = 1}^{n}\;a_i\big)/c$.
 That is, we need at least as much space as there is volume in the things we are fitting.
@@ -153,10 +198,11 @@ So for example, if we had a ridiculous shift of 8 hours, we would first look for
 Then, if that volunteer could work 2 more hours but our next largest shift is 4 hours, that second one will be given to a different volunteer if our volunteers are (hypothetically) capped at working 10 hours a day.
 This algorithm is guaranteed to be within $\frac{11}{9}$ of the optimal number number of volunteers for the shifts that we have to fill and runs in $O(n\log n)$ time.
 Additionally, based on Korf's analysis, BFD is on average, 94.8\% of the time.
-For our problem, this approximation is plenty accurate as well as when we consider the fact that the truly ``optimal'' algorithm could be suboptimal anyways when taking into account our other constraints.
+For our problem, this approximation is plenty accurate as well as when we consider the fact that the truly ``optimal'' algorithm could be suboptimal anyways when taking into account our other constraints.} % END COMMENT OF OLD MATERIAL
 
-
-\section{Implementation}
+\subsection{Adjustments}
+% BEGIN COMMENT OF OLD MATERIAL
+\comment{
 Our program takes the following as input from the event organizers:
 \begin{itemize}
 \item A list of volunteers each with their preferences and the jobs they can do.
@@ -171,62 +217,14 @@ Given a large pool of potential volunteers, we randomly pick sufficiently sized 
 One would think that this probably doesn't give a very good result but it turns out, based on the very lowest possible bound of the number of volunteers required to run the event, our algorithm usually finds an schedules with a factor of 2 volunteers.
 
 We encode the problem of volunteers having external time conflicts by pre-filling each volunteer's schedule with ``jobs'' that are labeled ``UNAVAILABLE''.
+} % END COMMENT OF OLD MATERIAL
+\subsection{Correctness}
 
 \section{Results}
 Based on our randomly generated data, our solution to the problem is typically off the optimal number of volunteers by no more than 2 volunteers.
 For example, if there are 40 man hours in a day to work and each volunteer can work no more than 5 hours, then we need at least 8 volunteers just to satisfy the man hours, not considering any potential conflicts.
 
-Here is a snippet of one of our solutions:\\
-\vspace{2mm}
-Estimated Lower Bound: 13\ldots
-Current min volunteers needed: 17\\
-Current min volunteers needed: 15\\
-Current min volunteers needed: 13\\
-Finished with optimal (13) number of volunteers.\\
-Name: Volunteer 57 :: Hours 6\\
-        UNAVAILABLE :: 0 - 13\\
-        Shift 4.1 :: 13 - 14\\
-        Shift 4.2 :: 14 - 15\\
-        Shift 3.2 :: 15 - 16\\
-        Shift 3.3 :: 16 - 17\\
-        Shift 3.4 :: 17 - 18\\
-        Shift 5.3 :: 18 - 19\\
-        UNAVAILABLE :: 19 - 24\\
-Name: Volunteer 6 :: Hours 6\\
-        UNAVAILABLE :: 0 - 15\\
-        Shift 4.3 :: 15 - 16\\
-        Shift 5.1 :: 16 - 17\\
-        Shift 5.2 :: 17 - 18\\
-        Shift 8.5 :: 18 - 19\\
-        Shift 5.4 :: 19 - 20\\
-        Shift 5.5 :: 20 - 21\\
-        UNAVAILABLE :: 21 - 24\\
-Name: Volunteer 58 :: Hours 6\\
-        UNAVAILABLE :: 0 - 9\\
-        Shift 7.3 :: 9 - 10\\
-        Shift 11.2 :: 10 - 11\\
-        Shift 6.4 :: 11 - 12\\
-        Shift 6.5 :: 12 - 13\\
-        Shift 6.6 :: 13 - 14\\
-        Shift 8.1 :: 14 - 15\\
-        UNAVAILABLE :: 15 - 24\\
-Name: Volunteer 29 :: Hours 5\\
-        UNAVAILABLE :: 0 - 10\\
-        Shift 2.1 :: 10 - 11\\
-        Shift 2.2 :: 11 - 12\\
-        Shift 2.3 :: 12 - 13\\
-        Shift 2.4 :: 13 - 14\\
-        Shift 3.1 :: 14 - 15\\
-        UNAVAILABLE :: 15 - 24\\
-Name: Volunteer 49 :: Hours 5\\
-        UNAVAILABLE :: 0 - 13\\
-        Shift 13.1 :: 13 - 14\\
-        Shift 10.1 :: 14 - 15\\
-        Shift 8.2 :: 15 - 16\\
-        Shift 8.3 :: 16 - 17\\
-        Shift 8.4 :: 17 - 18\\
-        UNAVAILABLE :: 18 - 24
-
+INSERT GRAPHICAL REPRESENTATION
 
 \section{Future Work}
 We have so far been unable to finish the program part of our problem though we have (in our opinion) reasonably solved the algorithmic problem of assigning volunteers to positions based on availability.
