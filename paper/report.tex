@@ -174,10 +174,18 @@ Our problem can be approached multiple ways.
 Considering chromatic numbers on graphs of jobs, integer programming on time slots, and the bin packing problem are all viable approaches.
 Our problem is specifically a variation on the \textit{interval partitioning} problem which is a specific case of the bin packing problem.
 
-The general bin packing problem asks ``Given some numbers $a_1, \ldots, a_n$, what is the least number of bins with capacity $c$ that I need to store all numbers $a_i''$?''
-An immediate absolute minimum to this problem is $\big(\sum_{i = 1}^{n}\;a_i\big)/c$.
+The general bin packing problem asks ``Given some numbers $a_1, \ldots, a_n$, what is the least number of bins with capacity $c$ needed to store all numbers $a_i$?''
+An immediate lower bound to this problem is $\big(\sum_{i = 1}^{n}\;a_i\big)/c$.
+% Describe some solutions?
 
-The interval partitioning problem asks ``Given a set of tuples $\{(s_1, f_1), (s_2, f_2), \ldots, (s_n, f_n)\}$, what is the minimum number of containers needed for
+The interval partitioning problem asks ``Given a set of intervals $\{(s_1, f_1), (s_2, f_2), \ldots, (s_n, f_n)\}$, what is the minimum number of containers to store all the intervals such that in each container, no interval overlaps with another.
+There is a common greedy algorithm for this problem that runs in $O(n\log n)$ [CITATION NEEDED].
+For this problem, the lower bound on number of containers needed is the largest number of overlapping intervals.
+% Expound on this solution.
+
+Unfortunately, the problem is only similar to both of these.
+We would like to partition intervals into pre-existing containers that have limitations on what can be stored in them.
+We would like to store all the work shifts in volunteers but certain shifts will not ``fit'' for reasons other than being too large.
 
 % BEGIN COMMENT OF OLD MATERIAL
 \comment{After considering chromatic numbers on graphs of jobs and integer programming on times slots, we settled on describing the problem using the bin packing problem.
@@ -201,6 +209,7 @@ Additionally, based on Korf's analysis, BFD is on average, 94.8\% of the time.
 For our problem, this approximation is plenty accurate as well as when we consider the fact that the truly ``optimal'' algorithm could be suboptimal anyways when taking into account our other constraints.} % END COMMENT OF OLD MATERIAL
 
 \subsection{Adjustments}
+
 % BEGIN COMMENT OF OLD MATERIAL
 \comment{
 Our program takes the following as input from the event organizers:
