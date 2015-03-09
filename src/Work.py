@@ -14,13 +14,14 @@ class Volunteer:
     Boolean is_used - True if the volunteer's job list is not empty
     [Int] job_id_count - keeps count of how many shifts of each job ID a volunteer has
     """
+
     def __init__(self, a_name="", a_capacity=4):
         self.name = a_name
         self.capacity = a_capacity
         self.current_capacity = 0
         self.jobs = []
         self.is_used = False
-        self.job_id_count = [0 for _ in xrange(15)] # this is a bad thing to do :-(
+        self.job_id_count = [0 for _ in xrange(15)]
 
     def __cmp__(self, other):
         return -cmp(self.current_capacity, other.current_capacity)
@@ -60,6 +61,7 @@ class Volunteer:
         self.jobs = filter(lambda x: x.name.startswith('UNAVAILABLE'), self.jobs)
         self.current_capacity = 0
         self.is_used = False
+        self.job_id_count = [0 for _ in xrange(15)]
 
 
 class JobShift:
