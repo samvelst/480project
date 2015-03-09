@@ -93,6 +93,21 @@ current_best_weight = 0
 min_volunteers_needed = NUM_OF_VOLUNTEERS
 realistic_lower_bound = max(overlapping_lower_bound, capacity_lower_bound)
 
+#CALCULATE EXACT LOWER BOUND FROM INTERVAL PARTITIONING VIEW
+'''
+min_volunteers = 0
+open_volunteers = []
+jobss = sorted(jobs)
+for job in jobss:
+    for volunteer in open_volunteers:
+        if volunteer.can_take_job(job):
+            volunteer.add_job(job)
+            filled = True
+    if not filled:
+        min_volunteers += 1
+        open_volunteers.append(SS.Volunteer("Bob", 24))
+'''
+
 # Here we start randomizing the volunteer set to get different solutions
 # we keep track of the smallest solution and store it
 # we can choose to terminate before the optimal sol is found

@@ -1,4 +1,792 @@
-"\\documentclass[12pt]{article}\n\\usepackage{amsmath,amssymb,amsthm}\n\\usepackage{graphicx}\n\\usepackage[ruled,vlined,linesnumbered]{algorithm2e}\n\\usepackage{multicol}\n\n\\usepackage{listings}\n\\usepackage{color}\n\n\\definecolor{dkgreen}{rgb}{0,0.6,0}\n\\definecolor{gray}{rgb}{0.5,0.5,0.5}\n\\definecolor{mauve}{rgb}{0.58,0,0.82}\n\n\\lstset{frame=tb,\n\tlanguage=Python,\n\taboveskip=3mm,\n\tbelowskip=3mm,\n\tshowstringspaces=false,\n\tcolumns=flexible,\n\tbasicstyle={\\small\\ttfamily},\n\tnumbers=none,\n\tnumberstyle=\\tiny\\color{gray},\n\tkeywordstyle=\\color{blue},\n\tcommentstyle=\\color{dkgreen},\n\tstringstyle=\\color{mauve},\n\tbreaklines=true,\n\tbreakatwhitespace=true,\n\ttabsize=3\n}\n\n\\addtolength{\\oddsidemargin}{-.875in}\n\\addtolength{\\evensidemargin}{-.875in}\n\\addtolength{\\textwidth}{1.75in}\n\n\\addtolength{\\topmargin}{-.875in}\n\\addtolength{\\textheight}{1.75in}\n\n\\title{Optimizing Volunteer Shifts for Dance Weekends}\n\\author{John Jeng, Samvel Stepanyan}\n\\date{January 22nd, 2015}\n\\pagestyle{myheadings}\n\\markright{}\n\n% Custom commands\n\\newcommand{\\sumleft}{\\sum\\limits_{i=1}^n i^3}\n\\newcommand{\\sumright}{\\left(\\sum\\limits_{i=1}^n i \\right)^2}\n\\newcommand{\\Z}{\\mathbb{Z}}\n\\newcommand{\\C}{\\mathbb{C}}\n\\newcommand{\\pem}{$ (\\pi, E) $~}\n\n\\newtheorem{PF}{Proof}\n\\theoremstyle{definition}\n\\newtheorem{Def}{Definition}\n\\newtheorem{Thm}{Theorem}\n\\newtheorem{lemma}{Lemma}\n\n\\begin{document}\n%Begin Formalities========\n%=========================\n\\maketitle\n\\begin{abstract}\n\tThe Savoy Swing Club (SSC) in Seattle, WA is a non-profit that organizes dance weekends for the general public and has outreach programs to middle schools and high schools in the greater Seattle area. All events require volunteers to run the event. Volunteer scheduling is usually done by hand, but becomes harder with larger events and does not take into account many variables that could be considered such as volunteer time preferences and minimize the number of volunteers used. Our objective was to provide a program which would take a pool of volunteers and set of shifts and jobs, and return a schedule of volunteers that optimized for work balance, number of volunteers, ``choas'', and shift preferences. We were able to create schedules that came within the absolute minimum number of volunteers by 1 or 2 volunteers. We consider these schedules better than the most optimal ones because cutting it as close as exact leads to disastrous problems.\n\\end{abstract}\n%\\newpage\n%\\tableofcontents\n%\\newpage\n%End Formalities=========\n%========================\n\\noindent\\makebox[\\linewidth]{\\rule{\\textwidth}{0.4pt}}\n\\section{Problem Description}\n\\begin{multicols}{2}\nSavoy Swing Club (SSC) is local non-profit organization that currently seeks to teach swing dancing to middle and high school kids in the greater Seattle area.\nThey are also heavily involved with 2 ``dance weekends'': Seattle Lindy Exchange (SLX) and Killerdiller Weekend (KDW). Our focus is on these ``full-featured'' dance events where there are classes, evening dances, performances, and competitions.\nAt each of these events, volunteers are required to make the weekend go smoothly.\n\nEach volunteer has different jobs they are able (or allowed) to perform and preferences for which hours they are volunteering.\nVolunteers are compensated based on the number of hours they work and the type of work.\nFor example, 8 hours of volunteering might mean “full pass” (access to all classes and evening dances) while fewer hours of volunteering might just mean a “dance pass” (only access to evening dances) or a “partial full pass” (eg. classes and evening dances on Saturday only).\nA technician however, might receive a full weekend pass and additional cash compensation for just 6 hours of work.\nWhile we could optimize on some sort of cost function under conditions similar to the examples above, SSC has determined that since developing the cost function itself would require analysis of its own right, it is sufficient to just reduce the number of volunteers necessary for any given event.\n\nThus our objective is to develop a program that will return a schedule that is in some sense ``optimal'' for both the volunteers and SSC.\nWe achieve this objective through the following means.\n\nWe will take into consideration the volunteers' time preferences and availability.\nThis is an improvement over the current system because typically, volunteers do not know exactly what hours they will be working until at most a few days before the event.\nThis means that volunteers must commit their entire weekends even though they may only be working 6 to 8 hours over 2 days.\nWhile at this point most volunteers relent to this fact, it is an improvement that we seek to provide.\n\nWe will create a schedule that is not too hectic and is easy for a supervisor to understand.\nFor example, though it might minimize the number of volunteers if Volunteer A does the cashier job in Ballroom B, then runs across the street to to sales, back to Ballroom B for another shift, and finally ends the day driving instructors home, SSC would like to have the simplified to having Volunteer A just do 3 shifts as a cashier in Ballroom B unless the trade off is warranted.\n\nFinally, we will create a program that is easy for an event planner to input work shift and volunteer data which will return our schedule.\n\n\\subsection{Specific Challenges}\nInitially we considered simplifying the problem with many assumptions and constraints that resulted in schedules that were very similar to current ones done by hand and left little to be optimized or improved.\n\nEven though we have volunteer schedules from real events from around the United States, all schedules are final products after last minute adjustments and sometimes shift swaps engineered by the volunteers themselves.\nThis poses a problem since we don't have each event's potential volunteer pool and we for many cases, we don't know what the initial schedule was.\nWe are also missing data concerning the times that its volunteers would prefer to have worked or not worked.\n\n\\section{Data Collection}\nWe were able to make some observations about the structure of volunteer schedules by inspecting events in North America that ranged from ones with fewer than 100 people to the largest event in North America, Lindy Focus, that spanned 5 days and had over 1000 people to its name.\n\\begin{itemize}\\itemsep0pt\n\\item All shifts were generally about an hour long.\n\\item For any volunteer, it was uncommon for them to work more than 4 hours in a day and extremely rare for them to work more than 6 in a day.\n\\end{itemize}\n\nThrough some surveys, we were able to learn that most people who volunteer at events really would like to know their schedules sooner and be able to guarantee that they won't be working certain times or certain shifts.\nThough we were already planning to implement this feature, it was good to know that it was actually desired in the community.\n\nFrom previous volunteer schedules and discussions with event planners, were able to make the following initial simplifying assumptions:\n\\begin{itemize}\\itemsep0pt\n\\item All volunteers can do all jobs. This assumption is also equivalent to assuming that all volunteers are preassigned a job type.\n\\item Each job consists of 1 - 12 shifts\n\\item Each volunteer can get from shift to shift in very little time\n\\item There are no breaks\n\\item All shifts for the day can be contained in a 24 hour period\n\\item Each volunteer has a maximum daily work time of 4 hours\n\\end{itemize}\nWe would like to note that each of these assumptions could also be valid conditions in a ``real'' problem.\nMost of the majority of volunteering jobs do not require any special skill to accomplish.\nChecking people off at registration and making sure non-paying people don't get into classes is not particularly difficult.\nOn the flip side, at large events such as Lindy Focus, many volunteers are screened before hand so they already have a predetermined role.\n\nHaving each Job consist of 1-12 shifts is reasonable since that is more than the number of shifts any job has at Lindy Focus and that is the largest event we want to consider.\n\nMost of these events are hosted in a single hotel so traveling from one room to the next takes less than 5 minutes.\nWe decided that factoring in this time would not be valuable and instead decided to make the program more likely to match a volunteer who is already matched to the first shift in a job to the second shift in that same job (assuming all requirements of that job are met).\nThe same is true for breaks.\nWe leave it to the organizers to determine breaks and whether or not individual shifts have, say, a 10 minute break at each end.\n\nWe assume disjoint days because no one we talked to were aware of any Lindy Hop event where there are activities between 5 am and 8 am.\n\nThe last assumption is actually available as input in the final program but for our test purposes, we limited daily work time to 4 hours because that also happened to be the most any one person worked in a day at Lindy Focus.\n\n\\section{The Approach}\nAfter considering chromatic numbers on graphs of jobs and integer programming on times slots, we settled on describing the problem using the bin packing problem.\nThe bin packing problem states, \"Given some numbers $a_1, \\ldots, a_n$, what is the least number of bins with capacity $c$ that I need to store all numbers $a_i$?\nAn obvious absolute minimum on this problem is $\\big(\\sum_{i = 1}^{n}\\;a_i\\big)/c$.\nThat is, we need at least as much space as there is volume in the things we are fitting.\nWe end up using this lower bound to measure how close we are to an ``optimal''.\nTranslating to our problem, volunteers are the ``bins'' and the ``items'' we fill them with are the shifts that we assign.\nIn general, the bin packing problem is NP-Hard, but in our case it is much easier to solve since we have a relatively small sized problem.\n\nThe difference to the traditional bin packing problem is that we have additional constraints on what sort of objects our ``bins'' can take.\nThis problem is NP hard but by Korf, we could find optimal solutions.\nHowever, implementing his algorithm proved to be too memory intensive for our problem since we have to store more than just permutations of integers.\nThus, we resort to a near optimal algorithm, the Best First Decreasing (BFD) algorithm.\nIt sorts the items in order of decreasing size and puts the elements into the fullest bin that can accommodate the item.\n\nSo for example, if we had a ridiculous shift of 8 hours, we would first look for a volunteer that could be scheduled for the shift.\nThen, if that volunteer could work 2 more hours but our next largest shift is 4 hours, that second one will be given to a different volunteer if our volunteers are (hypothetically) capped at working 10 hours a day.\nThis algorithm is guaranteed to be within $\\frac{11}{9}$ of the optimal number number of volunteers for the shifts that we have to fill and runs in $O(n\\log n)$ time.\nAdditionally, based on Korf's analysis, BFD is on average, 94.8\\% of the time.\nFor our problem, this approximation is plenty accurate as well as when we consider the fact that the truly ``optimal'' algorithm could be suboptimal anyways when taking into account our other constraints.\n\n\n\\section{Implementation}\nOur program takes the following as input from the event organizers:\n\\begin{itemize}\n\\item A list of volunteers each with their preferences and the jobs they can do.\n\\item A list of jobs and the shifts for the jobs.\n\\item The maximum number of hours a volunteer can work in a day.\n\\item The maximum and minimum number of hours a volunteer can work total for the event\n\\end{itemize}\nHowever, in script form, we allowed these inputs to be hardcoded in as constants.\nSavoy Swing Club does not have any upcoming events until September of this year so the priority is getting a good algorithm that makes favorable schedules.\n\nGiven a large pool of potential volunteers, we randomly pick sufficiently sized subsets of the volunteers and try to match them.\nOne would think that this probably doesn't give a very good result but it turns out, based on the very lowest possible bound of the number of volunteers required to run the event, our algorithm usually finds an schedules with a factor of 2 volunteers.\n\nWe encode the problem of volunteers having external time conflicts by pre-filling each volunteer's schedule with ``jobs'' that are labeled ``UNAVAILABLE''.\n\n\\section{Results}\nBased on our randomly generated data, our solution to the problem is typically off the optimal number of volunteers by no more than 2 volunteers.\nFor example, if there are 40 man hours in a day to work and each volunteer can work no more than 5 hours, then we need at least 8 volunteers just to satisfy the man hours, not considering any potential conflicts.\n\nHere is a snippet of one of our solutions:\\\\\n\\vspace{2mm}\nEstimated Lower Bound: 13\\ldots\nCurrent min volunteers needed: 17\\\\\nCurrent min volunteers needed: 15\\\\\nCurrent min volunteers needed: 13\\\\\nFinished with optimal (13) number of volunteers.\\\\\nName: Volunteer 57 :: Hours 6\\\\\n        UNAVAILABLE :: 0 - 13\\\\\n        Shift 4.1 :: 13 - 14\\\\\n        Shift 4.2 :: 14 - 15\\\\\n        Shift 3.2 :: 15 - 16\\\\\n        Shift 3.3 :: 16 - 17\\\\\n        Shift 3.4 :: 17 - 18\\\\\n        Shift 5.3 :: 18 - 19\\\\\n        UNAVAILABLE :: 19 - 24\\\\\nName: Volunteer 6 :: Hours 6\\\\\n        UNAVAILABLE :: 0 - 15\\\\\n        Shift 4.3 :: 15 - 16\\\\\n        Shift 5.1 :: 16 - 17\\\\\n        Shift 5.2 :: 17 - 18\\\\\n        Shift 8.5 :: 18 - 19\\\\\n        Shift 5.4 :: 19 - 20\\\\\n        Shift 5.5 :: 20 - 21\\\\\n        UNAVAILABLE :: 21 - 24\\\\\nName: Volunteer 58 :: Hours 6\\\\\n        UNAVAILABLE :: 0 - 9\\\\\n        Shift 7.3 :: 9 - 10\\\\\n        Shift 11.2 :: 10 - 11\\\\\n        Shift 6.4 :: 11 - 12\\\\\n        Shift 6.5 :: 12 - 13\\\\\n        Shift 6.6 :: 13 - 14\\\\\n        Shift 8.1 :: 14 - 15\\\\\n        UNAVAILABLE :: 15 - 24\\\\\nName: Volunteer 29 :: Hours 5\\\\\n        UNAVAILABLE :: 0 - 10\\\\\n        Shift 2.1 :: 10 - 11\\\\\n        Shift 2.2 :: 11 - 12\\\\\n        Shift 2.3 :: 12 - 13\\\\\n        Shift 2.4 :: 13 - 14\\\\\n        Shift 3.1 :: 14 - 15\\\\\n        UNAVAILABLE :: 15 - 24\\\\\nName: Volunteer 49 :: Hours 5\\\\\n        UNAVAILABLE :: 0 - 13\\\\\n        Shift 13.1 :: 13 - 14\\\\\n        Shift 10.1 :: 14 - 15\\\\\n        Shift 8.2 :: 15 - 16\\\\\n        Shift 8.3 :: 16 - 17\\\\\n        Shift 8.4 :: 17 - 18\\\\\n        UNAVAILABLE :: 18 - 24\n\n\n\\section{Future Work}\nWe have so far been unable to finish the program part of our problem though we have (in our opinion) reasonably solved the algorithmic problem of assigning volunteers to positions based on availability.\nWe plan to proceed with the program and build a fully functional web app that will allow event organizers to use different approaches to solve the problem and to manually adjust any schedule that we conjure up.\n\nSSC is unfortunately not hosting any weekend events until this fall.\nHowever, we also plan to follow up on them in the fall and attempt to actually implement our system for choosing volunteers.\n\n\\end{multicols}\n\\section{Appendix}\n\\begin{lstlisting}\n#!/usr/bin/python\n#\n# Work objects\n#\n\n\nclass Volunteer:\n    \"\"\"\n    Represents a single volunteer\n    String name - Name of the volunteer\n    Int capacity - How many hours this volunteer has available\n    Int current_capacity - How many available hours the volunteer current has\n    [Job] jobs - Current list of jobs assigned to volunteer\n    Boolean is_used - True if the volunteer's job list is not empty\n    [Int] job_id_count - keeps count of how many shifts of each job ID a volunteer has\n    \"\"\"\n    def __init__(self, a_name=\"\", a_capacity=4):\n        self.name = a_name\n        self.capacity = a_capacity\n        self.current_capacity = 0\n        self.jobs = []\n        self.is_used = False\n        self.job_id_count = [0 for _ in xrange(15)] # this is a bad thing to do :-(\n\n    def __cmp__(self, other):\n        return -cmp(self.current_capacity, other.current_capacity)\n\n    def __repr__(self):\n        return self.name\n\n    def add_job(self, a_job):\n        \"\"\"Adds a job and updates state only if job is not a pseudo job\"\"\"\n        self.jobs.append(a_job)\n        if not a_job.name.startswith(\"UNAVAILABLE\"):\n            self.current_capacity += a_job.length\n            self.job_id_count[a_job.id] += 1\n            self.is_used = True\n\n    def can_take_job(self, a_job):\n        \"\"\"Will return true as long as volunteer has space and no conflicting jobs\"\"\"\n        for current_job in self.jobs:\n            if a_job.conflicts_with(current_job):\n                return False\n\n        if (self.current_capacity + a_job.length) > self.capacity:\n            return False\n\n        return True\n\n    def get_weight(self):\n        return sum([x**2 for x in self.job_id_count])\n\n    def print_schedule(self):\n        self.jobs = sorted(self.jobs, key=lambda x: x.start)\n        print \"Name: %s :: Hours %s\" % (self.name, self.capacity)\n        for j in self.jobs:\n            print \"\\t%s :: %s - %s\" % (j.name, j.start, j.end)\n\n    def clear_all(self):\n        self.jobs = filter(lambda x: x.name.startswith('UNAVAILABLE'), self.jobs)\n        self.current_capacity = 0\n        self.is_used = False\n\n\nclass JobShift:\n    \"\"\"\n    Represents a single shift\n    String name - name of the shift\n    Int start - shift's start time\n    Int end - shift's end time\n    [Int] interval - all hours covered by this shift\n    Int length - total number of hours for this shift\n    Int id - represents this shifts job ID\n    \"\"\"\n    def __init__(self, a_name, a_time_interval, an_id):\n        self.name = a_name\n        self.start, self.end  = a_time_interval\n        self.interval = set(range(self.start, self.end+1))\n        self.length = self.end - self.start\n        self.id = an_id\n\n    def __cmp__(self, other):\n        return -cmp(self.length, other.length)\n\n    def __repr__(self):\n        return \"%s :: %s - %s\" % (self.name, self.start, self.end)\n\n    def conflicts_with(self, another_job):\n        return len(self.interval & another_job.interval) > 1\n\n\\end{lstlisting}\n\\begin{lstlisting}\nimport sys\nimport random\nimport copy\nimport Work as SS\n\n\ndef rand_time_interval(a_min, a_max, a_length):\n    start = random.randint(a_min, a_max - a_length)\n    return (start, start+a_length)\n\n\ndef show_schedule(volunteers):\n    for v in volunteers:\n        if v.is_used:\n            v.print_schedule()\n\n\ndef make_random_volunteers(num_of_volunteers, capacity_range):\n    V = []\n    for x in xrange(1, num_of_volunteers+1):\n        name = \"Volunteer \" + str(x)\n        capacity = random.randint(capacity_range[0], capacity_range[1])\n        volunteer = SS.Volunteer(name, capacity)\n        available_start = random.randint(0, 24-capacity)\n        volunteer.add_job(SS.JobShift(\"UNAVAILABLE\", (0, available_start), -1))\n        volunteer.add_job(SS.JobShift(\"UNAVAILABLE\", (available_start+capacity, 24), -1))\n        V.append(volunteer)\n    return V\n\n\ndef make_random_jobs(num_of_jobs):\n    J = []\n    for x in xrange(1, num_of_jobs+1):\n        id = x-1\n        num_of_shifts = random.randint(1,6)\n        start_time = random.randint(0, 21-num_of_shifts)\n        for y in xrange(1, num_of_shifts+1):\n            name = \"Shift \" + str(x) + \".\" + str(y)\n            time_interval = (start_time+y-1, start_time+y)\n            job = SS.JobShift(name, time_interval, id)\n            J.append(job)\n    return J\n\n# BFD Algo: put largest item into bin with most stuff\ndef assign_jobs(jobs, volunteers):\n    unassigned_jobs = []\n    current_jobs = sorted(jobs)\n    current_volunteers = volunteers\n\n    while len(current_jobs) > 0:\n        job = current_jobs.pop(0)\n        current_volunteers = sorted(current_volunteers) # This makes it a BFD instead of an FFD algo\n        job_assigned = False\n\n        for volunteer in current_volunteers:\n            if volunteer.can_take_job(job):\n                volunteer.add_job(job)\n                job_assigned = True\n                break\n\n        if not job_assigned:\n            unassigned_jobs.append(job)\n\n    return (current_volunteers, unassigned_jobs)\n\n\nNUM_OF_JOBS = 15\nNUM_OF_VOLUNTEERS = 60\nvolunteers = make_random_volunteers(NUM_OF_VOLUNTEERS, (2,6))\njobs = make_random_jobs(NUM_OF_JOBS)\n\n# estimating lower bound by dividing sum of shifts by average volunteer capacity\ntotal_job_hours = sum([j.length for j in jobs])\navg_vol_capacity = sum([v.capacity for v in volunteers])/float(len(volunteers))\nestimated_lower_bound = int((total_job_hours/avg_vol_capacity)+1)\n\ncurrent_best_schedule = []\nmin_volunteers_needed = 60\n\nprint \"Estimated Lower Bound: %s...\" % estimated_lower_bound\n\n# Here we start randomizing the volunteer set to get different solutions\n# we keep track of the smallest solution and store it\n# we can choose to terminate before the optimal sol is found\n# we will either get the current most optimal solution\n# or an unfeasible, partial solution, with a list of anassignable jobs.\nwhile(min_volunteers_needed > estimated_lower_bound):\n    try:\n        volunteers, unassigned_jobs = assign_jobs(jobs, volunteers)\n\n        if len(unassigned_jobs) == 0:\n            current_min = sum([1 for x in volunteers if x.is_used])\n            if current_min < min_volunteers_needed:\n                min_volunteers_needed = current_min\n                current_best_schedule = copy.deepcopy(volunteers)\n                print \"Current min volunteers needed: %s\" % min_volunteers_needed\n\n        map(lambda x: x.clear_all(), volunteers)\n        random.shuffle(volunteers)\n\n    except KeyboardInterrupt:\n        print \"Terminating...\\n\\n\"\n        if len(unassigned_jobs) == 0:\n            print \"Min # of volunteers found so far: %s\" % min_volunteers_needed\n            print \"Schedule: \"\n            show_schedule(current_best_schedule)\n            print \"\\n\"\n        else:\n            print \"Not able to find feasible solution\"\n            print \"Unassigned jobs: %s\" % unassigned_jobs\n            print \"Current best schedule: \"\n            show_schedule(volunteers)\n        sys.exit()\n\nprint \"Finished with optimal (%s) number of volunteers.\" % min_volunteers_needed\nshow_schedule(current_best_schedule)\n\\end{lstlisting}\n\n\\begin{thebibliography}{9}\n\\bibitem{Korf02}\n\tRichard E. Korf\n\tA New Algorithm for Optimal Bin Packing\n\tAAAI-02 Proceedings. Copyright © 2002, AAAI\n\t2002\n\n\\end{thebibliography}\n\n\\end{document}\n"
+"\\documentclass[11pt]{article}\n\\usepackage{amsmath,amssymb,amsthm}\n\\usepackage{graphicx}\n\\usepackage[ruled,vlined,linesnumbered]{algorithm2e}\n\\usepackage{multicol}\n\n\\usepackage{listings}\n\\usepackage{color}\n\n\\definecolor{dkgreen}{rgb}{0,0.6,0}\n\\definecolor{gray}{rgb}{0.5,0.5,0.5}\n\\definecolor{mauve}{rgb}{0.58,0,0.82}\n\n\\lstset{frame=tb,\n\tlanguage=Python,\n\taboveskip=3mm,\n\tbelowskip=3mm,\n\tshowstringspaces=false,\n\tcolumns=flexible,\n\tbasicstyle={\\small\\ttfamily},\n\tnumbers=none,\n\tnumberstyle=\\tiny\\color{gray},\n\tkeywordstyle=\\color{blue},\n\tcommentstyle=\\color{dkgreen},\n\tstringstyle=\\color{mauve},\n\tbreaklines=true,\n\tbreakatwhitespace=true,\n\ttabsize=3\n}\n\n\\addtolength{\\oddsidemargin}{-.875in}\n\\addtolength{\\evensidemargin}{-.875in}\n\\addtolength{\\textwidth}{1.75in}\n\n\\addtolength{\\topmargin}{-.875in}\n\\addtolength{\\textheight}{1.75in}\n\n\\title{Optimizing Volunteer Shifts for Dance Weekends}\n\\author{John Jeng, Samvel Stepanyan}\n\\date{January 22nd, 2015}\n\\pagestyle{myheadings}\n\\markright{}\n\n% Custom commands\n\\newif\\ifcomment\n\\commentfalse % Show comments\n\\newcommand{\\comment}[1]{\\ifcomment#1\\fi}\n\n\\newcommand{\\sumleft}{\\sum\\limits_{i=1}^n i^3}\n\\newcommand{\\sumright}{\\left(\\sum\\limits_{i=1}^n i \\right)^2}\n\\newcommand{\\Z}{\\mathbb{Z}}\n\\newcommand{\\C}{\\mathbb{C}}\n\\newcommand{\\pem}{$ (\\pi, E) $~}\n\n\\newtheorem{PF}{Proof}\n\\theoremstyle{definition}\n\\newtheorem{Def}{Definition}\n\\newtheorem{Thm}{Theorem}\n\\newtheorem{lemma}{Lemma}\n\n\\begin{document}\n%Begin Formalities========\n%=========================\n\\maketitle\n\\begin{abstract}\n\tThe Savoy Swing Club (SSC) in Seattle, WA is a non-profit that organizes dance weekends for the general public and has outreach programs to middle schools and high schools in the greater Seattle area. All events require volunteers to run the event. Volunteer scheduling is usually done by hand, but becomes harder with larger events and does not take into account many variables that could be considered such as volunteer time preferences and minimize the number of volunteers used. Our objective was to provide a program which would take a pool of volunteers and set of shifts and jobs, and return a schedule of volunteers that optimized for work balance, number of volunteers, ``choas'', and shift preferences. We were able to create schedules that came within the absolute minimum number of volunteers by 1 or 2 volunteers. We consider these schedules better than the most optimal ones because cutting it as close as exact leads to disastrous problems.\n\\end{abstract}\n%\\newpage\n%\\tableofcontents\n%\\newpage\n%End Formalities=========\n%========================\n\\noindent\\makebox[\\linewidth]{\\rule{\\textwidth}{0.4pt}}\n%====================================================\n% Setting the Problem\n%====================================================\n\\section{Problem Description}\n\\begin{multicols}{2}\nSavoy Swing Club (SSC) is local non-profit organization that currently seeks to teach swing dancing to middle and high school kids in the greater Seattle area.\nThey are also heavily involved with 2 ``dance weekends'': Seattle Lindy Exchange (SLX) and Killerdiller Weekend (KDW). Our focus is on these ``full-featured'' dance events where there are classes, evening dances, performances, and competitions.\nAt each of these events, volunteers are required to make the weekend go smoothly.\n\nEach volunteer has different jobs they are able (or allowed) to perform and preferences for which hours they are volunteering.\nVolunteers are compensated based on the number of hours they work and the type of work.\nFor example, 8 hours of volunteering might mean “full pass” (access to all classes and evening dances) while fewer hours of volunteering might just mean a “dance pass” (only access to evening dances) or a “partial full pass” (eg. classes and evening dances on Saturday only).\nA technician however, might receive a full weekend pass and additional cash compensation for just 6 hours of work.\nWhile we could optimize on some sort of cost function under conditions similar to the examples above, SSC has determined that since developing the cost function itself would require analysis of its own right, it is sufficient to just reduce the number of volunteers necessary for any given event.\n\nThus our objective is to develop a program that will return a schedule that is in some sense ``optimal'' for both the volunteers and SSC.\nWe achieve this objective through the following means.\n\nWe will take into consideration the volunteers' time preferences and availability.\nThis is an improvement over the current system because typically, volunteers do not know exactly what hours they will be working until at most a few days before the event.\nThis means that volunteers must commit their entire weekends even though they may only be working 6 to 8 hours over 2 days.\nWhile at this point most volunteers relent to this fact, it is an improvement that we seek to provide.\n\nWe will create a schedule that is not too hectic and is easy for a supervisor to understand.\nFor example, though it might minimize the number of volunteers if Volunteer A does the cashier job in Ballroom B, then runs across the street to to sales, back to Ballroom B for another shift, and finally ends the day driving instructors home, SSC would like to have the simplified to having Volunteer A just do 3 shifts as a cashier in Ballroom B unless the trade off is warranted.\n\nFinally, we will create a program that is easy for an event planner to input work shift and volunteer data which will return our schedule.\n\n\\subsection{Specific Challenges}\nInitially we considered simplifying the problem with many assumptions and constraints that resulted in schedules that were very similar to current ones done by hand and left little to be optimized or improved.\n\nEven though we have volunteer schedules from real events from around the United States, all schedules are final products after last minute adjustments and sometimes shift swaps engineered by the volunteers themselves.\nThis poses a problem since we don't have each event's potential volunteer pool and we for many cases, we don't know what the initial schedule was.\nWe are also missing data concerning the times that its volunteers would prefer to have worked or not worked.\n\n%====================================================\n% Data Collection & Assumptions\n% Game plan for this section (and subsections):\n% Description of the data we were able to collect.\n% How the data was collected\n%\n% ASSUMPTIONS AND CONSTRAINTS\n%\n%====================================================\n\\section{Data Collection}\nWe were able to make some observations about the structure of volunteer schedules by inspecting events in North America that ranged from ones with fewer than 100 people to the largest event in North America, Lindy Focus, that spanned 5 days and had over 1000 people to its name.\n\\begin{itemize}\\itemsep0pt\n\\item All shifts were generally about an hour long.\n\\item For any volunteer, it was uncommon for them to work more than 4 hours in a day and extremely rare for them to work more than 6 in a day.\n\\end{itemize}\n\nThrough some surveys, we were able to learn that most people who volunteer at events really would like to know their schedules sooner and be able to guarantee that they won't be working certain times or certain shifts.\nThough we were already planning to implement this feature, it was good to know that it was actually desired in the community.\n\nWe would like to note that each of these assumptions could also be valid conditions in a ``real'' problem.\nMost of the majority of volunteering jobs do not require any special skill to accomplish.\nChecking people off at registration and making sure non-paying people don't get into classes is not particularly difficult.\nOn the flip side, at large events such as Lindy Focus, many volunteers are screened before hand so they already have a predetermined role.\n\nHaving each Job consist of 1-12 shifts is reasonable since that is more than the number of shifts any job has at Lindy Focus and that is the largest event we want to consider.\n\nMost of these events are hosted in a single hotel so traveling from one room to the next takes less than 5 minutes.\nWe decided that factoring in this time would not be valuable and instead decided to make the program more likely to match a volunteer who is already matched to the first shift in a job to the second shift in that same job (assuming all requirements of that job are met).\nThe same is true for breaks.\nWe leave it to the organizers to determine breaks and whether or not individual shifts have, say, a 10 minute break at each end.\n\nWe assume disjoint days because no one we talked to were aware of any Lindy Hop event where there are activities between 5 am and 8 am.\n\nThe last assumption is actually available as input in the final program but for our test purposes, we limited daily work time to 4 hours because that also happened to be the most any one person worked in a day at Lindy Focus.\n\n\\subsection{Simplifying Assumptions}\nFrom previous volunteer schedules and discussions with event planners, were able to make the following initial simplifying assumptions:\n\\begin{itemize}\\itemsep0pt\n\\item All volunteers can do all jobs. This assumption is also equivalent to assuming that all volunteers are preassigned a job type.\n\\item Each job consists of 1 - 12 shifts\n\\item Each volunteer can get from shift to shift in very little time\n\\item There are no breaks\n\\item All shifts for the day can be contained in a 24 hour period\n\\item Each volunteer has a maximum daily work time of 4 hours\n\\end{itemize}\n%====================================================\n% FORMULATION OF PROBLEM\n% Game plan for this section (and subsections):\n% Introduce Model Archetype\n% - Include common algorithms?\n% Describe differences between Archetype(s) and our problem\n% - (But NOT how we tackled them. Just like ``We had these different/extra constraints'')\n%\n% ADJUSTMENTS\n% Describe our specific procedure.\n% Explain how the (all?) various constraints are accounted for.\n% Describe compared approaches if there are more than one.\n%\n% CORRECTNESS\n% How close is our specific algorithm close to optimal?\n% Acceptable Error?\n% Proof?\n%====================================================\n\\section{Formulation}\nOur problem can be approached multiple ways.\nConsidering chromatic numbers on graphs of jobs, integer programming on time slots, and the bin packing problem are all viable approaches.\nOur problem is specifically a variation on the \\textit{interval partitioning} problem which is a specific case of the bin packing problem.\n\nThe general bin packing problem asks ``Given some numbers $a_1, \\ldots, a_n$, what is the least number of bins with capacity $c$ that I need to store all numbers $a_i''$?''\nAn immediate absolute minimum to this problem is $\\big(\\sum_{i = 1}^{n}\\;a_i\\big)/c$.\n\nThe interval partitioning problem asks ``Given a set of tuples $\\{(s_1, f_1), (s_2, f_2), \\ldots, (s_n, f_n)\\}$, what is the minimum number of containers needed for\n\n% BEGIN COMMENT OF OLD MATERIAL\n\\comment{After considering chromatic numbers on graphs of jobs and integer programming on times slots, we settled on describing the problem using the bin packing problem.\nThe bin packing problem states, \"Given some numbers $a_1, \\ldots, a_n$, what is the least number of bins with capacity $c$ that I need to store all numbers $a_i$?\nAn obvious absolute minimum on this problem is $\\big(\\sum_{i = 1}^{n}\\;a_i\\big)/c$.\nThat is, we need at least as much space as there is volume in the things we are fitting.\nWe end up using this lower bound to measure how close we are to an ``optimal''.\nTranslating to our problem, volunteers are the ``bins'' and the ``items'' we fill them with are the shifts that we assign.\nIn general, the bin packing problem is NP-Hard, but in our case it is much easier to solve since we have a relatively small sized problem.\n\nThe difference to the traditional bin packing problem is that we have additional constraints on what sort of objects our ``bins'' can take.\nThis problem is NP hard but by Korf, we could find optimal solutions.\nHowever, implementing his algorithm proved to be too memory intensive for our problem since we have to store more than just permutations of integers.\nThus, we resort to a near optimal algorithm, the Best First Decreasing (BFD) algorithm.\nIt sorts the items in order of decreasing size and puts the elements into the fullest bin that can accommodate the item.\n\nSo for example, if we had a ridiculous shift of 8 hours, we would first look for a volunteer that could be scheduled for the shift.\nThen, if that volunteer could work 2 more hours but our next largest shift is 4 hours, that second one will be given to a different volunteer if our volunteers are (hypothetically) capped at working 10 hours a day.\nThis algorithm is guaranteed to be within $\\frac{11}{9}$ of the optimal number number of volunteers for the shifts that we have to fill and runs in $O(n\\log n)$ time.\nAdditionally, based on Korf's analysis, BFD is on average, 94.8\\% of the time.\nFor our problem, this approximation is plenty accurate as well as when we consider the fact that the truly ``optimal'' algorithm could be suboptimal anyways when taking into account our other constraints.} % END COMMENT OF OLD MATERIAL\n\n\\subsection{Adjustments}\n% BEGIN COMMENT OF OLD MATERIAL\n\\comment{\nOur program takes the following as input from the event organizers:\n\\begin{itemize}\n\\item A list of volunteers each with their preferences and the jobs they can do.\n\\item A list of jobs and the shifts for the jobs.\n\\item The maximum number of hours a volunteer can work in a day.\n\\item The maximum and minimum number of hours a volunteer can work total for the event\n\\end{itemize}\nHowever, in script form, we allowed these inputs to be hardcoded in as constants.\nSavoy Swing Club does not have any upcoming events until September of this year so the priority is getting a good algorithm that makes favorable schedules.\n\nGiven a large pool of potential volunteers, we randomly pick sufficiently sized subsets of the volunteers and try to match them.\nOne would think that this probably doesn't give a very good result but it turns out, based on the very lowest possible bound of the number of volunteers required to run the event, our algorithm usually finds an schedules with a factor of 2 volunteers.\n\nWe encode the problem of volunteers having external time conflicts by pre-filling each volunteer's schedule with ``jobs'' that are labeled ``UNAVAILABLE''.\n} % END COMMENT OF OLD MATERIAL\n\\subsection{Correctness}\n\n\\section{Results}\nBased on our randomly generated data, our solution to the problem is typically off the optimal number of volunteers by no more than 2 volunteers.\nFor example, if there are 40 man hours in a day to work and each volunteer can work no more than 5 hours, then we need at least 8 volunteers just to satisfy the man hours, not considering any potential conflicts.\n\nINSERT GRAPHICAL REPRESENTATION\n\n\\section{Future Work}\nWe have so far been unable to finish the program part of our problem though we have (in our opinion) reasonably solved the algorithmic problem of assigning volunteers to positions based on availability.\nWe plan to proceed with the program and build a fully functional web app that will allow event organizers to use different approaches to solve the problem and to manually adjust any schedule that we conjure up.\n\nSSC is unfortunately not hosting any weekend events until this fall.\nHowever, we also plan to follow up on them in the fall and attempt to actually implement our system for choosing volunteers.\n\n\\end{multicols}\n\\section{Appendix}\n\\begin{lstlisting}\n#!/usr/bin/python\n#\n# Work objects\n#\n\n\nclass Volunteer:\n    \"\"\"\n    Represents a single volunteer\n    String name - Name of the volunteer\n    Int capacity - How many hours this volunteer has available\n    Int current_capacity - How many available hours the volunteer current has\n    [Job] jobs - Current list of jobs assigned to volunteer\n    Boolean is_used - True if the volunteer's job list is not empty\n    [Int] job_id_count - keeps count of how many shifts of each job ID a volunteer has\n    \"\"\"\n    def __init__(self, a_name=\"\", a_capacity=4):\n        self.name = a_name\n        self.capacity = a_capacity\n        self.current_capacity = 0\n        self.jobs = []\n        self.is_used = False\n        self.job_id_count = [0 for _ in xrange(15)] # this is a bad thing to do :-(\n\n    def __cmp__(self, other):\n        return -cmp(self.current_capacity, other.current_capacity)\n\n    def __repr__(self):\n        return self.name\n\n    def add_job(self, a_job):\n        \"\"\"Adds a job and updates state only if job is not a pseudo job\"\"\"\n        self.jobs.append(a_job)\n        if not a_job.name.startswith(\"UNAVAILABLE\"):\n            self.current_capacity += a_job.length\n            self.job_id_count[a_job.id] += 1\n            self.is_used = True\n\n    def can_take_job(self, a_job):\n        \"\"\"Will return true as long as volunteer has space and no conflicting jobs\"\"\"\n        for current_job in self.jobs:\n            if a_job.conflicts_with(current_job):\n                return False\n\n        if (self.current_capacity + a_job.length) > self.capacity:\n            return False\n\n        return True\n\n    def get_weight(self):\n        return sum([x**2 for x in self.job_id_count])\n\n    def print_schedule(self):\n        self.jobs = sorted(self.jobs, key=lambda x: x.start)\n        print \"Name: %s :: Hours %s\" % (self.name, self.capacity)\n        for j in self.jobs:\n            print \"\\t%s :: %s - %s\" % (j.name, j.start, j.end)\n\n    def clear_all(self):\n        self.jobs = filter(lambda x: x.name.startswith('UNAVAILABLE'), self.jobs)\n        self.current_capacity = 0\n        self.is_used = False\n\n\nclass JobShift:\n    \"\"\"\n    Represents a single shift\n    String name - name of the shift\n    Int start - shift's start time\n    Int end - shift's end time\n    [Int] interval - all hours covered by this shift\n    Int length - total number of hours for this shift\n    Int id - represents this shifts job ID\n    \"\"\"\n    def __init__(self, a_name, a_time_interval, an_id):\n        self.name = a_name\n        self.start, self.end  = a_time_interval\n        self.interval = set(range(self.start, self.end+1))\n        self.length = self.end - self.start\n        self.id = an_id\n\n    def __cmp__(self, other):\n        return -cmp(self.length, other.length)\n\n    def __repr__(self):\n        return \"%s :: %s - %s\" % (self.name, self.start, self.end)\n\n    def conflicts_with(self, another_job):\n        return len(self.interval & another_job.interval) > 1\n\n\\end{lstlisting}\n\\begin{lstlisting}\nimport sys\nimport random\nimport copy\nimport Work as SS\n\n\ndef rand_time_interval(a_min, a_max, a_length):\n    start = random.randint(a_min, a_max - a_length)\n    return (start, start+a_length)\n\n\ndef show_schedule(volunteers):\n    for v in volunteers:\n        if v.is_used:\n            v.print_schedule()\n\n\ndef make_random_volunteers(num_of_volunteers, capacity_range):\n    V = []\n    for x in xrange(1, num_of_volunteers+1):\n        name = \"Volunteer \" + str(x)\n        capacity = random.randint(capacity_range[0], capacity_range[1])\n        volunteer = SS.Volunteer(name, capacity)\n        available_start = random.randint(0, 24-capacity)\n        volunteer.add_job(SS.JobShift(\"UNAVAILABLE\", (0, available_start), -1))\n        volunteer.add_job(SS.JobShift(\"UNAVAILABLE\", (available_start+capacity, 24), -1))\n        V.append(volunteer)\n    return V\n\n\ndef make_random_jobs(num_of_jobs):\n    J = []\n    for x in xrange(1, num_of_jobs+1):\n        id = x-1\n        num_of_shifts = random.randint(1,6)\n        start_time = random.randint(0, 21-num_of_shifts)\n        for y in xrange(1, num_of_shifts+1):\n            name = \"Shift \" + str(x) + \".\" + str(y)\n            time_interval = (start_time+y-1, start_time+y)\n            job = SS.JobShift(name, time_interval, id)\n            J.append(job)\n    return J\n\n# BFD Algo: put largest item into bin with most stuff\ndef assign_jobs(jobs, volunteers):\n    unassigned_jobs = []\n    current_jobs = sorted(jobs)\n    current_volunteers = volunteers\n\n    while len(current_jobs) > 0:\n        job = current_jobs.pop(0)\n        current_volunteers = sorted(current_volunteers) # This makes it a BFD instead of an FFD algo\n        job_assigned = False\n\n        for volunteer in current_volunteers:\n            if volunteer.can_take_job(job):\n                volunteer.add_job(job)\n                job_assigned = True\n                break\n\n        if not job_assigned:\n            unassigned_jobs.append(job)\n\n    return (current_volunteers, unassigned_jobs)\n\n\nNUM_OF_JOBS = 15\nNUM_OF_VOLUNTEERS = 60\nvolunteers = make_random_volunteers(NUM_OF_VOLUNTEERS, (2,6))\njobs = make_random_jobs(NUM_OF_JOBS)\n\n# estimating lower bound by dividing sum of shifts by average volunteer capacity\ntotal_job_hours = sum([j.length for j in jobs])\navg_vol_capacity = sum([v.capacity for v in volunteers])/float(len(volunteers))\nestimated_lower_bound = int((total_job_hours/avg_vol_capacity)+1)\n\ncurrent_best_schedule = []\nmin_volunteers_needed = 60\n\nprint \"Estimated Lower Bound: %s...\" % estimated_lower_bound\n\n# Here we start randomizing the volunteer set to get different solutions\n# we keep track of the smallest solution and store it\n# we can choose to terminate before the optimal sol is found\n# we will either get the current most optimal solution\n# or an unfeasible, partial solution, with a list of anassignable jobs.\nwhile(min_volunteers_needed > estimated_lower_bound):\n    try:\n        volunteers, unassigned_jobs = assign_jobs(jobs, volunteers)\n\n        if len(unassigned_jobs) == 0:\n            current_min = sum([1 for x in volunteers if x.is_used])\n            if current_min < min_volunteers_needed:\n                min_volunteers_needed = current_min\n                current_best_schedule = copy.deepcopy(volunteers)\n                print \"Current min volunteers needed: %s\" % min_volunteers_needed\n\n        map(lambda x: x.clear_all(), volunteers)\n        random.shuffle(volunteers)\n\n    except KeyboardInterrupt:\n        print \"Terminating...\\n\\n\"\n        if len(unassigned_jobs) == 0:\n            print \"Min # of volunteers found so far: %s\" % min_volunteers_needed\n            print \"Schedule: \"\n            show_schedule(current_best_schedule)\n            print \"\\n\"\n        else:\n            print \"Not able to find feasible solution\"\n            print \"Unassigned jobs: %s\" % unassigned_jobs\n            print \"Current best schedule: \"\n            show_schedule(volunteers)\n        sys.exit()\n\nprint \"Finished with optimal (%s) number of volunteers.\" % min_volunteers_needed\nshow_schedule(current_best_schedule)\n\\end{lstlisting}\n\n\\begin{thebibliography}{9}\n\\bibitem{Korf02}\n\tRichard E. Korf\n\tA New Algorithm for Optimal Bin Packing\n\tAAAI-02 Proceedings. Copyright © 2002, AAAI\n\t2002\n\n\\end{thebibliography}\n\n\\end{document}\n"
+{"patch":[[[[0,"an one.\n"],[1,"\n"],[0,"%\n% CORR"]],10079,10079,16,17]],"time":1425852840183}
+{"patch":[[[[0,"an one.\n"],[1,"% "],[0,"\n%\n% COR"]],10079,10079,16,18]],"time":1425852839438}
+{"patch":[[[[0," one.\n% "],[1,"- (Theoretical)"],[0,"\n%\n% COR"]],10081,10081,16,31]],"time":1425852838718}
+{"patch":[[[[0,"oretical"],[1," results not experi"],[0,")\n%\n% CO"]],10095,10095,16,35]],"time":1425852837891}
+{"patch":[[[[0,"t experi"],[1,"m"],[0,")\n%\n% CO"]],10114,10114,16,17]],"time":1425852837202}
+{"patch":[[[[0,"ot exper"],[-1,"im"],[0,")\n%\n% CO"]],10113,10113,18,16]],"time":1425852835645}
+{"patch":[[[[0,"s not ex"],[-1,"per"],[0,")\n%\n% CO"]],10110,10110,19,16]],"time":1425852834918}
+{"patch":[[[[0,"s no"],[-1,"t ex"],[0,")\n%\n"]],10110,10110,12,8]],"time":1425852834118}
+{"patch":[[[[0,"resu"],[-1,"lts no"],[0,")\n%\n"]],10104,10104,14,8]],"time":1425852833374}
+{"patch":[[[[0,"tica"],[-1,"l resu"],[0,")\n%\n"]],10098,10098,14,8]],"time":1425852832648}
+{"patch":[[[[0," (Theore"],[-1,"tica"],[0,")\n%\n% CO"]],10090,10090,20,16]],"time":1425852831843}
+{"patch":[[[[0," - (Theo"],[-1,"re"],[0,")\n%\n% CO"]],10088,10088,18,16]],"time":1425852831100}
+{"patch":[[[[0,".\n% - (T"],[-1,"heo"],[0,")\n%\n% CO"]],10085,10085,19,16]],"time":1425852830447}
+{"patch":[[[[0,"e.\n% - ("],[-1,"T"],[0,")\n%\n% CO"]],10084,10084,17,16]],"time":1425852829635}
+{"patch":[[[[0,"ne.\n% - "],[-1,"()"],[0,"\n%\n% COR"]],10083,10083,18,16]],"time":1425852823510}
+{"patch":[[[[0,"one.\n% -"],[-1," "],[0,"\n%\n% COR"]],10082,10082,17,16]],"time":1425852822218}
+{"patch":[[[[0," one.\n% "],[-1,"-"],[0,"\n%\n% COR"]],10081,10081,17,16]],"time":1425852821223}
+{"patch":[[[[0,"n one.\n%"],[-1," "],[0,"\n%\n% COR"]],10080,10080,17,16]],"time":1425852820367}
+{"patch":[[[[0,"an one.\n"],[-1,"%"],[0,"\n%\n% COR"]],10079,10079,17,16]],"time":1425852819562}
+{"patch":[[[[0,"an one.\n"],[1,"%"],[0,"\n%\n% COR"]],10079,10079,16,17]],"time":1425852817785}
+{"patch":[[[[0,"n one.\n%"],[1," "],[0,"\n%\n% COR"]],10080,10080,16,17]],"time":1425852817014}
+{"patch":[[[[0," one.\n% "],[1,"-"],[0,"\n%\n% COR"]],10081,10081,16,17]],"time":1425852816273}
+{"patch":[[[[0," one.\n% "],[-1,"-"],[0,"\n%\n% COR"]],10081,10081,17,16]],"time":1425852815356}
+{"patch":[[[[0,"n one.\n%"],[-1," "],[0,"\n%\n% COR"]],10080,10080,17,16]],"time":1425852814641}
+{"patch":[[[[0,"an one.\n"],[-1,"%"],[0,"\n%\n% COR"]],10079,10079,17,16]],"time":1425852813840}
+{"patch":[[[[0,"an one.\n"],[-1,"\n"],[0,"%\n% CORR"]],10079,10079,17,16]],"time":1425852812285}
+{"patch":[[[[0," the (al"],[-1,"l?"],[0,") variou"]],9977,9977,18,16]],"time":1425852806404}
+{"patch":[[[[0,"the "],[-1,"(al)"],[0," var"]],9978,9978,12,8]],"time":1425852805682}
+{"patch":[[[[0,"how the "],[-1," "],[0,"various "]],9974,9974,17,16]],"time":1425852804900}
+{"patch":[[[[0,"straints"],[-1,"''"],[0,")\n%\n% AD"]],9901,9901,18,16]],"time":1425852785802}
+{"patch":[[[[0,"ra const"],[-1,"raints"],[0,")\n%\n% AD"]],9895,9895,22,16]],"time":1425852784244}
+{"patch":[[[[0,"t/extra "],[-1,"const"],[0,")\n%\n% AD"]],9890,9890,21,16]],"time":1425852783526}
+{"patch":[[[[0,"t/ex"],[-1,"tra "],[0,")\n%\n"]],9890,9890,12,8]],"time":1425852782695}
+{"patch":[[[[0,"rent"],[-1,"/ex"],[0,")\n%\n"]],9887,9887,11,8]],"time":1425852781952}
+{"patch":[[[[0,"ifferent"],[1," c"],[0,")\n%\n% AD"]],9883,9883,16,18]],"time":1425852781243}
+{"patch":[[[[0,"ferent c"],[1,"on"],[0,")\n%\n% AD"]],9885,9885,16,18]],"time":1425852780447}
+{"patch":[[[[0,"fferent "],[-1,"con"],[0,")\n%\n% AD"]],9884,9884,19,16]],"time":1425852779727}
+{"patch":[[[[0,"hese dif"],[-1,"ferent "],[0,")\n%\n% AD"]],9877,9877,23,16]],"time":1425852778933}
+{"patch":[[[[0,"had thes"],[-1,"e dif"],[0,")\n%\n% AD"]],9872,9872,21,16]],"time":1425852778162}
+{"patch":[[[[0,"We had t"],[-1,"hes"],[0,")\n%\n% AD"]],9869,9869,19,16]],"time":1425852777431}
+{"patch":[[[[0,"`We had "],[-1,"t"],[0,")\n%\n% AD"]],9868,9868,17,16]],"time":1425852776655}
+{"patch":[[[[0,"`We had "],[1,"pre-f"],[0,")\n%\n% AD"]],9868,9868,16,21]],"time":1425852773751}
+{"patch":[[[[0,"ad pre-f"],[1,"illed"],[0,")\n%\n% AD"]],9873,9873,16,21]],"time":1425852772959}
+{"patch":[[[[0,"re-f"],[-1,"illed"],[0,")\n%\n"]],9877,9877,13,8]],"time":1425852772248}
+{"patch":[[[[0," had pre"],[-1,"-f"],[0,")\n%\n% AD"]],9871,9871,18,16]],"time":1425852771459}
+{"patch":[[[[0,"`We had "],[-1,"pre"],[0,")\n%\n% AD"]],9868,9868,19,16]],"time":1425852770706}
+{"patch":[[[[0,"like ``W"],[-1,"e had "],[0,")\n%\n% AD"]],9862,9862,22,16]],"time":1425852769979}
+{"patch":[[[[0," like ``"],[-1,"W"],[0,")\n%\n% AD"]],9861,9861,17,16]],"time":1425852769235}
+{"patch":[[[[0,"st like "],[-1,"`"],[0,"`)\n%\n% A"]],9859,9859,17,16]],"time":1425852767319}
+{"patch":[[[[0,"st like "],[-1,"`"],[0,")\n%\n% AD"]],9859,9859,17,16]],"time":1425852766345}
+{"patch":[[[[0,"st like "],[1,"\""],[0,")\n%\n% AD"]],9859,9859,16,17]],"time":1425852765555}
+{"patch":[[[[0,"st like "],[-1,"\""],[1,"``"],[0,")\n%\n% AD"]],9859,9859,17,18]],"time":1425852764043}
+{"patch":[[[[0,"st like "],[-1,"`"],[0,"`)\n%\n% A"]],9859,9859,17,16]],"time":1425852763299}
+{"patch":[[[[0,"st like "],[-1,"`"],[0,")\n%\n% AD"]],9859,9859,17,16]],"time":1425852762256}
+{"patch":[[[[0,"ust like"],[-1," "],[0,")\n%\n% AD"]],9858,9858,17,16]],"time":1425852760763}
+{"patch":[[[[0," Jus"],[-1,"t like"],[0,")\n%\n"]],9856,9856,14,8]],"time":1425852759970}
+{"patch":[[[[0,"em. "],[-1,"Jus"],[0,")\n%\n"]],9853,9853,11,8]],"time":1425852759227}
+{"patch":[[[[0,"led them"],[-1,". "],[0,")\n%\n% AD"]],9847,9847,18,16]],"time":1425852758435}
+{"patch":[[[[0,"kled the"],[-1,"m"],[0,")\n%\n% AD"]],9846,9846,17,16]],"time":1425852757724}
+{"patch":[[[[0,"we tackl"],[-1,"ed the"],[0,")\n%\n% AD"]],9840,9840,22,16]],"time":1425852756966}
+{"patch":[[[[0,"e ta"],[-1,"ckl"],[0,")\n%\n"]],9841,9841,11,8]],"time":1425852756203}
+{"patch":[[[[0," how we "],[-1,"ta"],[0,")\n%\n% AD"]],9835,9835,18,16]],"time":1425852755435}
+{"patch":[[[[0,"OT h"],[-1,"ow we "],[0,")\n%\n"]],9833,9833,14,8]],"time":1425852754629}
+{"patch":[[[[0,"But "],[-1,"NOT h"],[0,")\n%\n"]],9828,9828,13,8]],"time":1425852753922}
+{"patch":[[[[0," - ("],[-1,"But "],[0,")\n%\n"]],9824,9824,12,8]],"time":1425852752414}
+{"patch":[[[[0,"lem\n% - "],[-1,"()"],[0,"\n%\n% ADJ"]],9819,9819,18,16]],"time":1425852751673}
+{"patch":[[[[0,"blem\n% -"],[-1," "],[0,"\n%\n% ADJ"]],9818,9818,17,16]],"time":1425852750939}
+{"patch":[[[[0,"oblem\n% "],[-1,"-"],[0,"\n%\n% ADJ"]],9817,9817,17,16]],"time":1425852750123}
+{"patch":[[[[0,"problem\n"],[-1,"% "],[0,"\n%\n% ADJ"]],9815,9815,18,16]],"time":1425852749406}
+{"patch":[[[[0,"problem\n"],[1," "],[0,"\n%\n% ADJ"]],9815,9815,16,17]],"time":1425852748610}
+{"patch":[[[[0,"problem\n"],[-1," "],[0,"\n%\n% ADJ"]],9815,9815,17,16]],"time":1425852747870}
+{"patch":[[[[0,"problem\n"],[-1,"\n"],[0,"%\n% ADJU"]],9815,9815,17,16]],"time":1425852747072}
+{"patch":[[[[0,"gorithms"],[-1,"?"],[0,"\n% Descr"]],9753,9753,17,16]],"time":1425852737061}
+{"patch":[[[[0,"\n\n% "],[-1,"BEGIN COMMENT OF OLD MATERIAL"],[1,"Comment of old text."],[0,"\n\\co"]],10914,10914,37,28]],"time":1425852707473}
+{"patch":[[[[0,"} % END "],[-1,"COMMENT OF OLD MATERIAL"],[1,"OLD TEXT COMMENT"],[0,"\n\n\\subse"]],13156,13156,39,32]],"time":1425852697359}
+{"patch":[[[[0,"D MATERI"],[-1,"AL"],[0,"\n\\commen"]],13228,13228,18,16]],"time":1425852685308}
+{"patch":[[[[0," OF OLD "],[-1,"MATERI"],[0,"\n\\commen"]],13222,13222,22,16]],"time":1425852684591}
+{"patch":[[[[0,"OMMENT O"],[-1,"F OLD "],[0,"\n\\commen"]],13216,13216,22,16]],"time":1425852683835}
+{"patch":[[[[0,"BEGIN CO"],[-1,"MMENT O"],[0,"\n\\commen"]],13209,13209,23,16]],"time":1425852683046}
+{"patch":[[[[0,"% BE"],[-1,"GIN CO"],[0,"\n\\co"]],13207,13207,14,8]],"time":1425852682312}
+{"patch":[[[[0,"ts}\n% BE"],[1,"CON "],[0,"\n\\commen"]],13203,13203,16,20]],"time":1425852681579}
+{"patch":[[[[0,"% BE"],[-1,"CON "],[0,"\n\\co"]],13207,13207,12,8]],"time":1425852680774}
+{"patch":[[[[0,"}\n% "],[-1,"BE"],[0,"\n\\co"]],13205,13205,10,8]],"time":1425852680023}
+{"patch":[[[[0,"ments}\n%"],[-1," "],[0,"\n\\commen"]],13200,13200,17,16]],"time":1425852679277}
+{"patch":[[[[0,"tments}\n"],[-1,"%"],[0,"\n\\commen"]],13199,13199,17,16]],"time":1425852678481}
+{"patch":[[[[0,"tments}\n"],[-1,"\n"],[0,"\\comment"]],13199,13199,17,16]],"time":1425852676248}
+{"patch":[[[[0,"ATER"],[-1,"IAL"],[0,"\n\\su"]],14399,14399,11,8]],"time":1425852671946}
+{"patch":[[[[0,"LD MATER"],[1,"N"],[0,"\n\\subsec"]],14395,14395,16,17]],"time":1425852671144}
+{"patch":[[[[0,"OLD "],[-1,"MATERN"],[0,"\n\\su"]],14394,14394,14,8]],"time":1425852670395}
+{"patch":[[[[0,"MMENT OF"],[-1," OLD "],[0,"\n\\subsec"]],14385,14385,21,16]],"time":1425852669666}
+{"patch":[[[[0,"D CO"],[-1,"MMENT OF"],[0,"\n\\su"]],14381,14381,16,8]],"time":1425852668890}
+{"patch":[[[[0,".\n} % EN"],[-1,"D CO"],[0,"\n\\subsec"]],14373,14373,20,16]],"time":1425852668128}
+{"patch":[[[[0,"E''.\n} %"],[-1," EN"],[0,"\n\\subsec"]],14370,14370,19,16]],"time":1425852667396}
+{"patch":[[[[0,"LE''.\n} "],[-1,"%"],[0,"\n\\subsec"]],14369,14369,17,16]],"time":1425852666596}
+{"patch":[[[[0,"BLE''.\n}"],[-1," "],[0,"\n\\subsec"]],14368,14368,17,16]],"time":1425852664938}
+{"patch":[[[[0,"ABLE''.\n"],[-1,"}"],[0,"\n\\subsec"]],14367,14367,17,16]],"time":1425852663576}
+{"patch":[[[[0,"comment{"],[1,"}"],[0,"\nOur pro"]],13208,13208,16,17]],"time":1425852660745}
+{"patch":[[[[0,"\\comment"],[-1,"{}"],[0,"\nOur pro"]],13207,13207,18,16]],"time":1425852659411}
+{"patch":[[[[0,"ts}\n\\com"],[-1,"ment"],[0,"\nOur pro"]],13203,13203,20,16]],"time":1425852657849}
+{"patch":[[[[0,"tments}\n"],[-1,"\\com"],[0,"\nOur pro"]],13199,13199,20,16]],"time":1425852657103}
+{"patch":[[[[0,"tments}\n"],[1,"/"],[0,"\nOur pro"]],13199,13199,16,17]],"time":1425852656312}
+{"patch":[[[[0,"tments}\n"],[-1,"/"],[0,"\nOur pro"]],13199,13199,17,16]],"time":1425852655577}
+{"patch":[[[[0,"tments}\n"],[-1,"\n"],[0,"Our prog"]],13199,13199,17,16]],"time":1425852652734}
+{"patch":[[[[0,"tions):\n"],[1,"% Data Collection\n"],[0,"% Descri"]],6354,6354,16,34]],"time":1425852630154}
+{"patch":[[[[0,"RAINTS\n%"],[1," "],[0,"\n%======"]],6485,6485,16,17]],"time":1425852622992}
+{"patch":[[[[0,"AINTS\n% "],[1," B"],[0,"\n%======"]],6486,6486,16,18]],"time":1425852622267}
+{"patch":[[[[0,"NTS\n%  B"],[1,"asically solid interpre"],[0,"\n%======"]],6488,6488,16,39]],"time":1425852621464}
+{"patch":[[[[0,"interpre"],[1,"tation of the"],[0,"\n%======"]],6511,6511,16,29]],"time":1425852620698}
+{"patch":[[[[0,"n of the"],[1," "],[0,"\n%======"]],6524,6524,16,17]],"time":1425852620028}
+{"patch":[[[[0,"etation "],[-1,"of the "],[0,"\n%======"]],6518,6518,23,16]],"time":1425852618478}
+{"patch":[[[[0,"retation"],[1,"s"],[0," \n%====="]],6517,6517,16,17]],"time":1425852617675}
+{"patch":[[[[0,"tations "],[1,"o"],[0,"\n%======"]],6519,6519,16,17]],"time":1425852616940}
+{"patch":[[[[0,"nterpret"],[-1,"ations o"],[0,"\n%======"]],6512,6512,24,16]],"time":1425852616234}
+{"patch":[[[[0," int"],[-1,"erpret"],[0,"\n%=="]],6510,6510,14,8]],"time":1425852615474}
+{"patch":[[[[0,"lly soli"],[-1,"d int"],[0,"\n%======"]],6501,6501,21,16]],"time":1425852614684}
+{"patch":[[[[0,"lly "],[-1,"soli"],[0,"\n%=="]],6501,6501,12,8]],"time":1425852613986}
+{"patch":[[[[0,"sically "],[1,"f"],[0,"\n%======"]],6497,6497,16,17]],"time":1425852612479}
+{"patch":[[[[0,"sically "],[-1,"f"],[0,"\n%======"]],6497,6497,17,16]],"time":1425852611682}
+{"patch":[[[[0,"asically"],[-1," "],[0,"\n%======"]],6496,6496,17,16]],"time":1425852610112}
+{"patch":[[[[0,"S\n%  Bas"],[-1,"ically"],[0,"\n%======"]],6490,6490,22,16]],"time":1425852609364}
+{"patch":[[[[0,"INTS\n%  "],[-1,"Bas"],[0,"\n%======"]],6487,6487,19,16]],"time":1425852608639}
+{"patch":[[[[0,"AINTS\n% "],[-1," "],[0,"\n%======"]],6486,6486,17,16]],"time":1425852607870}
+{"patch":[[[[0,"RAINTS\n%"],[-1," "],[0,"\n%======"]],6485,6485,17,16]],"time":1425852603164}
+{"patch":[[[[0,"TRAINTS\n"],[-1,"%"],[0,"\n%======"]],6484,6484,17,16]],"time":1425852602199}
+{"patch":[[[[0,"TRAINTS\n"],[-1,"\n"],[0,"%======="]],6484,6484,17,16]],"time":1425852601303}
+{"patch":[[[[0,"ONST"],[-1,"RAINTS"],[0,"\n%=="]],6481,6481,14,8]],"time":1425852600559}
+{"patch":[[[[0,"AND "],[-1,"CONST"],[0,"\n%=="]],6476,6476,13,8]],"time":1425852599857}
+{"patch":[[[[0,"MPTI"],[-1,"ONS AND "],[0,"\n%=="]],6468,6468,16,8]],"time":1425852599026}
+{"patch":[[[[0,"ASSU"],[-1,"MPTI"],[0,"\n%=="]],6464,6464,12,8]],"time":1425852598319}
+{"patch":[[[[0,"\n% A"],[-1,"SSU"],[0,"\n%=="]],6461,6461,11,8]],"time":1425852597590}
+{"patch":[[[[0,"ed\n%\n% A"],[1,"ssumptions and Constraints\n%"],[0,"\n%======"]],6457,6457,16,44]],"time":1425852596835}
+{"patch":[[[[0,"nstraint"],[-1,"s"],[0,"\n%\n%===="]],6482,6482,17,16]],"time":1425852594319}
+{"patch":[[[[0,"nd Const"],[-1,"raint"],[0,"\n%\n%===="]],6477,6477,21,16]],"time":1425852593569}
+{"patch":[[[[0," and Con"],[-1,"st"],[0,"\n%\n%===="]],6475,6475,18,16]],"time":1425852592843}
+{"patch":[[[[0,"ons "],[-1,"and Con"],[0,"\n%\n%"]],6472,6472,15,8]],"time":1425852592048}
+{"patch":[[[[0,"\n% Assum"],[-1,"ptions "],[0,"\n%\n%===="]],6461,6461,23,16]],"time":1425852591297}
+{"patch":[[[[0,"ed\n%\n% A"],[-1,"ssum"],[0,"\n%\n%===="]],6457,6457,20,16]],"time":1425852590581}
+{"patch":[[[[0,"ed\n%\n% A"],[1,"DJUSTMENTS\n% Describe our specific procedure.\n% Explain how the various constraints are accounted for.\n% Describe compared approaches if there are more than one."],[0,"\n%\n%===="]],6457,6457,16,177]],"time":1425852589776}
+{"patch":[[[[0," collect"],[-1,"ed"],[0,"\n%\n% ADJ"]],6449,6449,18,16]],"time":1425852585603}
+{"patch":[[[[0," was col"],[-1,"lect"],[0,"\n%\n% ADJ"]],6445,6445,20,16]],"time":1425852584874}
+{"patch":[[[[0,"ata was "],[-1,"col"],[0,"\n%\n% ADJ"]],6442,6442,19,16]],"time":1425852584128}
+{"patch":[[[[0," dat"],[-1,"a was "],[0,"\n%\n%"]],6440,6440,14,8]],"time":1425852583310}
+{"patch":[[[[0,".\n% How "],[-1,"the dat"],[0,"\n%\n% ADJ"]],6429,6429,23,16]],"time":1425852582595}
+{"patch":[[[[0,"llect.\n%"],[-1," How "],[0,"\n%\n% ADJ"]],6424,6424,21,16]],"time":1425852581834}
+{"patch":[[[[0,"ollect.\n"],[-1,"%"],[0,"\n%\n% ADJ"]],6423,6423,17,16]],"time":1425852581039}
+{"patch":[[[[0,"ollect.\n"],[-1,"\n"],[0,"%\n% ADJU"]],6423,6423,17,16]],"time":1425852580303}
+{"patch":[[[[0," collect"],[-1,"."],[0,"\n%\n% ADJ"]],6421,6421,17,16]],"time":1425852579514}
+{"patch":[[[[0,"to colle"],[-1,"ct"],[0,"\n%\n% ADJ"]],6419,6419,18,16]],"time":1425852578758}
+{"patch":[[[[0," to "],[-1,"colle"],[0,"\n%\n%"]],6418,6418,13,8]],"time":1425852578028}
+{"patch":[[[[0," were ab"],[-1,"le to "],[0,"\n%\n% ADJ"]],6408,6408,22,16]],"time":1425852577266}
+{"patch":[[[[0,"ata we w"],[-1,"ere ab"],[0,"\n%\n% ADJ"]],6402,6402,22,16]],"time":1425852576499}
+{"patch":[[[[0,"he data "],[-1,"we w"],[0,"\n%\n% ADJ"]],6398,6398,20,16]],"time":1425852575750}
+{"patch":[[[[0,"the data"],[1,"t"],[0," \n%\n% AD"]],6397,6397,16,17]],"time":1425852575018}
+{"patch":[[[[0,"he d"],[-1,"atat "],[0,"\n%\n%"]],6398,6398,13,8]],"time":1425852574240}
+{"patch":[[[[0,"tion of "],[-1,"the d"],[0,"\n%\n% ADJ"]],6389,6389,21,16]],"time":1425852573434}
+{"patch":[[[[0,"ipti"],[-1,"on of "],[0,"\n%\n%"]],6387,6387,14,8]],"time":1425852572673}
+{"patch":[[[[0,"n\n% Desc"],[-1,"ripti"],[0,"\n%\n% ADJ"]],6378,6378,21,16]],"time":1425852571947}
+{"patch":[[[[0,"tion\n% D"],[-1,"esc"],[0,"\n%\n% ADJ"]],6375,6375,19,16]],"time":1425852571222}
+{"patch":[[[[0,"ction\n% "],[-1,"D"],[1,"- Include common algorithms\n% Describe differences between Archetype(s) and our problem"],[0,"\n%\n% ADJ"]],6374,6374,17,103]],"time":1425852570399}
+{"patch":[[[[0,"ata Coll"],[-1,"ection"],[0,"\n% - Inc"]],6365,6365,22,16]],"time":1425852566821}
+{"patch":[[[[0,"Data Col"],[-1,"l"],[1,"ect"],[0,"\n% - Inc"]],6364,6364,17,19]],"time":1425852566094}
+{"patch":[[[[0,"Data Col"],[-1,"ect"],[0,"\n% - Inc"]],6364,6364,19,16]],"time":1425852565286}
+{"patch":[[[[0,"\n% Data "],[-1,"Col"],[0,"\n% - Inc"]],6361,6361,19,16]],"time":1425852564547}
+{"patch":[[[[0,"ns):\n% D"],[-1,"ata "],[0,"\n% - Inc"]],6357,6357,20,16]],"time":1425852563843}
+{"patch":[[[[0,"ons):\n% "],[-1,"D"],[1,"Introduce Model Archetype"],[0,"\n% - Inc"]],6356,6356,17,41]],"time":1425852563066}
+{"patch":[[[[0,"ons\n"],[-1,"% Game plan for this section (and subsections):\n% Introduce Model Archetype\n% - Include common algorithms\n% Describe differences between Archetype(s) and our problem\n%\n% ADJUSTMENTS\n% Describe our specific procedure.\n% Explain how the various constraints are accounted for.\n% Describe compared approaches if there are more than one.\n"],[0,"%\n%="]],6310,6310,341,8]],"time":1425852558488}
+{"patch":[[[[0,"mptions\n"],[-1,"%"],[0,"\n%======"]],6306,6306,17,16]],"time":1425852550783}
+{"patch":[[[[0,"mptions\n"],[-1,"\n"],[0,"%======="]],6306,6306,17,16]],"time":1425852549833}
+{"patch":[[[[0,"rs neede"],[-1,"d"],[0," for\n\n% "]],10739,10739,17,16]],"time":1425852540993}
+{"patch":[[[[0,"ainers n"],[-1,"eede"],[0," for\n\n% "]],10735,10735,20,16]],"time":1425852540050}
+{"patch":[[[[0,"tainers "],[-1,"n"],[1,"I need"],[0," for\n\n% "]],10734,10734,17,22]],"time":1425852539247}
+{"patch":[[[[0,"need for"],[1," "],[0,"\n\n% Comm"]],10744,10744,16,17]],"time":1425852530908}
+{"patch":[[[[0,"sect"],[-1,"ions)"],[0,":\n% "]],9531,9531,13,8]],"time":1425852521888}
+{"patch":[[[[0,"d subsec"],[-1,"t"],[1,"ion"],[0,":\n% Intr"]],9526,9526,17,19]],"time":1425852521014}
+{"patch":[[[[0,"ubsecion"],[1,"s"],[0,":\n% Intr"]],9529,9529,16,17]],"time":1425852520180}
+{"patch":[[[[0,"ubsecion"],[1,"d"],[0,"s:\n% Int"]],9529,9529,16,17]],"time":1425852519463}
+{"patch":[[[[0,"ubsecion"],[1,"t"],[0,"d"],[-1,"s"],[0,":\n% Intr"]],9529,9529,18,18]],"time":1425852518639}
+{"patch":[[[[0,"bseciont"],[-1,"d"],[1,"s"],[0,":\n% Intr"]],9530,9530,17,17]],"time":1425852517936}
+{"patch":[[[[0,"bsec"],[-1,"ionts"],[0,":\n% "]],9530,9530,13,8]],"time":1425852517167}
+{"patch":[[[[0," (and su"],[-1,"bsec"],[0,":\n% Intr"]],9522,9522,20,16]],"time":1425852516365}
+{"patch":[[[[0,"n (a"],[-1,"nd su"],[0,":\n% "]],9521,9521,13,8]],"time":1425852515624}
+{"patch":[[[[0,"section "],[-1,"(a"],[0,":\n% Intr"]],9515,9515,18,16]],"time":1425852514888}
+{"patch":[[[[0," section"],[-1," "],[0,":\n% Intr"]],9514,9514,17,16]],"time":1425852514155}
+{"patch":[[[[0,"section:"],[1," ()"],[0,"\n% Intro"]],9515,9515,16,19]],"time":1425852512311}
+{"patch":[[[[0,"ction: ("],[1,"With si"],[0,")\n% Intr"]],9517,9517,16,23]],"time":1425852511587}
+{"patch":[[[[0,": (With "],[-1,"si"],[0,")\n% Intr"]],9522,9522,18,16]],"time":1425852510041}
+{"patch":[[[[0,"tion: (W"],[-1,"ith "],[0,")\n% Intr"]],9518,9518,20,16]],"time":1425852509276}
+{"patch":[[[[0,"on: "],[-1,"(W)"],[0,"\n% I"]],9520,9520,11,8]],"time":1425852508558}
+{"patch":[[[[0,"section:"],[-1," "],[0,"\n% Intro"]],9515,9515,17,16]],"time":1425852507763}
+{"patch":[[[[0,"M\n% "],[-1,"Game plan for this section:"],[0,"\n% I"]],9492,9492,35,8]],"time":1425852506870}
+{"patch":[[[[0,"ROBLEM\n%"],[-1," "],[0,"\n% Intro"]],9487,9487,17,16]],"time":1425852506155}
+{"patch":[[[[0,"PROBLEM\n"],[-1,"%"],[0,"\n% Intro"]],9486,9486,17,16]],"time":1425852505331}
+{"patch":[[[[0,"PROBLEM\n"],[1,"% "],[0,"\n% Intro"]],9486,9486,16,18]],"time":1425852502651}
+{"patch":[[[[0,"OBLEM\n% "],[1,"Game plan for this section:"],[0,"\n% Intro"]],9488,9488,16,43]],"time":1425852501861}
+{"patch":[[[[0,"Proo"],[-1,"f?"],[0,"\n%=="]],9903,9903,10,8]],"time":1425852494489}
+{"patch":[[[[0,"ror?\n% P"],[-1,"roo"],[0,"\n%======"]],9896,9896,19,16]],"time":1425852493731}
+{"patch":[[[[0,"rror?\n% "],[-1,"P"],[0,"\n%======"]],9895,9895,17,16]],"time":1425852492972}
+{"patch":[[[[0,"Error?\n%"],[-1," "],[0,"\n%======"]],9894,9894,17,16]],"time":1425852488622}
+{"patch":[[[[0," Error?\n"],[-1,"%"],[0,"\n%======"]],9893,9893,17,16]],"time":1425852487861}
+{"patch":[[[[0,"le Error"],[-1,"?\n"],[0,"\n%======"]],9891,9891,18,16]],"time":1425852487111}
+{"patch":[[[[0,"le E"],[-1,"rror"],[0,"\n%=="]],9891,9891,12,8]],"time":1425852486353}
+{"patch":[[[[0,"epta"],[-1,"ble E"],[0,"\n%=="]],9886,9886,13,8]],"time":1425852485567}
+{"patch":[[[[0,"% Accept"],[-1,"a"],[0,"\n%======"]],9881,9881,17,16]],"time":1425852484859}
+{"patch":[[[[0,"\n% A"],[-1,"ccept"],[0,"\n%=="]],9880,9880,13,8]],"time":1425852484063}
+{"patch":[[[[0,"ptimal?\n"],[-1,"% A"],[0,"\n%======"]],9873,9873,19,16]],"time":1425852483339}
+{"patch":[[[[0,"ptimal?\n"],[-1,"\n"],[0,"%======="]],9873,9873,17,16]],"time":1425852482590}
+{"patch":[[[[0,"opti"],[-1,"mal?"],[0,"\n%=="]],9872,9872,12,8]],"time":1425852481800}
+{"patch":[[[[0,"lose to "],[-1,"opti"],[0,"\n%======"]],9864,9864,20,16]],"time":1425852481060}
+{"patch":[[[[0,"lose to "],[1,"p"],[0,"\n%======"]],9864,9864,16,17]],"time":1425852480335}
+{"patch":[[[[0,"m close "],[-1,"t"],[0,"o "],[-1,"p"],[0,"\n%======"]],9861,9861,20,18]],"time":1425852479559}
+{"patch":[[[[0,"m close "],[-1,"o "],[0,"\n%======"]],9861,9861,18,16]],"time":1425852478795}
+{"patch":[[[[0,"gorithm "],[-1,"close "],[0,"\n%======"]],9855,9855,22,16]],"time":1425852478083}
+{"patch":[[[[0,"c algori"],[-1,"thm "],[0,"\n%======"]],9851,9851,20,16]],"time":1425852477268}
+{"patch":[[[[0,"cific al"],[-1,"gori"],[0,"\n%======"]],9847,9847,20,16]],"time":1425852476511}
+{"patch":[[[[0,"pecific "],[-1,"al"],[0,"\n%======"]],9845,9845,18,16]],"time":1425852475771}
+{"patch":[[[[0,"s our sp"],[-1,"ecific "],[0,"\n%======"]],9838,9838,23,16]],"time":1425852474955}
+{"patch":[[[[0,"ose is o"],[-1,"ur sp"],[0,"\n%======"]],9833,9833,21,16]],"time":1425852474258}
+{"patch":[[[[0,"lose is "],[-1,"o"],[1,"th"],[0,"\n%======"]],9832,9832,17,18]],"time":1425852473524}
+{"patch":[[[[0,"lose is "],[-1,"th"],[0,"\n%======"]],9832,9832,18,16]],"time":1425852472717}
+{"patch":[[[[0,"w cl"],[-1,"ose is "],[0,"\n%=="]],9829,9829,15,8]],"time":1425852471933}
+{"patch":[[[[0,"NESS\n% H"],[-1,"ow cl"],[0,"\n%======"]],9820,9820,21,16]],"time":1425852471215}
+{"patch":[[[[0,"TNESS\n% "],[-1,"H"],[0,"\n%======"]],9819,9819,17,16]],"time":1425852470478}
+{"patch":[[[[0,"CTNESS\n%"],[-1," "],[0,"\n%======"]],9818,9818,17,16]],"time":1425852469118}
+{"patch":[[[[0,"ECTNESS\n"],[-1,"%"],[0,"\n%======"]],9817,9817,17,16]],"time":1425852468184}
+{"patch":[[[[0,"ECTNESS\n"],[-1,"\n"],[0,"%======="]],9817,9817,17,16]],"time":1425852467454}
+{"patch":[[[[0,"ECTN"],[-1,"ESS"],[0,"\n%=="]],9817,9817,11,8]],"time":1425852466690}
+{"patch":[[[[0," COR"],[-1,"RECTN"],[0,"\n%=="]],9812,9812,13,8]],"time":1425852465877}
+{"patch":[[[[0,"%\n% "],[-1,"COR"],[0,"\n%=="]],9809,9809,11,8]],"time":1425852465162}
+{"patch":[[[[0,"one.\n%\n%"],[-1," "],[0,"\n%======"]],9804,9804,17,16]],"time":1425852464319}
+{"patch":[[[[0," one.\n%\n"],[-1,"%"],[0,"\n%======"]],9803,9803,17,16]],"time":1425852463371}
+{"patch":[[[[0," one.\n%\n"],[-1,"\n"],[0,"%======="]],9803,9803,17,16]],"time":1425852462639}
+{"patch":[[[[0,"an one.\n"],[-1,"%"],[0,"\n%======"]],9801,9801,17,16]],"time":1425852461840}
+{"patch":[[[[0,"n one.\n\n"],[1,"\n"],[0,"%======="]],9802,9802,16,17]],"time":1425852461098}
+{"patch":[[[[0,"n one.\n\n"],[-1,"\n"],[0,"%======="]],9802,9802,17,16]],"time":1425852460335}
+{"patch":[[[[0,"an one.\n"],[-1,"\n"],[0,"%======="]],9801,9801,17,16]],"time":1425852459552}
+{"patch":[[[[0,"rocedure"],[-1,"."],[0,"\n% Expla"]],9683,9683,17,16]],"time":1425852455769}
+{"patch":[[[[0,"nted for"],[-1,"."],[0,"\n% Descr"]],9739,9739,17,16]],"time":1425852454713}
+{"patch":[[[[0," tha"],[-1,"n one."],[0,"\n%=="]],9796,9796,14,8]],"time":1425852453199}
+{"patch":[[[[0,"ere are "],[-1,"more tha"],[0,"\n%======"]],9784,9784,24,16]],"time":1425852452428}
+{"patch":[[[[0,"es if th"],[-1,"ere are "],[0,"\n%======"]],9776,9776,24,16]],"time":1425852451631}
+{"patch":[[[[0,"roaches "],[-1,"if th"],[0,"\n%======"]],9771,9771,21,16]],"time":1425852450880}
+{"patch":[[[[0," approac"],[-1,"hes "],[0,"\n%======"]],9767,9767,20,16]],"time":1425852449360}
+{"patch":[[[[0,"ed appro"],[-1,"ac"],[0,"\n%======"]],9765,9765,18,16]],"time":1425852448642}
+{"patch":[[[[0,"ompared "],[-1,"appro"],[0,"\n%======"]],9760,9760,21,16]],"time":1425852447946}
+{"patch":[[[[0," com"],[-1,"pared "],[0,"\n%=="]],9758,9758,14,8]],"time":1425852447083}
+{"patch":[[[[0,"escribe "],[-1,"com"],[0,"\n%======"]],9751,9751,19,16]],"time":1425852446374}
+{"patch":[[[[0,"\n% Descr"],[-1,"ibe "],[0,"\n%======"]],9747,9747,20,16]],"time":1425852444784}
+{"patch":[[[[0," for\n% D"],[-1,"escr"],[0,"\n%======"]],9743,9743,20,16]],"time":1425852444078}
+{"patch":[[[[0,"d for\n% "],[-1,"D"],[0,"\n%======"]],9742,9742,17,16]],"time":1425852443319}
+{"patch":[[[[0,"ed for\n%"],[-1," "],[0,"\n%======"]],9741,9741,17,16]],"time":1425852438846}
+{"patch":[[[[0,"ed for\n%"],[1," Explain ho"],[0,"\n%======"]],9741,9741,16,27]],"time":1425852438011}
+{"patch":[[[[0,"plain ho"],[1,"w "],[0,"\n%======"]],9752,9752,16,18]],"time":1425852437215}
+{"patch":[[[[0,"xplain h"],[-1,"ow "],[0,"\n%======"]],9751,9751,19,16]],"time":1425852435778}
+{"patch":[[[[0,"for\n% Ex"],[-1,"plain h"],[0,"\n%======"]],9744,9744,23,16]],"time":1425852435031}
+{"patch":[[[[0,"ed for\n%"],[-1," Ex"],[0,"\n%======"]],9741,9741,19,16]],"time":1425852434235}
+{"patch":[[[[0,"ted for\n"],[-1,"%\n"],[0,"%======="]],9740,9740,18,16]],"time":1425852433510}
+{"patch":[[[[0,"accounte"],[-1,"d for"],[0,"\n%======"]],9734,9734,21,16]],"time":1425852431954}
+{"patch":[[[[0," acc"],[-1,"ounte"],[0,"\n%=="]],9733,9733,13,8]],"time":1425852431249}
+{"patch":[[[[0,"s ar"],[-1,"e acc"],[0,"\n%=="]],9728,9728,13,8]],"time":1425852430435}
+{"patch":[[[[0,"onstrain"],[-1,"ts ar"],[0,"\n%======"]],9719,9719,21,16]],"time":1425852429664}
+{"patch":[[[[0,"us const"],[-1,"rain"],[1,"a"],[0,"\n%======"]],9715,9715,20,17]],"time":1425852428962}
+{"patch":[[[[0,"various "],[-1,"consta"],[0,"\n%======"]],9710,9710,22,16]],"time":1425852428152}
+{"patch":[[[[0," the var"],[-1,"ious "],[0,"\n%======"]],9705,9705,21,16]],"time":1425852427394}
+{"patch":[[[[0,"ow t"],[-1,"he var"],[0,"\n%=="]],9703,9703,14,8]],"time":1425852426674}
+{"patch":[[[[0,"ain how "],[-1,"t"],[0,"\n%======"]],9698,9698,17,16]],"time":1425852425918}
+{"patch":[[[[0,"Explain "],[-1,"how "],[0,"\n%======"]],9694,9694,20,16]],"time":1425852425174}
+{"patch":[[[[0,"% Ex"],[-1,"plain "],[0,"\n%=="]],9692,9692,14,8]],"time":1425852423654}
+{"patch":[[[[0,"edure\n% "],[-1,"Ex"],[0,"\n%======"]],9686,9686,18,16]],"time":1425852422926}
+{"patch":[[[[0,"cedure\n%"],[-1," "],[0,"\n%======"]],9685,9685,17,16]],"time":1425852422097}
+{"patch":[[[[0,"ocedure\n"],[-1,"%\n"],[0,"%======="]],9684,9684,18,16]],"time":1425852421379}
+{"patch":[[[[0," procedu"],[-1,"re"],[0,"\n%======"]],9681,9681,18,16]],"time":1425852420591}
+{"patch":[[[[0,"fic proc"],[-1,"edu"],[0,"\n%======"]],9678,9678,19,16]],"time":1425852419874}
+{"patch":[[[[0,"ecific p"],[-1,"roc"],[0,"\n%======"]],9675,9675,19,16]],"time":1425852419066}
+{"patch":[[[[0,"r specif"],[-1,"ic p"],[0,"\n%======"]],9671,9671,20,16]],"time":1425852418364}
+{"patch":[[[[0,"be our s"],[-1,"pecif"],[0,"\n%======"]],9666,9666,21,16]],"time":1425852417607}
+{"patch":[[[[0,"ibe our "],[-1,"s"],[0,"\n%======"]],9665,9665,17,16]],"time":1425852416806}
+{"patch":[[[[0,"cribe ou"],[-1,"r"],[1,"t"],[0," \n%====="]],9663,9663,17,17]],"time":1425852416082}
+{"patch":[[[[0,"crib"],[-1,"e out "],[0,"\n%=="]],9663,9663,14,8]],"time":1425852415299}
+{"patch":[[[[0,"S\n% Desc"],[-1,"rib"],[0,"\n%======"]],9656,9656,19,16]],"time":1425852414537}
+{"patch":[[[[0,"ENTS\n% D"],[-1,"esc"],[0,"\n%======"]],9653,9653,19,16]],"time":1425852413815}
+{"patch":[[[[0,"MENTS\n% "],[-1,"D"],[0,"\n%======"]],9652,9652,17,16]],"time":1425852413045}
+{"patch":[[[[0,"TMENTS\n%"],[-1," "],[0,"\n%======"]],9651,9651,17,16]],"time":1425852412214}
+{"patch":[[[[0,"STMENTS\n"],[-1,"%\n"],[0,"%======="]],9650,9650,18,16]],"time":1425852411500}
+{"patch":[[[[0,"JUSTMENT"],[-1,"S"],[0,"\n%======"]],9648,9648,17,16]],"time":1425852410447}
+{"patch":[[[[0,"ADJU"],[-1,"STMENT"],[0,"\n%=="]],9646,9646,14,8]],"time":1425852409669}
+{"patch":[[[[0,"\n% A"],[-1,"DJU"],[0,"\n%=="]],9643,9643,11,8]],"time":1425852408952}
+{"patch":[[[[0,"lem\n%\n% "],[-1,"A"],[0,"\n%======"]],9638,9638,17,16]],"time":1425852408175}
+{"patch":[[[[0,"blem\n%\n%"],[-1," "],[0,"\n%======"]],9637,9637,17,16]],"time":1425852405876}
+{"patch":[[[[0,"oblem\n%\n"],[-1,"%\n"],[0,"%======="]],9636,9636,18,16]],"time":1425852404542}
+{"patch":[[[[0,"problem\n"],[-1,"%"],[0,"\n%======"]],9634,9634,17,16]],"time":1425852403743}
+{"patch":[[[[0,"problem\n"],[1,"#"],[0,"\n%======"]],9634,9634,16,17]],"time":1425852402967}
+{"patch":[[[[0,"problem\n"],[-1,"#"],[0,"\n%======"]],9634,9634,17,16]],"time":1425852402024}
+{"patch":[[[[0,"problem\n"],[-1,"\n"],[0,"%======="]],9634,9634,17,16]],"time":1425852396740}
+{"patch":[[[[0,"and our "],[-1,"problem"],[0,"\n%======"]],9626,9626,23,16]],"time":1425852394059}
+{"patch":[[[[0,"(s) and "],[-1,"our "],[0,"\n%======"]],9622,9622,20,16]],"time":1425852393311}
+{"patch":[[[[0,"type(s) "],[-1,"and "],[0,"\n%======"]],9618,9618,20,16]],"time":1425852392595}
+{"patch":[[[[0,"type"],[-1,"(s) "],[0,"\n%=="]],9618,9618,12,8]],"time":1425852391807}
+{"patch":[[[[0,"Archetyp"],[-1,"e"],[0,"\n%======"]],9613,9613,17,16]],"time":1425852391035}
+{"patch":[[[[0,"n Archet"],[-1,"yp"],[0,"\n%======"]],9611,9611,18,16]],"time":1425852390280}
+{"patch":[[[[0,"en Arche"],[-1,"t"],[0,"\n%======"]],9610,9610,17,16]],"time":1425852389499}
+{"patch":[[[[0,"etween A"],[-1,"rche"],[0,"\n%======"]],9606,9606,20,16]],"time":1425852388767}
+{"patch":[[[[0,"between "],[-1,"A"],[0,"\n%======"]],9605,9605,17,16]],"time":1425852387995}
+{"patch":[[[[0,"between "],[1,"a"],[0,"\n%======"]],9605,9605,16,17]],"time":1425852386615}
+{"patch":[[[[0,"between "],[-1,"a"],[0,"\n%======"]],9605,9605,17,16]],"time":1425852385855}
+{"patch":[[[[0,"s betwee"],[-1,"n "],[0,"\n%======"]],9603,9603,18,16]],"time":1425852381868}
+{"patch":[[[[0,"ences be"],[-1,"twee"],[0,"\n%======"]],9599,9599,20,16]],"time":1425852381151}
+{"patch":[[[[0,"erences "],[-1,"be"],[0,"\n%======"]],9597,9597,18,16]],"time":1425852380379}
+{"patch":[[[[0,"e differ"],[-1,"ences "],[0,"\n%======"]],9591,9591,22,16]],"time":1425852378863}
+{"patch":[[[[0,"scribe d"],[-1,"iffer"],[0,"\n%======"]],9586,9586,21,16]],"time":1425852378068}
+{"patch":[[[[0,"scribe d"],[1,"ef"],[0,"\n%======"]],9586,9586,16,18]],"time":1425852377310}
+{"patch":[[[[0,"scribe d"],[-1,"ef"],[0,"\n%======"]],9586,9586,18,16]],"time":1425852376599}
+{"patch":[[[[0,"escribe "],[-1,"d"],[0,"\n%======"]],9585,9585,17,16]],"time":1425852375821}
+{"patch":[[[[0,"gorithms"],[1," "],[0,"\n% Descr"]],9573,9573,16,17]],"time":1425852373705}
+{"patch":[[[[0,"orithms "],[1,"and "],[0,"\n% Descr"]],9574,9574,16,20]],"time":1425852372750}
+{"patch":[[[[0,"thms and"],[-1," "],[0,"\n% Descr"]],9577,9577,17,16]],"time":1425852371945}
+{"patch":[[[[0,"gorithms"],[-1," and"],[0,"\n% Descr"]],9573,9573,20,16]],"time":1425852371179}
+{"patch":[[[[0,"algorith"],[-1,"ms"],[0,"\n% Descr"]],9571,9571,18,16]],"time":1425852370459}
+{"patch":[[[[0,"mon algo"],[-1,"rith"],[0,"\n% Descr"]],9567,9567,20,16]],"time":1425852369699}
+{"patch":[[[[0,"common a"],[-1,"lgo"],[0,"\n% Descr"]],9564,9564,19,16]],"time":1425852368902}
+{"patch":[[[[0,"ude comm"],[-1,"on a"],[0,"\n% Descr"]],9560,9560,20,16]],"time":1425852368179}
+{"patch":[[[[0,"Include "],[-1,"comm"],[0,"\n% Descr"]],9556,9556,20,16]],"time":1425852367434}
+{"patch":[[[[0,"Incl"],[-1,"ude "],[1,"d"],[0,"\n% D"]],9556,9556,12,9]],"time":1425852366660}
+{"patch":[[[[0," - I"],[-1,"ncld"],[0,"\n% D"]],9553,9553,12,8]],"time":1425852365873}
+{"patch":[[[[0,"ype\n% - "],[-1,"I"],[0,"\n% Descr"]],9548,9548,17,16]],"time":1425852365144}
+{"patch":[[[[0,"etype\n% "],[-1,"- "],[0,"\n% Descr"]],9546,9546,18,16]],"time":1425852364347}
+{"patch":[[[[0,"hetype\n%"],[-1," "],[0,"\n% Descr"]],9545,9545,17,16]],"time":1425852363604}
+{"patch":[[[[0,"chetype\n"],[-1,"%"],[0,"\n% Descr"]],9544,9544,17,16]],"time":1425852362911}
+{"patch":[[[[0,"chetype\n"],[-1,"\n"],[0,"% Descri"]],9544,9544,17,16]],"time":1425852362031}
+{"patch":[[[[0,"escr"],[-1,"ibe "],[0,"\n%=="]],9555,9555,12,8]],"time":1425852357689}
+{"patch":[[[[0,"type\n% D"],[-1,"escr"],[0,"\n%======"]],9547,9547,20,16]],"time":1425852356979}
+{"patch":[[[[0,"hetype\n%"],[-1," D"],[0,"\n%======"]],9545,9545,18,16]],"time":1425852356191}
+{"patch":[[[[0,"chetype\n"],[-1,"%"],[0,"\n%======"]],9544,9544,17,16]],"time":1425852355441}
+{"patch":[[[[0,"chetype\n"],[-1,"\n"],[0,"%======="]],9544,9544,17,16]],"time":1425852354705}
+{"patch":[[[[0,"l Archet"],[-1,"ype"],[0,"\n%======"]],9540,9540,19,16]],"time":1425852353905}
+{"patch":[[[[0,"l Ar"],[-1,"chet"],[0,"\n%=="]],9540,9540,12,8]],"time":1425852353145}
+{"patch":[[[[0,"Mode"],[-1,"l Ar"],[0,"\n%=="]],9536,9536,12,8]],"time":1425852352415}
+{"patch":[[[[0,"uce "],[-1,"Mode"],[0,"\n%=="]],9532,9532,12,8]],"time":1425852351573}
+{"patch":[[[[0," Int"],[-1,"roduce "],[0,"\n%=="]],9525,9525,15,8]],"time":1425852350868}
+{"patch":[[[[0,"tion:\n% "],[-1,"Int"],[0,"\n%======"]],9518,9518,19,16]],"time":1425852350140}
+{"patch":[[[[0,"ction:\n%"],[-1," "],[0,"\n%======"]],9517,9517,17,16]],"time":1425852349400}
+{"patch":[[[[0,"ection:\n"],[-1,"%"],[0,"\n%======"]],9516,9516,17,16]],"time":1425852343197}
+{"patch":[[[[0," section"],[-1,":\n"],[0,"\n%======"]],9514,9514,18,16]],"time":1425852342418}
+{"patch":[[[[0,"this sec"],[-1,"tion"],[1,"i"],[0,"\n%======"]],9510,9510,20,17]],"time":1425852341685}
+{"patch":[[[[0,"this sec"],[-1,"i"],[0,"\n%======"]],9510,9510,17,16]],"time":1425852340113}
+{"patch":[[[[0," thi"],[-1,"s sec"],[0,"\n%=="]],9509,9509,13,8]],"time":1425852339358}
+{"patch":[[[[0,"plan for"],[-1," thi"],[0,"\n%======"]],9501,9501,20,16]],"time":1425852338615}
+{"patch":[[[[0,"e pl"],[-1,"an for"],[0,"\n%=="]],9499,9499,14,8]],"time":1425852337816}
+{"patch":[[[[0,"M\n% "],[-1,"Game pl"],[0,"\n%=="]],9492,9492,15,8]],"time":1425852337067}
+{"patch":[[[[0,"PROBLEM\n"],[-1,"% "],[0,"\n%======"]],9486,9486,18,16]],"time":1425852336349}
+{"patch":[[[[0,"PROBLEM\n"],[1,"\\comm"],[0,"\n%======"]],9486,9486,16,21]],"time":1425852334757}
+{"patch":[[[[0,"EM\n\\comm"],[1,"ent{Game pla}"],[0,"\n%======"]],9491,9491,16,29]],"time":1425852334019}
+{"patch":[[[[0,"{Game pl"],[-1,"a"],[0,"}\n%====="]],9502,9502,17,16]],"time":1425852333300}
+{"patch":[[[[0,"t{Ga"],[-1,"me pl"],[0,"}\n%="]],9501,9501,13,8]],"time":1425852332533}
+{"patch":[[[[0,"ent{"],[-1,"Ga"],[1," "],[0,"}\n%="]],9499,9499,10,9]],"time":1425852331742}
+{"patch":[[[[0,"omment{ "],[1,"Ga"],[0,"}\n%====="]],9496,9496,16,18]],"time":1425852331018}
+{"patch":[[[[0,"nt{ "],[-1,"Ga"],[0,"}\n%="]],9500,9500,10,8]],"time":1425852330237}
+{"patch":[[[[0,"comment{"],[-1," "],[0,"}\n%====="]],9495,9495,17,16]],"time":1425852329522}
+{"patch":[[[[0,"\\comment"],[-1,"{}"],[0,"\n%======"]],9494,9494,18,16]],"time":1425852328718}
+{"patch":[[[[0,"M\n\\comme"],[-1,"n"],[0,"t\n%====="]],9492,9492,17,16]],"time":1425852327982}
+{"patch":[[[[0,"LEM\n\\com"],[-1,"met"],[1,"en"],[0,"\n%======"]],9490,9490,19,18]],"time":1425852326410}
+{"patch":[[[[0,"LEM\n\\com"],[-1,"en"],[0,"\n%======"]],9490,9490,18,16]],"time":1425852325645}
+{"patch":[[[[0,"ROBLEM\n\\"],[-1,"com"],[0,"\n%======"]],9487,9487,19,16]],"time":1425852324998}
+{"patch":[[[[0,"PROBLEM\n"],[-1,"\\"],[0,"\n%======"]],9486,9486,17,16]],"time":1425852324126}
+{"patch":[[[[0,"PROBLEM\n"],[1,"%"],[0,"\n%======"]],9486,9486,16,17]],"time":1425852322885}
+{"patch":[[[[0,"PROBLEM\n"],[-1,"%"],[0,"\n%======"]],9486,9486,17,16]],"time":1425852320734}
+{"patch":[[[[0,"PROBLEM\n"],[1,"%"],[0,"\n%======"]],9486,9486,16,17]],"time":1425852319303}
+{"patch":[[[[0,"PROBLEM\n"],[-1,"%"],[0,"\n%======"]],9486,9486,17,16]],"time":1425852318207}
+{"patch":[[[[0,"PROBLEM\n"],[-1,"\n"],[0,"%======="]],9486,9486,17,16]],"time":1425852317394}
+{"patch":[[[[0,"s_n, f_n"],[-1,")"],[0,"\\}$, wha"]],10253,10253,17,16]],"time":1425852297378}
+{"patch":[[[[0,"\\ldots, "],[-1,"("],[0,"s_n, f_n"]],10244,10244,17,16]],"time":1425852296635}
+{"patch":[[[[0,"\\ldots, "],[1,"9"],[0,"s_n, f_n"]],10244,10244,16,17]],"time":1425852295635}
+{"patch":[[[[0,"\\ldots, "],[-1,"9"],[0,"s_n, f_n"]],10244,10244,17,16]],"time":1425852294495}
+{"patch":[[[[0,"s_2, f_2"],[-1,")"],[0,", \\ldots"]],10233,10233,17,16]],"time":1425852291602}
+{"patch":[[[[0,", f_1), "],[-1,"("],[0,"s_2, f_2"]],10224,10224,17,16]],"time":1425852290512}
+{"patch":[[[[0,"ples $\\{"],[-1,"("],[0,"s_1, f_1"]],10212,10212,17,16]],"time":1425852289004}
+{"patch":[[[[0,"s_1, f_1"],[-1,")"],[0,", s_2, f"]],10220,10220,17,16]],"time":1425852287946}
+{"patch":[[[[0,"t of tup"],[-1,"les"],[0," $\\{s_1,"]],10205,10205,19,16]],"time":1425852285964}
+{"patch":[[[[0,"set of t"],[-1,"up"],[0," $\\{s_1,"]],10203,10203,18,16]],"time":1425852285110}
+{"patch":[[[[0,"set of t"],[1,"tup"],[0," $\\{s_1,"]],10203,10203,16,19]],"time":1425852283541}
+{"patch":[[[[0,"et of tt"],[-1,"up"],[0," $\\{s_1,"]],10204,10204,18,16]],"time":1425852282821}
+{"patch":[[[[0,"set of t"],[-1,"t"],[1,"imes"],[0," $\\{s_1,"]],10203,10203,17,20]],"time":1425852282042}
+{"patch":[[[[0,"dots, s_"],[-1,"n"],[0,", f_n\\}$"]],10241,10241,17,16]],"time":1425852267655}
+{"patch":[[[[0,"dots, s_"],[1,"i"],[0,", f_n\\}$"]],10241,10241,16,17]],"time":1425852266672}
+{"patch":[[[[0," s_i, f_"],[-1,"n"],[0,"\\}$, wha"]],10246,10246,17,16]],"time":1425852265442}
+{"patch":[[[[0," s_i, f_"],[1,"i"],[0,"\\}$, wha"]],10246,10246,16,17]],"time":1425852264645}
+{"patch":[[[[0,", s_i, f"],[-1,"_i"],[0,"\\}$, wha"]],10245,10245,18,16]],"time":1425852262758}
+{"patch":[[[[0,"s, s_i, "],[-1,"f"],[0,"\\}$, wha"]],10244,10244,17,16]],"time":1425852262017}
+{"patch":[[[[0,"ots, s_i"],[-1,", "],[0,"\\}$, wha"]],10242,10242,18,16]],"time":1425852261107}
+{"patch":[[[[0,"dots, s_"],[-1,"i"],[0,"\\}$, wha"]],10241,10241,17,16]],"time":1425852260376}
+{"patch":[[[[0,"ldots, s"],[-1,"_"],[0,"\\}$, wha"]],10240,10240,17,16]],"time":1425852259556}
+{"patch":[[[[0,"\\ldots, "],[-1,"s"],[0,"\\}$, wha"]],10239,10239,17,16]],"time":1425852258798}
+{"patch":[[[[0,", \\ldots"],[-1,", "],[0,"\\}$, wha"]],10237,10237,18,16]],"time":1425852256440}
+{"patch":[[[[0," f_2, \\l"],[-1,"dots"],[0,"\\}$, wha"]],10233,10233,20,16]],"time":1425852254898}
+{"patch":[[[[0,"2, f_2, "],[-1,"\\l"],[0,"\\}$, wha"]],10231,10231,18,16]],"time":1425852254167}
+{"patch":[[[[0,"_2, f_2,"],[-1," "],[0,"\\}$, wha"]],10230,10230,17,16]],"time":1425852252656}
+{"patch":[[[[0,"s_2, f_2"],[-1,","],[0,"\\}$, wha"]],10229,10229,17,16]],"time":1425852251668}
+{"patch":[[[[0,"s I need"],[-1," for "],[0,"\n\n% Comm"]],10281,10281,21,16]],"time":1425852243809}
+{"patch":[[[[0,"iners I "],[-1,"need"],[0,"\n\n% Comm"]],10277,10277,20,16]],"time":1425852243046}
+{"patch":[[[[0,"iner"],[-1,"s I "],[0,"\n\n% "]],10277,10277,12,8]],"time":1425852242320}
+{"patch":[[[[0,"cont"],[-1,"ainer"],[0,"\n\n% "]],10272,10272,13,8]],"time":1425852241523}
+{"patch":[[[[0,"mber of "],[-1,"cont"],[0,"\n\n% Comm"]],10264,10264,20,16]],"time":1425852240799}
+{"patch":[[[[0,"mum numb"],[-1,"er of "],[0,"\n\n% Comm"]],10258,10258,22,16]],"time":1425852240004}
+{"patch":[[[[0,"minimum "],[-1,"numb"],[0,"\n\n% Comm"]],10254,10254,20,16]],"time":1425852239256}
+{"patch":[[[[0,"he minim"],[-1,"um "],[0,"\n\n% Comm"]],10251,10251,19,16]],"time":1425852238520}
+{"patch":[[[[0,"the mini"],[-1,"m"],[0,"\n\n% Comm"]],10250,10250,17,16]],"time":1425852237750}
+{"patch":[[[[0," is the "],[-1,"mini"],[0,"\n\n% Comm"]],10246,10246,20,16]],"time":1425852236974}
+{"patch":[[[[0,"what is "],[-1,"the "],[0,"\n\n% Comm"]],10242,10242,20,16]],"time":1425852236183}
+{"patch":[[[[0,"_2\\}$, w"],[-1,"hat is "],[0,"\n\n% Comm"]],10235,10235,23,16]],"time":1425852235468}
+{"patch":[[[[0,"f_2\\}$, "],[-1,"w"],[0,"\n\n% Comm"]],10234,10234,17,16]],"time":1425852234696}
+{"patch":[[[[0,"f_2\\}$, "],[1,"f"],[0,"\n\n% Comm"]],10234,10234,16,17]],"time":1425852231478}
+{"patch":[[[[0,"f_2\\}$, "],[-1,"f"],[0,"\n\n% Comm"]],10234,10234,17,16]],"time":1425852212382}
+{"patch":[[[[0,"2, f_2\\}"],[-1,"$, "],[0,"\n\n% Comm"]],10231,10231,19,16]],"time":1425852210487}
+{"patch":[[[[0,"2, f_2\\}"],[1,", "],[0,"\n\n% Comm"]],10231,10231,16,18]],"time":1425852208959}
+{"patch":[[[[0,", f_2\\},"],[-1," "],[0,"\n\n% Comm"]],10232,10232,17,16]],"time":1425852207443}
+{"patch":[[[[0,"2, f_2\\}"],[-1,","],[0,"\n\n% Comm"]],10231,10231,17,16]],"time":1425852206420}
+{"patch":[[[[0,"s_2, f_2"],[-1,"\\"],[0,"}\n\n% Com"]],10229,10229,17,16]],"time":1425852203364}
+{"patch":[[[[0," s_2, f_"],[-1,"2"],[1,"@"],[0,"}\n\n% Com"]],10228,10228,17,17]],"time":1425852202165}
+{"patch":[[[[0,", f_"],[-1,"@"],[0,"}\n\n%"]],10232,10232,9,8]],"time":1425852201364}
+{"patch":[[[[0,", s_2, f"],[-1,"_"],[0,"}\n\n% Com"]],10227,10227,17,16]],"time":1425852200606}
+{"patch":[[[[0,"_1, s_2,"],[-1," f"],[0,"}\n\n% Com"]],10225,10225,18,16]],"time":1425852199885}
+{"patch":[[[[0,"f_1, s_2"],[-1,","],[0,"}\n\n% Com"]],10224,10224,17,16]],"time":1425852199062}
+{"patch":[[[[0," f_1, s_"],[-1,"2"],[0,"}\n\n% Com"]],10223,10223,17,16]],"time":1425852197949}
+{"patch":[[[[0,", f_1, s"],[-1,"_"],[0,"}\n\n% Com"]],10222,10222,17,16]],"time":1425852197180}
+{"patch":[[[[0,"1, f_1, "],[-1,"s"],[0,"}\n\n% Com"]],10221,10221,17,16]],"time":1425852196135}
+{"patch":[[[[0,"s_1, f_1"],[-1,", "],[0,"}\n\n% Com"]],10219,10219,18,16]],"time":1425852195317}
+{"patch":[[[[0,"{s_1, f_"],[-1,"1"],[0,"}\n\n% Com"]],10218,10218,17,16]],"time":1425852193752}
+{"patch":[[[[0,"$\\{s_1, "],[-1,"f_"],[0,"}\n\n% Com"]],10216,10216,18,16]],"time":1425852193041}
+{"patch":[[[[0," $\\{s_1,"],[-1," "],[0,"}\n\n% Com"]],10215,10215,17,16]],"time":1425852192268}
+{"patch":[[[[0,"s $\\{s_1"],[-1,","],[0,"}\n\n% Com"]],10214,10214,17,16]],"time":1425852191290}
+{"patch":[[[[0,"es $\\{s_"],[-1,"1"],[1,"i"],[0,"}\n\n% Com"]],10213,10213,17,17]],"time":1425852190332}
+{"patch":[[[[0,"es $\\{s_"],[-1,"i"],[0,"}\n\n% Com"]],10213,10213,17,16]],"time":1425852189607}
+{"patch":[[[[0,"mes $\\{s"],[-1,"_"],[0,"}\n\n% Com"]],10212,10212,17,16]],"time":1425852188817}
+{"patch":[[[[0,"imes $\\{"],[-1,"s"],[0,"}\n\n% Com"]],10211,10211,17,16]],"time":1425852187097}
+{"patch":[[[[0,"es $"],[-1,"\\{}"],[0,"\n\n% "]],10213,10213,11,8]],"time":1425852186305}
+{"patch":[[[[0," times $"],[1,"{s}"],[0,"\n\n% Comm"]],10209,10209,16,19]],"time":1425852185453}
+{"patch":[[[[0,"times ${"],[-1,"s"],[0,"}\n\n% Com"]],10210,10210,17,16]],"time":1425852184630}
+{"patch":[[[[0," times $"],[-1,"{}"],[0,"\n\n% Comm"]],10209,10209,18,16]],"time":1425852183577}
+{"patch":[[[[0," times $"],[1,"s"],[0,"\n\n% Comm"]],10209,10209,16,17]],"time":1425852181160}
+{"patch":[[[[0,"times $s"],[1,"_"],[0,"\n\n% Comm"]],10210,10210,16,17]],"time":1425852180128}
+{"patch":[[[[0,"imes $s_"],[1,"j"],[0,"\n\n% Comm"]],10211,10211,16,17]],"time":1425852176274}
+{"patch":[[[[0,"imes $s_"],[-1,"j"],[0,"\n\n% Comm"]],10211,10211,17,16]],"time":1425852175085}
+{"patch":[[[[0," times $"],[-1,"s_"],[0,"\n\n% Comm"]],10209,10209,18,16]],"time":1425852174327}
+{"patch":[[[[0," times $"],[1,"S"],[0,"\n\n% Comm"]],10209,10209,16,17]],"time":1425852173544}
+{"patch":[[[[0," times $"],[-1,"S"],[0,"\n\n% Comm"]],10209,10209,17,16]],"time":1425852172813}
+{"patch":[[[[0,"f times "],[-1,"$"],[0,"\n\n% Comm"]],10208,10208,17,16]],"time":1425852172065}
+{"patch":[[[[0,"set of t"],[-1,"imes "],[0,"\n\n% Comm"]],10203,10203,21,16]],"time":1425852170081}
+{"patch":[[[[0," set of "],[-1,"t"],[0,"\n\n% Comm"]],10202,10202,17,16]],"time":1425852169339}
+{"patch":[[[[0,"a set of"],[-1," "],[0,"\n\n% Comm"]],10201,10201,17,16]],"time":1425852161700}
+{"patch":[[[[0,"en a set"],[-1," of"],[0,"\n\n% Comm"]],10198,10198,19,16]],"time":1425852160887}
+{"patch":[[[[0,"ven "],[-1,"a set"],[0,"\n\n% "]],10197,10197,13,8]],"time":1425852160159}
+{"patch":[[[[0,"asks ``G"],[-1,"iven "],[0,"\n\n% Comm"]],10188,10188,21,16]],"time":1425852159444}
+{"patch":[[[[0," asks ``"],[-1,"G"],[0,"\n\n% Comm"]],10187,10187,17,16]],"time":1425852158679}
+{"patch":[[[[0,"m asks `"],[-1,"`"],[0,"\n\n% Comm"]],10186,10186,17,16]],"time":1425852156905}
+{"patch":[[[[0,"em asks "],[-1,"`"],[0,"\n\n% Comm"]],10185,10185,17,16]],"time":1425852155923}
+{"patch":[[[[0,"lem asks"],[-1," "],[0,"\n\n% Comm"]],10184,10184,17,16]],"time":1425852155185}
+{"patch":[[[[0,"roblem a"],[-1,"sks"],[0,"\n\n% Comm"]],10181,10181,19,16]],"time":1425852154457}
+{"patch":[[[[0,"problem "],[-1,"a"],[0,"\n\n% Comm"]],10180,10180,17,16]],"time":1425852153635}
+{"patch":[[[[0,"oblem as"],[-1,"ks"],[0," ``Given"]],9920,9920,18,16]],"time":1425852151668}
+{"patch":[[[[0,"problem "],[-1,"a"],[0,"s ``Give"]],9918,9918,17,16]],"time":1425852150404}
+{"patch":[[[[0,"roblem s"],[1,"tate"],[0," ``Given"]],9919,9919,16,20]],"time":1425852149612}
+{"patch":[[[[0,"em state"],[1,"s"],[0," ``Given"]],9923,9923,16,17]],"time":1425852148873}
+{"patch":[[[[0," problem"],[-1," "],[0,"\n\n% Comm"]],10181,10181,17,16]],"time":1425852146728}
+{"patch":[[[[0,"ioning p"],[-1,"roblem"],[0,"\n\n% Comm"]],10175,10175,22,16]],"time":1425852145775}
+{"patch":[[[[0,"artition"],[-1,"ing p"],[0,"\n\n% Comm"]],10170,10170,21,16]],"time":1425852145015}
+{"patch":[[[[0,"rval par"],[-1,"tition"],[0,"\n\n% Comm"]],10164,10164,22,16]],"time":1425852144301}
+{"patch":[[[[0,"nterval "],[-1,"par"],[0,"\n\n% Comm"]],10161,10161,19,16]],"time":1425852143504}
+{"patch":[[[[0,"he inter"],[-1,"val "],[0,"\n\n% Comm"]],10157,10157,20,16]],"time":1425852142729}
+{"patch":[[[[0,"$.\n\nThe "],[-1,"inter"],[0,"\n\n% Comm"]],10152,10152,21,16]],"time":1425852141999}
+{"patch":[[[[0,"g)/c$.\n\n"],[-1,"The "],[0,"\n\n% Comm"]],10148,10148,20,16]],"time":1425852141185}
+{"patch":[[[[0,"g)/c$.\n\n"],[1,"For "],[0,"\n\n% Comm"]],10148,10148,16,20]],"time":1425852140469}
+{"patch":[[[[0,"$.\n\nFor "],[1,"the interval part"],[0,"\n\n% Comm"]],10152,10152,16,33]],"time":1425852139721}
+{"patch":[[[[0,"val part"],[1,"itioning problem"],[0,"\n\n% Comm"]],10169,10169,16,32]],"time":1425852138966}
+{"patch":[[[[0," problem"],[1," "],[0,"\n\n% Comm"]],10185,10185,16,17]],"time":1425852138175}
+{"patch":[[[[0," problem"],[-1," "],[0,"\n\n% Comm"]],10185,10185,17,16]],"time":1425852137448}
+{"patch":[[[[0,"ioning p"],[-1,"roblem"],[0,"\n\n% Comm"]],10179,10179,22,16]],"time":1425852136634}
+{"patch":[[[[0,"titi"],[-1,"oning p"],[0,"\n\n% "]],10176,10176,15,8]],"time":1425852135864}
+{"patch":[[[[0,"al parti"],[-1,"t"],[0,"i"],[1,"on"],[0,"\n\n% Comm"]],10170,10170,18,19]],"time":1425852135163}
+{"patch":[[[[0,"al parti"],[-1,"ion"],[0,"\n\n% Comm"]],10170,10170,19,16]],"time":1425852134444}
+{"patch":[[[[0,"terval p"],[-1,"arti"],[0,"\n\n% Comm"]],10166,10166,20,16]],"time":1425852133590}
+{"patch":[[[[0,"nterval "],[-1,"p"],[0,"\n\n% Comm"]],10165,10165,17,16]],"time":1425852132887}
+{"patch":[[[[0,"he inter"],[-1,"val "],[0,"\n\n% Comm"]],10161,10161,20,16]],"time":1425852132093}
+{"patch":[[[[0,"For the "],[-1,"inter"],[0,"\n\n% Comm"]],10156,10156,21,16]],"time":1425852131362}
+{"patch":[[[[0,")/c$.\n\nF"],[-1,"or the "],[0,"\n\n% Comm"]],10149,10149,23,16]],"time":1425852130641}
+{"patch":[[[[0,"g)/c$.\n\n"],[-1,"F"],[0,"\n\n% Comm"]],10148,10148,17,16]],"time":1425852129858}
+{"patch":[[[[0,"g)/c$.\n\n"],[1,"For"],[0,"\n\n% Comm"]],10148,10148,16,19]],"time":1425852128788}
+{"patch":[[[[0,"c$.\n\nFor"],[1," "],[0,"\n\n% Comm"]],10151,10151,16,17]],"time":1425852128025}
+{"patch":[[[[0,"/c$.\n\nFo"],[-1,"r "],[0,"\n\n% Comm"]],10150,10150,18,16]],"time":1425852124546}
+{"patch":[[[[0,"g)/c$.\n\n"],[-1,"Fo"],[0,"\n\n% Comm"]],10148,10148,18,16]],"time":1425852123336}
+{"patch":[[[[0,")/c$.\n\n\n"],[-1,"\n"],[0,"% Commen"]],10149,10149,17,16]],"time":1425852122574}
+{"patch":[[[[0,"g)/c$.\n\n"],[-1,"\n"],[0,"% Commen"]],10148,10148,17,16]],"time":1425852121157}
+{"patch":[[[[0,"ig)/c$.\n"],[-1,"\n"],[0,"% Commen"]],10147,10147,17,16]],"time":1425852120363}
+{"patch":[[[[0,"minimum "],[-1,"t"],[0,"o this p"]],10091,10091,17,16]],"time":1425852116501}
+{"patch":[[[[0,"inimum o"],[1,"n"],[0," this pr"]],10092,10092,16,17]],"time":1425852115776}
+{"patch":[[[[0,"imme"],[-1,"diate"],[0," abs"]],10072,10072,13,8]],"time":1425852112252}
+{"patch":[[[[0,"?''\nAn i"],[-1,"mme"],[0," absolut"]],10065,10065,19,16]],"time":1425852111516}
+{"patch":[[[[0,"$?''\nAn "],[-1,"i"],[1,"obvious"],[0," absolut"]],10064,10064,17,23]],"time":1425852110710}
+{"patch":[[[[0,"$a_i"],[-1,"''$?''\nAn obvious absolute minimum on this problem is $\\big(\\sum_{i = 1}^{n}\\;a_i\\big)/c$."],[1,"$?\n"],[0,"\n% C"]],10058,10058,98,11]],"time":1425852106884}
+{"patch":[[[[0,"bers"],[-1," $a_1, \\ldots, a_n$, what is the least number of bins with capacity $c$ that I need to store all numbers $a_i$?"],[0,"\n\n% "]],9949,9949,119,8]],"time":1425852079115}
+{"patch":[[[[0,"some num"],[-1,"bers"],[0,"\n\n% Comm"]],9941,9941,20,16]],"time":1425852069716}
+{"patch":[[[[0,"`Given s"],[-1,"ome num"],[0,"\n\n% Comm"]],9934,9934,23,16]],"time":1425852068992}
+{"patch":[[[[0,"ates ``G"],[-1,"iven s"],[0,"\n\n% Comm"]],9928,9928,22,16]],"time":1425852068273}
+{"patch":[[[[0,"tates ``"],[-1,"G"],[0,"\n\n% Comm"]],9927,9927,17,16]],"time":1425852067515}
+{"patch":[[[[0,"states `"],[-1,"`"],[0,"\n\n% Comm"]],9926,9926,17,16]],"time":1425852066753}
+{"patch":[[[[0," states "],[-1,"`"],[0,"\n\n% Comm"]],9925,9925,17,16]],"time":1425852065760}
+{"patch":[[[[0,"m states"],[-1," "],[0,"\n\n% Comm"]],9924,9924,17,16]],"time":1425852061567}
+{"patch":[[[[0,"oblem st"],[-1,"ates"],[0,"\n\n% Comm"]],9920,9920,20,16]],"time":1425852057020}
+{"patch":[[[[0,"ing prob"],[-1,"lem st"],[0,"\n\n% Comm"]],9914,9914,22,16]],"time":1425852056255}
+{"patch":[[[[0,"bin pack"],[-1,"ing prob"],[0,"\n\n% Comm"]],9906,9906,24,16]],"time":1425852055478}
+{"patch":[[[[0,"eral bin"],[-1," pack"],[0,"\n\n% Comm"]],9901,9901,21,16]],"time":1425852054726}
+{"patch":[[[[0,"general "],[-1,"bin"],[0,"\n\n% Comm"]],9898,9898,19,16]],"time":1425852053983}
+{"patch":[[[[0,"\nThe gen"],[-1,"eral "],[0,"\n\n% Comm"]],9893,9893,21,16]],"time":1425852053189}
+{"patch":[[[[0,"lem.\n\nTh"],[-1,"e gen"],[0,"\n\n% Comm"]],9888,9888,21,16]],"time":1425852052437}
+{"patch":[[[[0,"oblem.\n\n"],[-1,"Th"],[0,"\n\n% Comm"]],9886,9886,18,16]],"time":1425852051709}
+{"patch":[[[[0,"blem.\n\n\n"],[-1,"\n"],[0,"% Commen"]],9887,9887,17,16]],"time":1425852050919}
+{"patch":[[[[0,"oblem.\n\n"],[-1,"\n"],[0,"% Commen"]],9886,9886,17,16]],"time":1425852049640}
+{"patch":[[[[0," problem"],[-1,"."],[0,"\n\n% Comm"]],9883,9883,17,16]],"time":1425852048926}
+{"patch":[[[[0,"packing "],[-1,"problem"],[0,"\n\n% Comm"]],9876,9876,23,16]],"time":1425852048117}
+{"patch":[[[[0,"e bin pa"],[-1,"cking "],[0,"\n\n% Comm"]],9870,9870,22,16]],"time":1425852047362}
+{"patch":[[[[0," of the "],[-1,"bin pa"],[0,"\n\n% Comm"]],9864,9864,22,16]],"time":1425852046652}
+{"patch":[[[[0,"ic case "],[-1,"of the "],[0,"\n\n% Comm"]],9857,9857,23,16]],"time":1425852045846}
+{"patch":[[[[0,"pecific "],[-1,"case "],[0,"\n\n% Comm"]],9852,9852,21,16]],"time":1425852045102}
+{"patch":[[[[0,"is a spe"],[-1,"cific "],[0,"\n\n% Comm"]],9846,9846,22,16]],"time":1425852044391}
+{"patch":[[[[0,"ch is a "],[-1,"spe"],[0,"\n\n% Comm"]],9843,9843,19,16]],"time":1425852043627}
+{"patch":[[[[0," which i"],[-1,"s a "],[0,"\n\n% Comm"]],9839,9839,20,16]],"time":1425852042829}
+{"patch":[[[[0,"m wh"],[-1,"ich i"],[0,"\n\n% "]],9838,9838,13,8]],"time":1425852042074}
+{"patch":[[[[0," problem"],[-1," wh"],[0,"\n\n% Comm"]],9831,9831,19,16]],"time":1425852041364}
+{"patch":[[[[0," problem"],[1,"."],[0,"\n\n% Comm"]],9831,9831,16,17]],"time":1425852040604}
+{"patch":[[[[0,"} proble"],[-1,"m."],[0,"\n\n% Comm"]],9830,9830,18,16]],"time":1425852035591}
+{"patch":[[[[0,"ioning} "],[-1,"proble"],[0,"\n\n% Comm"]],9824,9824,22,16]],"time":1425852034892}
+{"patch":[[[[0,"tioning}"],[-1," "],[0,"\n\n% Comm"]],9823,9823,17,16]],"time":1425852034130}
+{"patch":[[[[0,"partitio"],[-1,"ning"],[0,"}\n\n% Com"]],9818,9818,20,16]],"time":1425852033353}
+{"patch":[[[[0,"rval par"],[-1,"titio"],[1,"i"],[0,"}\n\n% Com"]],9813,9813,21,17]],"time":1425852032627}
+{"patch":[[[[0,"erval pa"],[-1,"ri"],[0,"}\n\n% Com"]],9812,9812,18,16]],"time":1425852031875}
+{"patch":[[[[0,"nterval "],[-1,"pa"],[0,"}\n\n% Com"]],9810,9810,18,16]],"time":1425852031095}
+{"patch":[[[[0,"t{interv"],[-1,"al "],[0,"}\n\n% Com"]],9807,9807,19,16]],"time":1425852030331}
+{"patch":[[[[0,"extit{in"],[-1,"terv"],[0,"}\n\n% Com"]],9803,9803,20,16]],"time":1425852029616}
+{"patch":[[[[0,"\\textit{"],[-1,"in"],[0,"}\n\n% Com"]],9801,9801,18,16]],"time":1425852028859}
+{"patch":[[[[0,"he \\text"],[1,"_"],[0,"it{}\n\n% "]],9798,9798,16,17]],"time":1425852005076}
+{"patch":[[[[0,"he \\text"],[-1,"_"],[0,"it{}\n\n% "]],9798,9798,17,16]],"time":1425852004008}
+{"patch":[[[[0," \\textit"],[-1,"{}"],[0,"\n\n% Comm"]],9800,9800,18,16]],"time":1425852000942}
+{"patch":[[[[0,"he \\text"],[-1,"it"],[0,"\n\n% Comm"]],9798,9798,18,16]],"time":1425852000135}
+{"patch":[[[[0," the \\te"],[-1,"xt"],[0,"\n\n% Comm"]],9796,9796,18,16]],"time":1425851999374}
+{"patch":[[[[0,"on the \\"],[-1,"te"],[0,"\n\n% Comm"]],9794,9794,18,16]],"time":1425851998654}
+{"patch":[[[[0," on the "],[-1,"\\"],[0,"\n\n% Comm"]],9793,9793,17,16]],"time":1425851997899}
+{"patch":[[[[0,"tion on "],[-1,"the "],[0,"\n\n% Comm"]],9789,9789,20,16]],"time":1425851990252}
+{"patch":[[[[0,"iation o"],[-1,"n "],[0,"\n\n% Comm"]],9787,9787,18,16]],"time":1425851989436}
+{"patch":[[[[0,"vari"],[-1,"ation o"],[0,"\n\n% "]],9784,9784,15,8]],"time":1425851988724}
+{"patch":[[[[0,"lly "],[-1,"a vari"],[0,"\n\n% "]],9778,9778,14,8]],"time":1425851987972}
+{"patch":[[[[0,"specific"],[-1,"ally "],[0,"\n\n% Comm"]],9769,9769,21,16]],"time":1425851987179}
+{"patch":[[[[0,"is speci"],[-1,"fic"],[0,"\n\n% Comm"]],9766,9766,19,16]],"time":1425851986430}
+{"patch":[[[[0,"blem is "],[-1,"speci"],[0,"\n\n% Comm"]],9761,9761,21,16]],"time":1425851985721}
+{"patch":[[[[0," problem"],[-1," is "],[0,"\n\n% Comm"]],9757,9757,20,16]],"time":1425851984904}
+{"patch":[[[[0,"s.\nOur p"],[-1,"roblem"],[0,"\n\n% Comm"]],9751,9751,22,16]],"time":1425851984178}
+{"patch":[[[[0,"aches.\nO"],[-1,"ur p"],[0,"\n\n% Comm"]],9747,9747,20,16]],"time":1425851983461}
+{"patch":[[[[0,"oaches.\n"],[-1,"O"],[0,"\n\n% Comm"]],9746,9746,17,16]],"time":1425851982679}
+{"patch":[[[[0,"aches.\n\n"],[-1,"\n"],[0,"% Commen"]],9747,9747,17,16]],"time":1425851963936}
+{"patch":[[[[0,"proa"],[-1,"ches."],[0,"\n\n% "]],9744,9744,13,8]],"time":1425851963223}
+{"patch":[[[[0," viable "],[-1,"approa"],[0,"\n\n% Comm"]],9734,9734,22,16]],"time":1425851962410}
+{"patch":[[[[0,"e all vi"],[-1,"able "],[0,"\n\n% Comm"]],9729,9729,21,16]],"time":1425851961660}
+{"patch":[[[[0,"are all "],[-1,"vi"],[0,"\n\n% Comm"]],9727,9727,18,16]],"time":1425851960943}
+{"patch":[[[[0," are all"],[-1," "],[0,"\n\n% Comm"]],9726,9726,17,16]],"time":1425851960189}
+{"patch":[[[[0," are all"],[1," viable "],[0,"\n\n% Comm"]],9726,9726,16,24]],"time":1425851958174}
+{"patch":[[[[0," all via"],[-1,"ble "],[1,"l"],[0,"\n\n% Comm"]],9730,9730,20,17]],"time":1425851957461}
+{"patch":[[[[0,"all "],[-1,"vial"],[0,"\n\n% "]],9731,9731,12,8]],"time":1425851955893}
+{"patch":[[[[0,"em are a"],[-1,"ll "],[0,"\n\n% Comm"]],9724,9724,19,16]],"time":1425851955162}
+{"patch":[[[[0,"problem "],[-1,"are a"],[0,"\n\n% Comm"]],9719,9719,21,16]],"time":1425851954359}
+{"patch":[[[[0,"ing prob"],[-1,"lem "],[0,"\n\n% Comm"]],9715,9715,20,16]],"time":1425851953606}
+{"patch":[[[[0,"king pro"],[-1,"b"],[0,"\n\n% Comm"]],9714,9714,17,16]],"time":1425851952887}
+{"patch":[[[[0,"bin pack"],[-1,"ing pro"],[0,"\n\n% Comm"]],9707,9707,23,16]],"time":1425851952089}
+{"patch":[[[[0,"nd the b"],[-1,"in pack"],[0,"\n\n% Comm"]],9700,9700,23,16]],"time":1425851951334}
+{"patch":[[[[0,"s, and t"],[-1,"he b"],[0,"\n\n% Comm"]],9696,9696,20,16]],"time":1425851950628}
+{"patch":[[[[0,"ts, and "],[-1,"t"],[0,"\n\n% Comm"]],9695,9695,17,16]],"time":1425851949831}
+{"patch":[[[[0,"slots, a"],[-1,"nd "],[0,"\n\n% Comm"]],9692,9692,19,16]],"time":1425851949029}
+{"patch":[[[[0," slots, "],[-1,"a"],[0,"\n\n% Comm"]],9691,9691,17,16]],"time":1425851948247}
+{"patch":[[[[0,"me slots"],[-1,", "],[0,"\n\n% Comm"]],9689,9689,18,16]],"time":1425851921459}
+{"patch":[[[[0,"n time s"],[-1,"lots"],[0,"\n\n% Comm"]],9685,9685,20,16]],"time":1425851920669}
+{"patch":[[[[0," on "],[-1,"time s"],[0,"\n\n% "]],9683,9683,14,8]],"time":1425851919968}
+{"patch":[[[[0,"programm"],[-1,"ing on "],[0,"\n\n% Comm"]],9672,9672,23,16]],"time":1425851919183}
+{"patch":[[[[0,"ger prog"],[-1,"ramm"],[0,"\n\n% Comm"]],9668,9668,20,16]],"time":1425851917617}
+{"patch":[[[[0," integer"],[-1," prog"],[0,"\n\n% Comm"]],9663,9663,21,16]],"time":1425851916897}
+{"patch":[[[[0,"obs, int"],[-1,"eger"],[0,"\n\n% Comm"]],9659,9659,20,16]],"time":1425851916135}
+{"patch":[[[[0,"f jobs, "],[-1,"int"],[0,"\n\n% Comm"]],9656,9656,19,16]],"time":1425851915326}
+{"patch":[[[[0,"aphs of "],[-1,"jobs, "],[0,"\n\n% Comm"]],9650,9650,22,16]],"time":1425851914569}
+{"patch":[[[[0," on grap"],[-1,"hs of "],[0,"\n\n% Comm"]],9644,9644,22,16]],"time":1425851913856}
+{"patch":[[[[0,"mbers on"],[-1," grap"],[0,"\n\n% Comm"]],9639,9639,21,16]],"time":1425851913060}
+{"patch":[[[[0,"tic numb"],[-1,"ers on"],[0,"\n\n% Comm"]],9633,9633,22,16]],"time":1425851912307}
+{"patch":[[[[0,"romatic "],[-1,"numb"],[0,"\n\n% Comm"]],9629,9629,20,16]],"time":1425851911585}
+{"patch":[[[[0,"ng chrom"],[-1,"atic "],[0,"\n\n% Comm"]],9624,9624,21,16]],"time":1425851910807}
+{"patch":[[[[0,"idering "],[-1,"chrom"],[0,"\n\n% Comm"]],9619,9619,21,16]],"time":1425851910039}
+{"patch":[[[[0,".\nConsid"],[-1,"ering "],[0,"\n\n% Comm"]],9613,9613,22,16]],"time":1425851908540}
+{"patch":[[[[0,"ys.\n"],[-1,"Consid"],[0,"\n\n% "]],9611,9611,14,8]],"time":1425851907984}
+{"patch":[[[[0,"e ways.\n"],[1,"Chroma"],[0,"\n\n% Comm"]],9607,9607,16,22]],"time":1425851906983}
+{"patch":[[[[0,"ways.\nCh"],[-1,"roma"],[0,"\n\n% Comm"]],9609,9609,20,16]],"time":1425851905504}
+{"patch":[[[[0," ways.\nC"],[-1,"h"],[0,"\n\n% Comm"]],9608,9608,17,16]],"time":1425851904763}
+{"patch":[[[[0,"e ways.\n"],[-1,"C"],[0,"\n\n% Comm"]],9607,9607,17,16]],"time":1425851904000}
+{"patch":[[[[0,"le ways."],[-1,"\n"],[1," "],[0,"\n\n% Comm"]],9606,9606,17,17]],"time":1425851901075}
+{"patch":[[[[0,"e wa"],[-1,"ys. "],[0,"\n\n% "]],9607,9607,12,8]],"time":1425851900287}
+{"patch":[[[[0,"ulti"],[-1,"ple wa"],[0,"\n\n% "]],9601,9601,14,8]],"time":1425851899544}
+{"patch":[[[[0,"ached mu"],[-1,"lti"],[0,"\n\n% Comm"]],9594,9594,19,16]],"time":1425851898825}
+{"patch":[[[[0,"oach"],[-1,"ed mu"],[0,"\n\n% "]],9593,9593,13,8]],"time":1425851898119}
+{"patch":[[[[0,"n be app"],[-1,"roach"],[0,"\n\n% Comm"]],9584,9584,21,16]],"time":1425851897281}
+{"patch":[[[[0,"can "],[-1,"be app"],[0,"\n\n% "]],9582,9582,14,8]],"time":1425851896573}
+{"patch":[[[[0,"roblem c"],[-1,"an "],[0,"\n\n% Comm"]],9575,9575,19,16]],"time":1425851895810}
+{"patch":[[[[0," pro"],[-1,"blem c"],[0,"\n\n% "]],9573,9573,14,8]],"time":1425851895026}
+{"patch":[[[[0,"ion}\nOur"],[-1," pro"],[0,"\n\n% Comm"]],9565,9565,20,16]],"time":1425851894267}
+{"patch":[[[[0,"lation}\n"],[-1,"Our"],[0,"\n\n% Comm"]],9562,9562,19,16]],"time":1425851893550}
+{"patch":[[[[0,"ation}\n\n"],[-1,"\n"],[0,"% Commen"]],9563,9563,17,16]],"time":1425851892793}
+{"patch":[[[[0,"ation}\n\n"],[1,"\n"],[0,"% Commen"]],9563,9563,16,17]],"time":1425851891776}
+{"patch":[[[[0,"ation}\n\n"],[-1,"\n"],[0,"% Commen"]],9563,9563,17,16]],"time":1425851836752}
+{"patch":[[[[0,"D TE"],[-1,"XT"],[0," COM"]],11821,11821,10,8]],"time":1425851833423}
+{"patch":[[[[0,"ND O"],[-1,"LD TE"],[0," COM"]],11816,11816,13,8]],"time":1425851832715}
+{"patch":[[[[0,"} % END "],[-1,"O"],[0," COMMENT"]],11811,11811,17,16]],"time":1425851831912}
+{"patch":[[[[0,"} % END "],[-1," "],[0,"COMMENT\n"]],11811,11811,17,16]],"time":1425851831152}
+{"patch":[[[[0," old tex"],[-1,"t."],[0,"\n\\commen"]],9583,9583,18,16]],"time":1425851825048}
+{"patch":[[[[0," of old "],[-1,"tex"],[0,"\n\\commen"]],9580,9580,19,16]],"time":1425851824246}
+{"patch":[[[[0," of "],[-1,"old "],[0,"\n\\co"]],9580,9580,12,8]],"time":1425851823473}
+{"patch":[[[[0,"ment of "],[1,"all"],[0,"\n\\commen"]],9576,9576,16,19]],"time":1425851822756}
+{"patch":[[[[0,"t of all"],[1," "],[0,"\n\\commen"]],9579,9579,16,17]],"time":1425851821993}
+{"patch":[[[[0,"ment of "],[-1,"all "],[0,"\n\\commen"]],9576,9576,20,16]],"time":1425851821229}
+{"patch":[[[[0,"Comm"],[-1,"ent of "],[0,"\n\\co"]],9573,9573,15,8]],"time":1425851820452}
+{"patch":[[[[0,"\n\n% "],[-1,"Comm"],[0,"\n\\co"]],9569,9569,12,8]],"time":1425851819748}
+{"patch":[[[[0,"tion}\n\n%"],[-1," "],[0,"\n\\commen"]],9564,9564,17,16]],"time":1425851818987}
+{"patch":[[[[0,"ation}\n\n"],[-1,"%"],[0,"\n\\commen"]],9563,9563,17,16]],"time":1425851818132}
+{"patch":[[[[0,"ation}\n\n"],[-1,"\n"],[0,"\\comment"]],9563,9563,17,16]],"time":1425851816339}
+{"patch":[[[[0,"\\comment"],[-1,"false"],[0," % Show "]],1022,1022,21,16]],"time":1425851789387}
+{"patch":[[[[0,"\\comment"],[1,"tru"],[0," % Show "]],1022,1022,16,19]],"time":1425851788577}
+{"patch":[[[[0,"mmenttru"],[1,"e"],[0," % Show "]],1025,1025,16,17]],"time":1425851787830}
+{"patch":[[[[0,"D CO"],[-1,"MMENT"],[0,"\n\n\\s"]],11793,11793,13,8]],"time":1425851777337}
+{"patch":[[[[0," % E"],[-1,"ND CO"],[0,"\n\n\\s"]],11788,11788,13,8]],"time":1425851776569}
+{"patch":[[[[0,"ints.} %"],[-1," E"],[0,"\n\n\\subse"]],11782,11782,18,16]],"time":1425851775842}
+{"patch":[[[[0,"aints.} "],[-1,"%"],[0,"\n\n\\subse"]],11781,11781,17,16]],"time":1425851775046}
+{"patch":[[[[0,"raints.}"],[-1," "],[0,"\n\n\\subse"]],11780,11780,17,16]],"time":1425851773693}
+{"patch":[[[[0,"traints."],[-1,"}"],[0,"\n\n\\subse"]],11779,11779,17,16]],"time":1425851748605}
+{"patch":[[[[0,"\\comment"],[-1,"{"],[0,"After co"]],9570,9570,17,16]],"time":1425851743041}
+{"patch":[[[[0,"n}\n\n\\com"],[-1,"ment"],[0,"After co"]],9566,9566,20,16]],"time":1425851742272}
+{"patch":[[[[0,"tion}\n\n\\"],[-1,"com"],[0,"After co"]],9563,9563,19,16]],"time":1425851741543}
+{"patch":[[[[0,"ation}\n\n"],[-1,"\\"],[0,"After co"]],9562,9562,17,16]],"time":1425851740754}
+{"patch":[[[[0,"t#1\\fi}\n"],[-1,"\n"],[0,"\\newcomm"]],1085,1085,17,16]],"time":1425851727238}
+{"patch":[[[[0,"nds\n"],[-1,"\\newif\\ifcomment\n\\commenttrue % Show comments\n\\newcommand{\\comment}[1]{\\ifcomment#1\\fi}"],[0,"\n\\ne"]],1001,1001,95,8]],"time":1425851726486}
+{"patch":[[[[0,"ommands\n"],[-1,"\n"],[0,"\\newcomm"]],997,997,17,16]],"time":1425851725735}
+{"patch":[[[[0,"lation}\n"],[-1,"\n"],[0,"After co"]],9472,9472,17,16]],"time":1425851636599}
+{"patch":[[[[0,"{Results"],[1," of Implementation"],[0,"}\nBased "]],12908,12908,16,34]],"time":1425851615839}
+{"patch":[[[[0,"mplement"],[-1,"ation"],[0,"}\nBased "]],12921,12921,21,16]],"time":1425851612082}
+{"patch":[[[[0,"of Imple"],[-1,"ment"],[0,"}\nBased "]],12917,12917,20,16]],"time":1425851611302}
+{"patch":[[[[0,"lts of I"],[-1,"mple"],[0,"}\nBased "]],12913,12913,20,16]],"time":1425851610505}
+{"patch":[[[[0,"lts "],[-1,"of I"],[0,"}\nBa"]],12913,12913,12,8]],"time":1425851609743}
+{"patch":[[[[0,"{Results"],[-1," "],[0,"}\nBased "]],12908,12908,17,16]],"time":1425851609030}
+{"patch":[[[[0,"section{"],[1,"Imp"],[0,"Results}"]],12901,12901,16,19]],"time":1425851605914}
+{"patch":[[[[0,"tion{Imp"],[1,"lemen"],[0,"Results}"]],12904,12904,16,21]],"time":1425851605202}
+{"patch":[[[[0,"on{Imple"],[-1,"men"],[0,"Results}"]],12906,12906,19,16]],"time":1425851603655}
+{"patch":[[[[0,"ection{I"],[-1,"mple"],[0,"Results}"]],12902,12902,20,16]],"time":1425851602942}
+{"patch":[[[[0,"section{"],[-1,"I"],[0,"Results}"]],12901,12901,17,16]],"time":1425851602151}
+{"patch":[[[[0,"tem "],[-1,"All shifts for the day can be contained in a 24 hour period"],[1,"No "],[0,"\n\\it"]],9185,9185,67,11]],"time":1425851552835}
+{"patch":[[[[0,"item No "],[1,"shift ex"],[0,"\n\\item E"]],9184,9184,16,24]],"time":1425851552121}
+{"patch":[[[[0,"tem "],[-1,"No shift ex"],[0,"\n\\it"]],9185,9185,19,8]],"time":1425851551337}
+{"patch":[[[[0,"s\n\\item "],[1,"N"],[0,"\n\\item E"]],9181,9181,16,17]],"time":1425851550238}
+{"patch":[[[[0,"\n\\item N"],[1,"o shift e"],[0,"\n\\item E"]],9182,9182,16,25]],"time":1425851549477}
+{"patch":[[[[0," shift e"],[1,"x"],[0,"\n\\item E"]],9191,9191,16,17]],"time":1425851548675}
+{"patch":[[[[0,"No shift"],[-1," ex"],[0,"\n\\item E"]],9189,9189,19,16]],"time":1425851547949}
+{"patch":[[[[0,"m No shi"],[-1,"ft"],[0,"\n\\item E"]],9187,9187,18,16]],"time":1425851547194}
+{"patch":[[[[0,"\n\\item N"],[-1,"o shi"],[0,"\n\\item E"]],9182,9182,21,16]],"time":1425851546454}
+{"patch":[[[[0,"s\n\\item "],[-1,"N"],[0,"\n\\item E"]],9181,9181,17,16]],"time":1425851545644}
+{"patch":[[[[0,"s\n\\item "],[1,"No"],[0,"\n\\item E"]],9181,9181,16,18]],"time":1425851538685}
+{"patch":[[[[0,"\n\\item N"],[-1,"o"],[0,"\n\\item E"]],9182,9182,17,16]],"time":1425851537042}
+{"patch":[[[[0,"s\n\\item "],[-1,"N"],[1,"All shifts for the day can be contained in a 24 hour period"],[0,"\n\\item E"]],9181,9181,17,75]],"time":1425851536283}
+{"patch":[[[[0,"unity.\n\n"],[1,"\n"],[0,"We would"]],7158,7158,16,17]],"time":1425851481400}
+{"patch":[[[[0,"unity.\n\n"],[1,"From previous volunteer schedules and discussions with event planners, were able to make the following initial simplifying assumptions:\n\\begin{itemize}\\itemsep0pt\n\\item All volunteers can do all jobs. This assumption is also equivalent to assuming that all volunteers are preassigned a job type.\n\\item Each job consists of 1 - 12 shifts\n\\item Each volunteer can get from shift to shift in very little time\n\\item There are no breaks\n\\item All shifts for the day can be contained in a 24 hour period\n\\item Each volunteer has a maximum daily work time of 4 hours\n\\end{itemize}"],[0,"\nWe woul"]],7158,7158,16,589]],"time":1425851480141}
+{"patch":[[[[0,"ns}\n"],[-1,"From previous volunteer schedules and discussions with event planners, were able to make the following initial simplifying assumptions:\n\\begin{itemize}\\itemsep0pt\n\\item All volunteers can do all jobs. This assumption is also equivalent to assuming that all volunteers are preassigned a job type.\n\\item Each job consists of 1 - 12 shifts\n\\item Each volunteer can get from shift to shift in very little time\n\\item There are no breaks\n\\item All shifts for the day can be contained in a 24 hour period\n\\item Each volunteer has a maximum daily work time of 4 hours\n\\end{itemize}"],[0,"\n%=="]],9321,9321,581,8]],"time":1425851477357}
+{"patch":[[[[0,"licts.\n\n"],[1,"\\Large{"],[0,"INSERT G"]],13271,13271,16,23]],"time":1425851438614}
+{"patch":[[[[0,"\n\n\\Large"],[-1,"{"],[0,"INSERT G"]],13277,13277,17,16]],"time":1425851431401}
+{"patch":[[[[0,"cts.\n\n\\L"],[-1,"arge"],[0,"INSERT G"]],13273,13273,20,16]],"time":1425851430633}
+{"patch":[[[[0,"cts.\n\n\\L"],[1,"l"],[0,"INSERT G"]],13273,13273,16,17]],"time":1425851429903}
+{"patch":[[[[0,"cts.\n\n\\L"],[-1,"l"],[0,"INSERT G"]],13273,13273,17,16]],"time":1425851429114}
+{"patch":[[[[0,"icts.\n\n\\"],[-1,"L"],[0,"INSERT G"]],13272,13272,17,16]],"time":1425851427554}
+{"patch":[[[[0,"licts.\n\n"],[-1,"\\"],[0,"INSERT G"]],13271,13271,17,16]],"time":1425851423355}
+{"patch":[[[[0,"SENTATIO"],[-1,"N"],[0,"\n\n\\secti"]],13301,13301,17,16]],"time":1425851415613}
+{"patch":[[[[0,"PRESENTA"],[-1,"TIO"],[0,"\n\n\\secti"]],13298,13298,19,16]],"time":1425851414629}
+{"patch":[[[[0,"ESEN"],[-1,"TA"],[0,"\n\n\\s"]],13300,13300,10,8]],"time":1425851413821}
+{"patch":[[[[0,"EPRE"],[-1,"SEN"],[0,"\n\n\\s"]],13297,13297,11,8]],"time":1425851413123}
+{"patch":[[[[0,"CAL "],[-1,"REPRE"],[0,"\n\n\\s"]],13292,13292,13,8]],"time":1425851412326}
+{"patch":[[[[0,"RAPH"],[-1,"ICAL "],[0,"\n\n\\s"]],13287,13287,13,8]],"time":1425851411619}
+{"patch":[[[[0,"T GR"],[-1,"APH"],[0,"\n\n\\s"]],13284,13284,11,8]],"time":1425851410837}
+{"patch":[[[[0,"ERT "],[-1,"GR"],[1,"V"],[0,"\n\n\\s"]],13282,13282,10,9]],"time":1425851410102}
+{"patch":[[[[0,"INSERT V"],[1,"ISUAL"],[0,"\n\n\\secti"]],13279,13279,16,21]],"time":1425851409332}
+{"patch":[[[[0,"T VISUAL"],[1," "],[0,"\n\n\\secti"]],13284,13284,16,17]],"time":1425851408518}
+{"patch":[[[[0,"T VISUAL"],[-1," "],[0,"\n\n\\secti"]],13284,13284,17,16]],"time":1425851401538}
+{"patch":[[[[0," VIS"],[-1,"UAL"],[0,"\n\n\\s"]],13285,13285,11,8]],"time":1425851400770}
+{"patch":[[[[0,"SERT VIS"],[1,"IUAL"],[0,"\n\n\\secti"]],13281,13281,16,20]],"time":1425851399984}
+{"patch":[[[[0,"VISI"],[-1,"UAL"],[0,"\n\n\\s"]],13286,13286,11,8]],"time":1425851399260}
+{"patch":[[[[0,"SERT VIS"],[-1,"I"],[0,"\n\n\\secti"]],13281,13281,17,16]],"time":1425851398473}
+{"patch":[[[[0,"SERT"],[-1," VIS"],[0,"\n\n\\s"]],13281,13281,12,8]],"time":1425851397752}
+{"patch":[[[[0,".\n\nINSER"],[-1,"T"],[0,"\n\n\\secti"]],13276,13276,17,16]],"time":1425851396989}
+{"patch":[[[[0,".\n\nI"],[-1,"NSER"],[0,"\n\n\\s"]],13276,13276,12,8]],"time":1425851395941}
+{"patch":[[[[0,"licts.\n\n"],[-1,"I"],[0,"\n\n\\secti"]],13271,13271,17,16]],"time":1425851395186}
+{"patch":[[[[0,"licts.\n\n"],[1,"Here is a snippet of one of our solutions:\\\\\n\\vspace{2mm}\nEstimated Lower Bound: 13\\ldots\nCurrent min volunteers needed: 17\\\\\nCurrent min volunteers needed: 15\\\\\nCurrent min volunteers needed: 13\\\\\nFinished with optimal (13) number of volunteers.\\\\\nName: Volunteer 57 :: Hours 6\\\\\n        UNAVAILABLE :: 0 - 13\\\\\n        Shift 4.1 :: 13 - 14\\\\\n        Shift 4.2 :: 14 - 15\\\\\n        Shift 3.2 :: 15 - 16\\\\\n        Shift 3.3 :: 16 - 17\\\\\n        Shift 3.4 :: 17 - 18\\\\\n        Shift 5.3 :: 18 - 19\\\\\n        UNAVAILABLE :: 19 - 24\\\\\nName: Volunteer 6 :: Hours 6\\\\\n        UNAVAILABLE :: 0 - 15\\\\\n        Shift 4.3 :: 15 - 16\\\\\n        Shift 5.1 :: 16 - 17\\\\\n        Shift 5.2 :: 17 - 18\\\\\n        Shift 8.5 :: 18 - 19\\\\\n        Shift 5.4 :: 19 - 20\\\\\n        Shift 5.5 :: 20 - 21\\\\\n        UNAVAILABLE :: 21 - 24\\\\\nName: Volunteer 58 :: Hours 6\\\\\n        UNAVAILABLE :: 0 - 9\\\\\n        Shift 7.3 :: 9 - 10\\\\\n        Shift 11.2 :: 10 - 11\\\\\n        Shift 6.4 :: 11 - 12\\\\\n        Shift 6.5 :: 12 - 13\\\\\n        Shift 6.6 :: 13 - 14\\\\\n        Shift 8.1 :: 14 - 15\\\\\n        UNAVAILABLE :: 15 - 24\\\\\nName: Volunteer 29 :: Hours 5\\\\\n        UNAVAILABLE :: 0 - 10\\\\\n        Shift 2.1 :: 10 - 11\\\\\n        Shift 2.2 :: 11 - 12\\\\\n        Shift 2.3 :: 12 - 13\\\\\n        Shift 2.4 :: 13 - 14\\\\\n        Shift 3.1 :: 14 - 15\\\\\n        UNAVAILABLE :: 15 - 24\\\\\nName: Volunteer 49 :: Hours 5\\\\\n        UNAVAILABLE :: 0 - 13\\\\\n        Shift 13.1 :: 13 - 14\\\\\n        Shift 10.1 :: 14 - 15\\\\\n        Shift 8.2 :: 15 - 16\\\\\n        Shift 8.3 :: 16 - 17\\\\\n        Shift 8.4 :: 17 - 18\\\\\n        UNAVAILABLE :: 18 - 24\n"],[0,"\n\n\\secti"]],13271,13271,16,1616]],"time":1425851392961}
+{"patch":[[[[0,"ptions}\n"],[-1,"\n"],[0,"%======="]],9317,9317,17,16]],"time":1425851372571}
+{"patch":[[[[0,"worked.\n"],[-1,"\n"],[0,"%======="]],6129,6129,17,16]],"time":1425851364134}
+{"patch":[[[[0,"g the Pr"],[-1,"oblem"],[0,"\n%======"]],2614,2614,21,16]],"time":1425851357032}
+{"patch":[[[[0,"ing the "],[-1,"Pr"],[0,"\n%======"]],2612,2612,18,16]],"time":1425851356281}
+{"patch":[[[[0,"\n% Setti"],[-1,"ng the "],[0,"\n%======"]],2605,2605,23,16]],"time":1425851355675}
+{"patch":[[[[0,"====\n% S"],[-1,"etti"],[0,"\n%======"]],2601,2601,20,16]],"time":1425851354761}
+{"patch":[[[[0,"=====\n% "],[-1,"S"],[1,"Problem etting"],[0,"\n%======"]],2600,2600,17,30]],"time":1425851354028}
+{"patch":[[[[0,"Problem "],[1,"s"],[0,"etting\n%"]],2608,2608,16,17]],"time":1425851350895}
+{"patch":[[[[0,"lem sett"],[-1,"ing"],[0,"\n%======"]],2612,2612,19,16]],"time":1425851349360}
+{"patch":[[[[0,"Problem "],[-1,"sett"],[0,"\n%======"]],2608,2608,20,16]],"time":1425851348385}
+{"patch":[[[[0,"===\n% Pr"],[-1,"oblem "],[0,"\n%======"]],2602,2602,22,16]],"time":1425851347573}
+{"patch":[[[[0,"===\n% Pr"],[1,"eb"],[0,"\n%======"]],2602,2602,16,18]],"time":1425851346807}
+{"patch":[[[[0,"\n% P"],[-1,"reb"],[0,"\n%=="]],2605,2605,11,8]],"time":1425851346081}
+{"patch":[[[[0,"=====\n% "],[-1,"P"],[1,"FORMULATION OF PROBLEM"],[0,"\n%======"]],2600,2600,17,38]],"time":1425851345322}
+{"patch":[[[[0,"t}}\n"],[-1,"%====================================================\n% FORMULATION OF PROBLEM\n%===================================================="],[0,"\n\\se"]],2548,2548,140,8]],"time":1425851340138}
+{"patch":[[[[0,"0.4pt}}\n"],[-1,"\n"],[0,"\\section"]],2544,2544,17,16]],"time":1425851339385}
+{"patch":[[[[0,"n & Assu"],[-1,"mptions"],[0,"\n%======"]],6077,6077,23,16]],"time":1425851326433}
+{"patch":[[[[0,"ion & As"],[-1,"su"],[0,"\n%======"]],6075,6075,18,16]],"time":1425851325634}
+{"patch":[[[[0,"ction & "],[-1,"As"],[0,"\n%======"]],6073,6073,18,16]],"time":1425851324828}
+{"patch":[[[[0,"lection "],[-1,"& "],[0,"\n%======"]],6071,6071,18,16]],"time":1425851324108}
+{"patch":[[[[0,"llection"],[-1," "],[0,"\n%======"]],6070,6070,17,16]],"time":1425851323325}
+{"patch":[[[[0,"lection\n"],[1,"\n"],[0,"%======="]],6071,6071,16,17]],"time":1425851322349}
+{"patch":[[[[0,"lection\n"],[1,"%"],[0,"\n%======"]],6071,6071,16,17]],"time":1425851321569}
+{"patch":[[[[0,"ection\n%"],[1," "],[0,"\n%======"]],6072,6072,16,17]],"time":1425851320394}
+{"patch":[[[[0,"ection\n%"],[-1," "],[0,"\n%======"]],6072,6072,17,16]],"time":1425851319197}
+{"patch":[[[[0,"ection\n%"],[1,"   "],[0,"\n%======"]],6072,6072,16,19]],"time":1425851318567}
+{"patch":[[[[0,"ection\n%"],[-1,"   "],[0,"\n%======"]],6072,6072,19,16]],"time":1425851317666}
+{"patch":[[[[0,"lection\n"],[-1,"%"],[0,"\n%======"]],6071,6071,17,16]],"time":1425851316163}
+{"patch":[[[[0,"lection\n"],[-1,"\n"],[0,"%======="]],6071,6071,17,16]],"time":1425851314843}
+{"patch":[[[[0,"ta Colle"],[-1,"ction"],[0,"\n%======"]],6065,6065,21,16]],"time":1425851314128}
+{"patch":[[[[0,"\n% Data "],[-1,"Colle"],[0,"\n%======"]],6060,6060,21,16]],"time":1425851313388}
+{"patch":[[[[0,"=\n% Data"],[-1," "],[0,"\n%======"]],6059,6059,17,16]],"time":1425851312543}
+{"patch":[[[[0,"====\n% D"],[-1,"ata"],[0,"\n%======"]],6056,6056,19,16]],"time":1425851311795}
+{"patch":[[[[0,"=====\n% "],[-1,"D"],[1,"FORMULATION OF PROBLEM"],[0,"\n%======"]],6055,6055,17,38]],"time":1425851311078}
+{"patch":[[[[0,"ed.\n"],[-1,"%====================================================\n% FORMULATION OF PROBLEM\n%===================================================="],[0,"\n\\se"]],6003,6003,140,8]],"time":1425851307039}
+{"patch":[[[[0,"LEM\n"],[-1,"%===================================================="],[0,"\n\\se"]],9130,9130,61,8]],"time":1425851299762}
+{"patch":[[[[0,"PROBLEM\n"],[-1,"\n"],[0,"\\section"]],9126,9126,17,16]],"time":1425851297204}
+{"patch":[[[[0,"PROB"],[-1,"LEM"],[0,"\n\\se"]],9126,9126,11,8]],"time":1425851296378}
+{"patch":[[[[0," OF "],[-1,"PROB"],[0,"\n\\se"]],9122,9122,12,8]],"time":1425851295641}
+{"patch":[[[[0,"ATIO"],[-1,"N OF "],[0,"\n\\se"]],9117,9117,13,8]],"time":1425851294877}
+{"patch":[[[[0,"RMULATIO"],[1,"P"],[0,"\n\\sectio"]],9113,9113,16,17]],"time":1425851294161}
+{"patch":[[[[0,"ORMU"],[-1,"LATIOP"],[0,"\n\\se"]],9112,9112,14,8]],"time":1425851293364}
+{"patch":[[[[0,"\n% FORMU"],[1,"K"],[0,"\n\\sectio"]],9108,9108,16,17]],"time":1425851292607}
+{"patch":[[[[0," FOR"],[-1,"MUK"],[0,"\n\\se"]],9110,9110,11,8]],"time":1425851291872}
+{"patch":[[[[0,"=\n% "],[-1,"FOR"],[0,"\n\\se"]],9107,9107,11,8]],"time":1425851291068}
+{"patch":[[[[0,"=======\n"],[-1,"% "],[0,"\n\\sectio"]],9101,9101,18,16]],"time":1425851290358}
+{"patch":[[[[0,"=======\n"],[-1,"\n"],[0,"\\section"]],9101,9101,17,16]],"time":1425851289545}
+{"patch":[[[[0,"========"],[-1,"==================="],[0,"\n\\sectio"]],9081,9081,35,16]],"time":1425851288248}
+{"patch":[[[[0,"========"],[-1,"======================="],[0,"\n\\sectio"]],9058,9058,39,16]],"time":1425851287466}
+{"patch":[[[[0,"ions}\n%="],[-1,"========="],[0,"\n\\sectio"]],9049,9049,25,16]],"time":1425851286698}
+{"patch":[[[[0,"tions}\n%"],[-1,"="],[0,"\n\\sectio"]],9048,9048,17,16]],"time":1425851286022}
+{"patch":[[[[0,"ptions}\n"],[-1,"%"],[0,"\n\\sectio"]],9047,9047,17,16]],"time":1425851285164}
+{"patch":[[[[0,"nstraints.\n\n"],[1,"\n"],[0,"\\subsection{"]],11276,11276,24,25]],"time":1425851280578}
+{"patch":[[[[0,"ctness}\n"],[-1,"\n"],[0,"\\section"]],12490,12490,17,16]],"time":1425851278545}
+{"patch":[[[[0,"rrec"],[-1,"tness"],[0,"}\n\\s"]],12487,12487,13,8]],"time":1425851276424}
+{"patch":[[[[0,"on{C"],[-1,"orrec"],[0,"}\n\\s"]],12482,12482,13,8]],"time":1425851275721}
+{"patch":[[[[0,"bsection"],[-1,"{C}"],[0,"\n\\sectio"]],12476,12476,19,16]],"time":1425851274969}
+{"patch":[[[[0,"\\subsect"],[-1,"ion"],[0,"\n\\sectio"]],12473,12473,19,16]],"time":1425851273879}
+{"patch":[[[[0,".\n\n\\subs"],[-1,"ect"],[0,"\n\\sectio"]],12470,12470,19,16]],"time":1425851272889}
+{"patch":[[[[0,"LE''.\n\n\\"],[-1,"subs"],[0,"\n\\sectio"]],12466,12466,20,16]],"time":1425851272122}
+{"patch":[[[[0,"BLE''.\n\n"],[-1,"\\"],[0,"\n\\sectio"]],12465,12465,17,16]],"time":1425851271401}
+{"patch":[[[[0,"BLE''.\n\n"],[-1,"\n"],[0,"\\section"]],12465,12465,17,16]],"time":1425851270607}
+{"patch":[[[[0,"on{Adjus"],[-1,"tments"],[0,"}\nOur pr"]],11298,11298,22,16]],"time":1425851257504}
+{"patch":[[[[0,"ection{A"],[-1,"djus"],[0,"}\nOur pr"]],11294,11294,20,16]],"time":1425851256789}
+{"patch":[[[[0,"section{"],[-1,"A"],[1,"Implementation"],[0,"}\nOur pr"]],11293,11293,17,30]],"time":1425851255975}
+{"patch":[[[[0,"raints.\n\n\n\\s"],[-1,"ub"],[0,"section{Impl"]],11279,11279,26,24]],"time":1425851247131}
+{"patch":[[[[0,"nts.\n\n\n\\"],[-1,"s"],[0,"section{"]],11282,11282,17,16]],"time":1425851246387}
+{"patch":[[[[0,"section{"],[1,"The "],[0,"Formulat"]],9057,9057,16,20]],"time":1425851230222}
+{"patch":[[[[0," Formula"],[-1,"tion"],[0,"}\nAfter "]],9068,9068,20,16]],"time":1425851225218}
+{"patch":[[[[0,"The Form"],[-1,"ul"],[0,"a}\nAfter"]],9065,9065,18,16]],"time":1425851224480}
+{"patch":[[[[0,"on{The F"],[-1,"orma"],[0,"}\nAfter "]],9062,9062,20,16]],"time":1425851223734}
+{"patch":[[[[0,"ion{The "],[-1,"F"],[1,"Approach"],[0,"}\nAfter "]],9061,9061,17,24]],"time":1425851222973}
+{"patch":[[[[0," Assumpt"],[-1,"ions"],[0,"}\n\n\\sect"]],9041,9041,20,16]],"time":1425851218629}
+{"patch":[[[[0,"fying As"],[-1,"sumpt"],[0,"}\n\n\\sect"]],9036,9036,21,16]],"time":1425851217857}
+{"patch":[[[[0,"ing "],[-1,"As"],[0,"}\n\n\\"]],9038,9038,10,8]],"time":1425851217062}
+{"patch":[[[[0,"{Simplif"],[-1,"ying "],[1,"i"],[0,"}\n\n\\sect"]],9029,9029,21,17]],"time":1425851216349}
+{"patch":[[[[0,"n{Simpli"],[-1,"fi"],[0,"}\n\n\\sect"]],9028,9028,18,16]],"time":1425851215558}
+{"patch":[[[[0,"on{Simpl"],[-1,"i"],[1,"y"],[0,"}\n\n\\sect"]],9027,9027,17,17]],"time":1425851214832}
+{"patch":[[[[0,"on{Simpl"],[-1,"y"],[0,"}\n\n\\sect"]],9027,9027,17,16]],"time":1425851214037}
+{"patch":[[[[0,"ection{S"],[-1,"impl"],[0,"}\n\n\\sect"]],9023,9023,20,16]],"time":1425851213077}
+{"patch":[[[[0,"tion"],[-1,"{S}"],[0,"\n\n\\s"]],9025,9025,11,8]],"time":1425851212284}
+{"patch":[[[[0,"ubsectio"],[-1,"n"],[0,"\n\n\\secti"]],9020,9020,17,16]],"time":1425851211085}
+{"patch":[[[[0,"s.\n\n\\sub"],[-1,"sectio"],[0,"\n\n\\secti"]],9014,9014,22,16]],"time":1425851210100}
+{"patch":[[[[0,"cus.\n\n\\s"],[1,"e"],[0,"u"],[-1,"b"],[0,"\n\n\\secti"]],9012,9012,18,18]],"time":1425851209340}
+{"patch":[[[[0,"ocus.\n\n\\"],[-1,"seu"],[0,"\n\n\\secti"]],9011,9011,19,16]],"time":1425851208575}
+{"patch":[[[[0,"Focus.\n\n"],[-1,"\\\n"],[0,"\n\\sectio"]],9010,9010,18,16]],"time":1425851207843}
+{"patch":[[[[0,"ndy Focus.\n\n"],[-1,"\n"],[0,"\\section{The"]],9006,9006,25,24]],"time":1425851207038}
+{"patch":[[[[0,"Focus.\n\n"],[1,"\n"],[0,"\\section"]],9010,9010,16,17]],"time":1425851202635}
+{"patch":[[[[0,"dy Focus.\n\n\n"],[1,"\n"],[0,"\\section{The"]],9007,9007,24,25]],"time":1425851201808}
+{"patch":[[[[0,"ocus.\n\n\n"],[-1,"\n"],[0,"\\section"]],9011,9011,17,16]],"time":1425851199255}
+{"patch":[[[[0,"ndy Focus.\n\n"],[-1,"\n"],[0,"\\section{The"]],9006,9006,25,24]],"time":1425851197527}
+{"patch":[[[[0,"ntclass["],[-1,"1"],[0,"1pt]{art"]],7,7,17,16]],"time":1425802396620}
+{"patch":[[[[0,"tclass[1"],[1,"2"],[0,"pt]{arti"]],8,8,16,17]],"time":1425802395898}
 {"patch":[[[[0,"hm usual"],[-1,"ly"],[0," finds a"]],12217,12217,18,16]],"time":1425304314023}
 {"patch":[[[[0,"gorithm "],[-1,"usual"],[0," finds a"]],12212,12212,21,16]],"time":1425304313270}
 {"patch":[[[[0,"gorithm "],[-1," "],[0,"finds an"]],12212,12212,17,16]],"time":1425304312514}
