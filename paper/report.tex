@@ -186,7 +186,7 @@ An immediate lower bound to this problem is $\big(\sum_{i = 1}^{n}\;a_i\big)/c$.
 
 The interval partitioning problem asks ``Given a set of intervals $\{(s_1, f_1), (s_2, f_2), \ldots, (s_n, f_n)\}$, what is the minimum number of containers to store all the intervals such that in each container, no interval overlaps with another?
 There is a common greedy algorithm for this problem that runs in $O(n\log n)$ [CITATION NEEDED].
-For this problem, the lower bound on number of containers needed is the largest number of overlapping intervals.
+For this problem, the lower bound on number of containers needed is the largest number of overlapping intervals, the aforementioned greedy algorithm can actually be proven to find this optimal lower-bound solution.
 % Expound on this solution.
 
 Unfortunately, the problem is only similar to either of these.
@@ -198,16 +198,52 @@ Translating to our problem, volunteers are the ``bins'' and the ``items'' we fil
 In general, the bin packing problem is NP-Hard, but in our case it is much easier to solve since we have a relatively small sized problem.
 
 The difference to the traditional bin packing problem is that we have additional constraints on what sort of objects our ``bins'' can take.
-This problem is NP hard but by Korf, we can find optimal solutions.
-However, implementing his algorithm proved to be too memory intensive for our problem since we have to store more than just permutations of integers.
-Thus, we resort to a near optimal algorithm, the Best First Decreasing (BFD) algorithm.
-It sorts the items in order of decreasing size and puts the elements into the fullest bin that can accommodate the item.
-
-So for example, if we had a ridiculous shift of 8 hours, we would first look for a volunteer that could be scheduled for the shift.
-Then, if that volunteer could work 2 more hours but our next largest shift is 4 hours, that second one will be given to a different volunteer if our volunteers are (hypothetically) capped at working 10 hours a day.
-This algorithm is guaranteed to be within $\frac{11}{9}$ of the optimal number number of volunteers for the shifts that we have to fill and runs in $O(n\log n)$ time.
-Additionally, based on Korf's analysis, BFD is on average, 94.8\% of the time.
+This problem is NP hard but by Korf, we can find an exact solution on the minimum number of bins required fairly quickly for small input sizes. 
+The Korf algorithm proved to be too memory intensive when applied to our problem, as we have varied bin sizes which only accept specific items of certain intervals. 
+Korf's algorithm used a branch and bound approach, pruning less-than-optimal partial solutions along the way. But in order to achieve this, all un-dominated completions of a certain 
+bin needed to be computed. Taking into account that all of our shifts are of length 1, the number of completions we had to keep track of grew very quickly, and these shifts being Python objects 
+took up quite a bit more space than your typical 4 byte integer. 
+Thus an exact algorithm is not practical in our case, and we resort to a near optimal algorithm, the Best First Decreasing (BFD) algorithm.
+The BFD algorithm is an approximation algorithm that runs in polynomial time. It does not guarantee an optimal solution but does guarantee a solution that is 
+no more than 11/9 * OPT + 4 bins more than OPT (the actual optimal number of bins). Also, according to Korf, this algorithm produced the optimal solution 94.8\% of the time on average. 
 For our problem, this approximation is plenty accurate as well as when we consider the fact that the truly ``optimal'' algorithm could be suboptimal anyways when taking into account our other constraints.
+
+
+\subsection{Correctness}
+
+
+\section{Solution}
+
+Our actual approach at producing an optimal schedule uses a mix of the BFD and randomization to look for the best solution.
+It works as follows:
+We first find a rough lower bound by taking the max(overlapping lower bound, capacity lower bound). The overlapping lower bound tells us that if there are $n$ shifts scheduled all at the same time, then 
+we must have at least $n$ volunteers, since no volunteer can be at more than one shift at one time. The largest number of overlapping shifts gives us the first lower bound. However, this is not enough, as 
+we could have other non-overlapping shifts that bring the total number of shift hours that need to be worked over the total number of hours that are available from all volunteers. Thus, for our second lower bound,
+the capacity lower bound, we divide the total number of shift-hours by the average number of available hours a volunteer has. Note that neither of these lower bounds take into account issues with actual assignment 
+of shifts. Thus we come up with a rough practical lower bound which we use as a benchmark for determining how good our solution is. 
+
+Once we have a lower bound, we begin by keeping running our list of volunteers and shifts through the BFD algorithm, which will produce either a complete schedule or a partial schedule with the specific un-assignable shifts
+highlighted.
+
+The BFD algorithm works by taking in our list of shifts, sorted in decreasing order of length, and our list of volunteers, ordered in decreasing order of "fullness". It then attempts to assign the first
+shift in the list to the first volunteer. If the volunteer can take this shift, we assign it to that volunteer, otherwise we move on to the next volunteer in our list. Once the job has been assigned, we re-sort
+the list of volunteers before considering the next job. This is the "best" part of the Best Decreasing Fit algorithm. We want to ensure that we always consider the volunteer with the most assigned shifts first. Now,
+if the a shift goes through all volunteers in our list unassigned, it goes into an "unassigned shifts" list, which we will then present afterwards with a partial schedule as incomplete. 
+
+We have also developed this notion of job-type weight that is associated with each volunteer. In essence, each shift is associated with a job-type and we would prefer to keep the same volunteer on shifts of the 
+same type, rather than shuffling around volunteers from shift to shift for no good reason (an optimal solution will not guarantee this consistency). The job-type weight of a volunteer is calculated by summing up the
+squares of the counts of shifts of the same type. (Eg, if volunteer A has shifts 1.1, 2.1, 2.2, her weight will be $1^2 + 2^2$). Counting the total weight of all volunteers who have been assigned shifts can help us compare
+solutions and find ones that better match this preferred shift assignment scheme. 
+
+Our actual algorithm is an any-time algorithm. If the volunteer set and shift set will not produce a feasible solution, then it will return a partial solution immediately. However, if one solution is found, we continue
+by running the BFD algorithm on various random permutations of our volunteer list. This will clearly produce a different schedule, as the BFD algorithm assigns shifts in a (selective) first come first served basis. On each
+iteration we keep track of the number of volunteers this solution assigned as well as the total weight of the assignment. If the number of volunteers needed on any given iteration is smaller than the smallest we have currently 
+found, then we update our new solution to reflect this assignment. If that number is the same as the smallest we have found so far, but the total weight of volunteers exceeds the max weight we have found, then we again update
+our best solution to reflect the new max weight solution. In other words, we want to maximize the total weight but not at the cost of adding an extra volunteer. 
+
+The user can choose to terminate the running code at any time. The longer the code is left running, the better the solution might get. 
+
+
 % BEGIN COMMENT OF OLD MATERIAL
 \comment{
 Our program takes the following as input from the event organizers:
@@ -225,14 +261,18 @@ One would think that this probably doesn't give a very good result but it turns 
 
 We encode the problem of volunteers having external time conflicts by pre-filling each volunteer's schedule with ``jobs'' that are labeled ``UNAVAILABLE''.
 } % END COMMENT OF OLD MATERIAL
-\subsection{Correctness}
+
 
 
 \section{Results}
-Based on our randomly generated data, our solution to the problem is typically off the optimal number of volunteers by no more than 2 volunteers.
-For example, if there are 40 man hours in a day to work and each volunteer can work no more than 5 hours, then we need at least 8 volunteers just to satisfy the man hours, not considering any potential conflicts.
+As sample data, we are currently generating a list of 60 volunteers, each of which are only able to work a random but continuous 2-6 hour chunk a day. We then create a random list of shifts. 
+We do this by starting with a base of 15 jobs, each of which can have 1-6 hour long shifts, and each job can start at a random hour of the day. Our algorithm consistently finds solutions that are
+within 2-3 volunteers of the lower bound. Many times it will actually find the optimal solution. Attached in appendix B are three sample runs, each of which were terminated after 30 seconds of running.
 
-INSERT GRAPHICAL REPRESENTATION
+We are fairly satisfied with the results of this algorithm. Inspecting the schedules ourselves, we have determined that there might be room for improvement in the sense of shuffling around shifts to make 
+things more consistent. However, this should provide our friends over at Savoy Swing Club a good starting point with their scheduling pain points. They will now be able to produce a fairly optimal schedule
+in under a minute with which they can then further "hand-optimize" to suit their needs. 
+
 
 \section{Future Work}
 We have so far reasonably solved the algorithmic problem of assigning volunteers to positions based on availability.
@@ -241,8 +281,13 @@ We plan to proceed with the program and build a fully functional web app that wi
 SSC is unfortunately not hosting any weekend events until this fall.
 However, we also plan to follow up with them in the fall and attempt to actually implement our system for choosing volunteers.
 
+\section{Acknowledgments}
+We would like to thank our community partners over at Savoy Swing Club for working closely with us on the problem. We would also like to thank Professor Sara Billey for meeting with us to suggest ways
+on how we could model the problem and which general problems our particular one resembled.
+
+
 \end{multicols}
-\section{Appendix}
+\section{Appendix A}
 \begin{lstlisting}
 #!/usr/bin/python
 #
@@ -260,13 +305,14 @@ class Volunteer:
     Boolean is_used - True if the volunteer's job list is not empty
     [Int] job_id_count - keeps count of how many shifts of each job ID a volunteer has
     """
+
     def __init__(self, a_name="", a_capacity=4):
         self.name = a_name
         self.capacity = a_capacity
         self.current_capacity = 0
         self.jobs = []
         self.is_used = False
-        self.job_id_count = [0 for _ in xrange(15)] # this is a bad thing to do :-(
+        self.job_id_count = [0 for _ in xrange(15)]
 
     def __cmp__(self, other):
         return -cmp(self.current_capacity, other.current_capacity)
@@ -306,6 +352,7 @@ class Volunteer:
         self.jobs = filter(lambda x: x.name.startswith('UNAVAILABLE'), self.jobs)
         self.current_capacity = 0
         self.is_used = False
+        self.job_id_count = [0 for _ in xrange(15)]
 
 
 class JobShift:
@@ -325,6 +372,10 @@ class JobShift:
         self.length = self.end - self.start
         self.id = an_id
 
+    """Sort by start time then by job
+        An earlier start time in a different job would conflict with the shift before it.
+        Assume shift times include break and travel times so shifts are always directly back to back.
+        was (self.length, other.length) (self.start, other.start)"""
     def __cmp__(self, other):
         return -cmp(self.length, other.length)
 
@@ -333,7 +384,6 @@ class JobShift:
 
     def conflicts_with(self, another_job):
         return len(self.interval & another_job.interval) > 1
-
 \end{lstlisting}
 \begin{lstlisting}
 import sys
@@ -342,6 +392,7 @@ import copy
 import Work as SS
 
 
+# Helper functions
 def rand_time_interval(a_min, a_max, a_length):
     start = random.randint(a_min, a_max - a_length)
     return (start, start+a_length)
@@ -379,6 +430,7 @@ def make_random_jobs(num_of_jobs):
             J.append(job)
     return J
 
+
 # BFD Algo: put largest item into bin with most stuff
 def assign_jobs(jobs, volunteers):
     unassigned_jobs = []
@@ -387,7 +439,7 @@ def assign_jobs(jobs, volunteers):
 
     while len(current_jobs) > 0:
         job = current_jobs.pop(0)
-        current_volunteers = sorted(current_volunteers) # This makes it a BFD instead of an FFD algo
+        current_volunteers = sorted(current_volunteers)
         job_assigned = False
 
         for volunteer in current_volunteers:
@@ -402,36 +454,73 @@ def assign_jobs(jobs, volunteers):
     return (current_volunteers, unassigned_jobs)
 
 
+# Initialization of random volunteers and shifts
 NUM_OF_JOBS = 15
 NUM_OF_VOLUNTEERS = 60
 volunteers = make_random_volunteers(NUM_OF_VOLUNTEERS, (2,6))
 jobs = make_random_jobs(NUM_OF_JOBS)
 
-# estimating lower bound by dividing sum of shifts by average volunteer capacity
+
+# Compute the capacity based lower bound for volunteers
 total_job_hours = sum([j.length for j in jobs])
-avg_vol_capacity = sum([v.capacity for v in volunteers])/float(len(volunteers))
-estimated_lower_bound = int((total_job_hours/avg_vol_capacity)+1)
+avg_vol_capacity = sum([v.capacity for v in volunteers])/float(NUM_OF_VOLUNTEERS)
+capacity_lower_bound = int((total_job_hours/avg_vol_capacity))
 
+
+# Compute the overlapping intervals based lower bound for volunteers
+overlap = dict.fromkeys(range(25), 0)
+for j in jobs:
+    for i in range(j.start, j.end):
+        overlap[i] += 1
+
+overlapping_lower_bound = max(overlap.values())
+
+# Taking the larger of the two lower bounds to give us a realistic one
+realistic_lower_bound = max(overlapping_lower_bound, capacity_lower_bound)
+
+# debug info:
+print "\n\nTotal number of volunteers available: %s" % len(volunteers)
+print "Total number of shifts that need assignment: %s" % len(jobs)
+print "Total available hours of all volunteers: %s" % sum([v.capacity for v in volunteers])
+print "Total hours of all jobs: %s" % sum([j.length for j in jobs])
+print "Capacity lower bound %s" % capacity_lower_bound
+print "Overlap lower bound %s (shifts at the same time)" % overlapping_lower_bound
+print "Lower bound on the number of volunteers needed is roughly: %s" % realistic_lower_bound
+
+print "\n\nPlease terminate process whenever you see fit (Ctrl-c in terminal).\n"
+print "Working...\n"
+
+# Init tracking variables
 current_best_schedule = []
-min_volunteers_needed = 60
+current_best_weight = 0
+min_volunteers_needed = NUM_OF_VOLUNTEERS
 
-print "Estimated Lower Bound: %s..." % estimated_lower_bound
 
 # Here we start randomizing the volunteer set to get different solutions
 # we keep track of the smallest solution and store it
-# we can choose to terminate before the optimal sol is found
+# we also keep track of the weight of each solution
 # we will either get the current most optimal solution
 # or an unfeasible, partial solution, with a list of anassignable jobs.
-while(min_volunteers_needed > estimated_lower_bound):
+while (1):
     try:
         volunteers, unassigned_jobs = assign_jobs(jobs, volunteers)
 
         if len(unassigned_jobs) == 0:
             current_min = sum([1 for x in volunteers if x.is_used])
-            if current_min < min_volunteers_needed:
+            total_weight = sum([v.get_weight() for v in volunteers])
+            if current_min < min_volunteers_needed or \
+              (current_min == min_volunteers_needed and total_weight > current_best_weight):
                 min_volunteers_needed = current_min
                 current_best_schedule = copy.deepcopy(volunteers)
-                print "Current min volunteers needed: %s" % min_volunteers_needed
+                current_best_weight = total_weight
+                print "New solution found with %s volunteers and weight %s" % (min_volunteers_needed, current_best_weight)
+        else:
+            print "Not able to find feasible solution"
+            print "Unassigned jobs: %s" % unassigned_jobs
+            print "Using %s volunteers" % sum([1 for x in volunteers if x.is_used])
+            print "Current best schedule: "
+            show_schedule(volunteers)
+            break
 
         map(lambda x: x.clear_all(), volunteers)
         random.shuffle(volunteers)
@@ -439,23 +528,370 @@ while(min_volunteers_needed > estimated_lower_bound):
     except KeyboardInterrupt:
         print "Terminating...\n\n"
         if len(unassigned_jobs) == 0:
-            print "Min # of volunteers found so far: %s" % min_volunteers_needed
-            print "Schedule: "
+            print "Volunteer count: %s" % min_volunteers_needed
+            print "Job-type weight: %s" % current_best_weight
+            print "Schedule produced: "
             show_schedule(current_best_schedule)
             print "\n"
-        else:
-            print "Not able to find feasible solution"
-            print "Unassigned jobs: %s" % unassigned_jobs
-            print "Current best schedule: "
-            show_schedule(volunteers)
         sys.exit()
-
-print "Finished with optimal (%s) number of volunteers." % min_volunteers_needed
-show_schedule(current_best_schedule)
 \end{lstlisting}
 
+\section{Appendix B}
+\begin{lstlisting}
+Run # 1
+
+Total number of volunteers available: 60
+Total number of shifts that need assignment: 46
+Total available hours of all volunteers: 234
+Total hours of all jobs: 46
+Capacity lower bound 11
+Overlap lower bound 5 (shifts at the same time)
+Lower bound on the number of volunteers needed is roughly: 11
+
+
+Please terminate process whenever you see fit (Ctrl-c in terminal).
+
+Working...
+
+Not able to find feasible solution
+Unassigned jobs: [Shift 7.1 :: 0 - 1]
+Using 15 volunteers
+Current best schedule: 
+Name: Volunteer 4 :: Hours 6
+	UNAVAILABLE :: 0 - 10
+	Shift 6.3 :: 10 - 11
+	Shift 6.4 :: 11 - 12
+	Shift 4.1 :: 12 - 13
+	Shift 4.2 :: 13 - 14
+	Shift 4.3 :: 14 - 15
+	Shift 4.4 :: 15 - 16
+	UNAVAILABLE :: 16 - 24
+Name: Volunteer 15 :: Hours 6
+	UNAVAILABLE :: 0 - 12
+	Shift 5.1 :: 12 - 13
+	Shift 5.2 :: 13 - 14
+	Shift 5.3 :: 14 - 15
+	Shift 5.4 :: 15 - 16
+	Shift 5.5 :: 16 - 17
+	Shift 11.2 :: 17 - 18
+	UNAVAILABLE :: 18 - 24
+Name: Volunteer 7 :: Hours 6
+	UNAVAILABLE :: 0 - 3
+	Shift 7.4 :: 3 - 4
+	Shift 1.1 :: 4 - 5
+	Shift 1.2 :: 5 - 6
+	Shift 10.1 :: 7 - 8
+	Shift 6.1 :: 8 - 9
+	UNAVAILABLE :: 9 - 24
+Name: Volunteer 10 :: Hours 6
+	UNAVAILABLE :: 0 - 1
+	Shift 7.2 :: 1 - 2
+	Shift 7.3 :: 2 - 3
+	Shift 14.1 :: 3 - 4
+	Shift 7.5 :: 4 - 5
+	Shift 8.1 :: 5 - 6
+	UNAVAILABLE :: 7 - 24
+Name: Volunteer 22 :: Hours 6
+	UNAVAILABLE :: 0 - 10
+	Shift 12.1 :: 10 - 11
+	Shift 12.2 :: 11 - 12
+	Shift 10.6 :: 12 - 13
+	Shift 15.1 :: 14 - 15
+	Shift 15.2 :: 15 - 16
+	UNAVAILABLE :: 16 - 24
+Name: Volunteer 6 :: Hours 3
+	UNAVAILABLE :: 0 - 13
+	Shift 9.2 :: 13 - 14
+	Shift 9.3 :: 14 - 15
+	Shift 9.4 :: 15 - 16
+	UNAVAILABLE :: 16 - 24
+Name: Volunteer 5 :: Hours 3
+	UNAVAILABLE :: 0 - 9
+	Shift 6.2 :: 9 - 10
+	Shift 10.4 :: 10 - 11
+	Shift 10.5 :: 11 - 12
+	UNAVAILABLE :: 12 - 24
+Name: Volunteer 2 :: Hours 4
+	UNAVAILABLE :: 0 - 17
+	Shift 2.1 :: 17 - 18
+	Shift 3.1 :: 19 - 20
+	UNAVAILABLE :: 21 - 24
+Name: Volunteer 9 :: Hours 4
+	UNAVAILABLE :: 0 - 6
+	Shift 10.2 :: 8 - 9
+	Shift 10.3 :: 9 - 10
+	UNAVAILABLE :: 10 - 24
+Name: Volunteer 8 :: Hours 5
+	UNAVAILABLE :: 0 - 15
+	Shift 11.1 :: 16 - 17
+	Shift 13.2 :: 17 - 18
+	UNAVAILABLE :: 20 - 24
+Name: Volunteer 19 :: Hours 2
+	UNAVAILABLE :: 0 - 11
+	Shift 9.1 :: 12 - 13
+	UNAVAILABLE :: 13 - 24
+Name: Volunteer 3 :: Hours 3
+	UNAVAILABLE :: 0 - 14
+	Shift 9.5 :: 16 - 17
+	UNAVAILABLE :: 17 - 24
+Name: Volunteer 25 :: Hours 4
+	UNAVAILABLE :: 0 - 11
+	Shift 12.3 :: 12 - 13
+	UNAVAILABLE :: 15 - 24
+Name: Volunteer 12 :: Hours 2
+	UNAVAILABLE :: 0 - 16
+	Shift 13.1 :: 16 - 17
+	Shift 15.4 :: 17 - 18
+	UNAVAILABLE :: 18 - 24
+Name: Volunteer 13 :: Hours 2
+	UNAVAILABLE :: 0 - 16
+	Shift 15.3 :: 16 - 17
+	UNAVAILABLE :: 18 - 24
+
+------
+Run #2
+
+Total number of volunteers available: 60
+Total number of shifts that need assignment: 49
+Total available hours of all volunteers: 219
+Total hours of all jobs: 49
+Capacity lower bound 13
+Overlap lower bound 5 (shifts at the same time)
+Lower bound on the number of volunteers needed is roughly: 13
+
+
+Please terminate process whenever you see fit (Ctrl-c in terminal).
+
+Working...
+
+New solution found with 14 volunteers and weight 95
+New solution found with 13 volunteers and weight 91
+New solution found with 13 volunteers and weight 93
+New solution found with 12 volunteers and weight 97
+New solution found with 12 volunteers and weight 103
+New solution found with 12 volunteers and weight 107
+Terminating...
+
+
+Volunteer count: 12
+Job-type weight: 107
+Schedule produced: 
+Name: Volunteer 55 :: Hours 6
+	UNAVAILABLE :: 0 - 9
+	Shift 9.3 :: 9 - 10
+	Shift 10.1 :: 10 - 11
+	Shift 9.5 :: 11 - 12
+	Shift 12.1 :: 12 - 13
+	Shift 12.2 :: 13 - 14
+	Shift 12.3 :: 14 - 15
+	UNAVAILABLE :: 15 - 24
+Name: Volunteer 46 :: Hours 6
+	UNAVAILABLE :: 0 - 3
+	Shift 13.2 :: 3 - 4
+	Shift 3.1 :: 4 - 5
+	Shift 3.2 :: 5 - 6
+	Shift 3.3 :: 6 - 7
+	Shift 9.1 :: 7 - 8
+	Shift 7.1 :: 8 - 9
+	UNAVAILABLE :: 9 - 24
+Name: Volunteer 24 :: Hours 6
+	UNAVAILABLE :: 0 - 5
+	Shift 13.4 :: 5 - 6
+	Shift 13.5 :: 6 - 7
+	Shift 11.1 :: 7 - 8
+	Shift 9.2 :: 8 - 9
+	Shift 7.2 :: 9 - 10
+	Shift 9.4 :: 10 - 11
+	UNAVAILABLE :: 11 - 24
+Name: Volunteer 7 :: Hours 6
+	UNAVAILABLE :: 0 - 1
+	Shift 5.1 :: 1 - 2
+	Shift 5.2 :: 2 - 3
+	Shift 14.4 :: 3 - 4
+	Shift 13.3 :: 4 - 5
+	Shift 8.1 :: 5 - 6
+	Shift 8.2 :: 6 - 7
+	UNAVAILABLE :: 7 - 24
+Name: Volunteer 9 :: Hours 5
+	UNAVAILABLE :: 0 - 12
+	Shift 9.6 :: 12 - 13
+	Shift 6.1 :: 13 - 14
+	Shift 6.2 :: 14 - 15
+	Shift 6.3 :: 15 - 16
+	Shift 6.4 :: 16 - 17
+	UNAVAILABLE :: 17 - 24
+Name: Volunteer 56 :: Hours 4
+	UNAVAILABLE :: 0 - 2
+	Shift 1.1 :: 2 - 3
+	Shift 1.2 :: 3 - 4
+	Shift 1.3 :: 4 - 5
+	Shift 1.4 :: 5 - 6
+	UNAVAILABLE :: 6 - 24
+Name: Volunteer 43 :: Hours 5
+	UNAVAILABLE :: 0 - 0
+	Shift 4.1 :: 0 - 1
+	Shift 4.2 :: 1 - 2
+	Shift 4.3 :: 2 - 3
+	Shift 14.5 :: 4 - 5
+	UNAVAILABLE :: 5 - 24
+Name: Volunteer 53 :: Hours 4
+	UNAVAILABLE :: 0 - 15
+	Shift 2.1 :: 15 - 16
+	Shift 2.2 :: 16 - 17
+	Shift 6.5 :: 17 - 18
+	UNAVAILABLE :: 19 - 24
+Name: Volunteer 42 :: Hours 3
+	UNAVAILABLE :: 0 - 0
+	Shift 14.1 :: 0 - 1
+	Shift 14.2 :: 1 - 2
+	Shift 13.1 :: 2 - 3
+	UNAVAILABLE :: 3 - 24
+Name: Volunteer 29 :: Hours 3
+	UNAVAILABLE :: 0 - 7
+	Shift 13.6 :: 7 - 8
+	Shift 11.2 :: 8 - 9
+	UNAVAILABLE :: 10 - 24
+Name: Volunteer 1 :: Hours 5
+	UNAVAILABLE :: 0 - 1
+	Shift 14.3 :: 2 - 3
+	Shift 14.6 :: 5 - 6
+	UNAVAILABLE :: 6 - 24
+Name: Volunteer 44 :: Hours 2
+	UNAVAILABLE :: 0 - 11
+	Shift 10.2 :: 11 - 12
+	Shift 15.1 :: 12 - 13
+	UNAVAILABLE :: 13 - 24
+
+------
+Run #3
+
+
+Total number of volunteers available: 60
+Total number of shifts that need assignment: 53
+Total available hours of all volunteers: 235
+Total hours of all jobs: 53
+Capacity lower bound 13
+Overlap lower bound 5 (shifts at the same time)
+Lower bound on the number of volunteers needed is roughly: 13
+
+
+Please terminate process whenever you see fit (Ctrl-c in terminal).
+
+Working...
+
+New solution found with 17 volunteers and weight 103
+New solution found with 17 volunteers and weight 109
+New solution found with 16 volunteers and weight 93
+New solution found with 15 volunteers and weight 105
+New solution found with 15 volunteers and weight 127
+New solution found with 14 volunteers and weight 115
+New solution found with 13 volunteers and weight 115
+New solution found with 13 volunteers and weight 131
+New solution found with 13 volunteers and weight 161
+Terminating...
+
+
+Volunteer count: 13
+Job-type weight: 161
+Schedule produced: 
+Name: Volunteer 9 :: Hours 6
+	UNAVAILABLE :: 0 - 14
+	Shift 2.1 :: 14 - 15
+	Shift 2.2 :: 15 - 16
+	Shift 2.3 :: 16 - 17
+	Shift 2.4 :: 17 - 18
+	Shift 2.5 :: 18 - 19
+	Shift 2.6 :: 19 - 20
+	UNAVAILABLE :: 20 - 24
+Name: Volunteer 46 :: Hours 6
+	UNAVAILABLE :: 0 - 12
+	Shift 3.1 :: 12 - 13
+	Shift 3.2 :: 13 - 14
+	Shift 1.1 :: 14 - 15
+	Shift 1.2 :: 15 - 16
+	Shift 1.3 :: 16 - 17
+	Shift 1.4 :: 17 - 18
+	UNAVAILABLE :: 18 - 24
+Name: Volunteer 51 :: Hours 6
+	UNAVAILABLE :: 0 - 4
+	Shift 5.1 :: 4 - 5
+	Shift 5.2 :: 5 - 6
+	Shift 5.3 :: 6 - 7
+	Shift 5.4 :: 7 - 8
+	Shift 4.2 :: 8 - 9
+	Shift 4.3 :: 9 - 10
+	UNAVAILABLE :: 10 - 24
+Name: Volunteer 21 :: Hours 6
+	UNAVAILABLE :: 0 - 9
+	Shift 7.2 :: 9 - 10
+	Shift 8.2 :: 10 - 11
+	Shift 8.3 :: 11 - 12
+	Shift 8.4 :: 12 - 13
+	Shift 8.5 :: 13 - 14
+	Shift 10.1 :: 14 - 15
+	UNAVAILABLE :: 15 - 24
+Name: Volunteer 34 :: Hours 6
+	UNAVAILABLE :: 0 - 3
+	Shift 12.2 :: 3 - 4
+	Shift 11.1 :: 4 - 5
+	Shift 12.4 :: 5 - 6
+	Shift 12.5 :: 6 - 7
+	Shift 12.6 :: 7 - 8
+	Shift 7.1 :: 8 - 9
+	UNAVAILABLE :: 9 - 24
+Name: Volunteer 18 :: Hours 5
+	UNAVAILABLE :: 0 - 3
+	Shift 9.1 :: 3 - 4
+	Shift 9.2 :: 4 - 5
+	Shift 9.3 :: 5 - 6
+	Shift 9.4 :: 6 - 7
+	Shift 4.1 :: 7 - 8
+	UNAVAILABLE :: 8 - 24
+Name: Volunteer 11 :: Hours 4
+	UNAVAILABLE :: 0 - 12
+	Shift 6.1 :: 12 - 13
+	Shift 6.2 :: 13 - 14
+	Shift 14.1 :: 14 - 15
+	Shift 10.2 :: 15 - 16
+	UNAVAILABLE :: 16 - 24
+Name: Volunteer 28 :: Hours 3
+	UNAVAILABLE :: 0 - 14
+	Shift 3.3 :: 14 - 15
+	Shift 3.4 :: 15 - 16
+	Shift 3.5 :: 16 - 17
+	UNAVAILABLE :: 17 - 24
+Name: Volunteer 27 :: Hours 3
+	UNAVAILABLE :: 0 - 9
+	Shift 8.1 :: 9 - 10
+	Shift 13.1 :: 10 - 11
+	Shift 13.2 :: 11 - 12
+	UNAVAILABLE :: 12 - 24
+Name: Volunteer 12 :: Hours 4
+	UNAVAILABLE :: 0 - 14
+	Shift 14.2 :: 15 - 16
+	Shift 10.3 :: 16 - 17
+	Shift 10.4 :: 17 - 18
+	UNAVAILABLE :: 18 - 24
+Name: Volunteer 55 :: Hours 3
+	UNAVAILABLE :: 0 - 2
+	Shift 12.1 :: 2 - 3
+	Shift 12.3 :: 4 - 5
+	UNAVAILABLE :: 5 - 24
+Name: Volunteer 56 :: Hours 3
+	UNAVAILABLE :: 0 - 17
+	Shift 3.6 :: 17 - 18
+	UNAVAILABLE :: 20 - 24
+Name: Volunteer 20 :: Hours 6
+	UNAVAILABLE :: 0 - 11
+	Shift 15.1 :: 13 - 14
+	Shift 14.3 :: 16 - 17
+	UNAVAILABLE :: 17 - 24
+
+\end{lstlisting}
+
+
 \begin{thebibliography}{9}
-\bibitem{Korf02}
+\bibitem{02}
 	Richard E. Korf
 	A New Algorithm for Optimal Bin Packing
 	AAAI-02 Proceedings. Copyright © 2002, AAAI
