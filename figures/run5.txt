@@ -1,0 +1,125 @@
+
+
+Total number of volunteers available: 60
+Total number of shifts that need assignment: 54
+Total available hours of all volunteers: 219
+Total hours of all jobs: 54
+Capacity lower bound 14
+Overlap lower bound 6 (shifts at the same time)
+Lower bound on the number of volunteers needed is roughly: 14
+
+
+Please terminate process whenever you see fit (Ctrl-c in terminal).
+
+Working...
+
+New solution found with 16 volunteers and weight 136
+New solution found with 15 volunteers and weight 126
+New solution found with 15 volunteers and weight 130
+New solution found with 15 volunteers and weight 136
+New solution found with 15 volunteers and weight 138
+New solution found with 14 volunteers and weight 116
+Terminating...
+
+
+Volunteer count: 14
+Job-type weight: 116
+Schedule produced: 
+Name: Volunteer 56 :: Hours 6
+	UNAVAILABLE :: 0 - 14
+	Shift 12.2 :: 14 - 15
+	Shift 8.2 :: 15 - 16
+	Shift 8.3 :: 16 - 17
+	Shift 8.4 :: 17 - 18
+	Shift 7.2 :: 18 - 19
+	Shift 8.6 :: 19 - 20
+	UNAVAILABLE :: 20 - 24
+Name: Volunteer 36 :: Hours 6
+	UNAVAILABLE :: 0 - 14
+	Shift 13.1 :: 14 - 15
+	Shift 13.2 :: 15 - 16
+	Shift 13.3 :: 16 - 17
+	Shift 12.5 :: 17 - 18
+	Shift 11.2 :: 18 - 19
+	Shift 9.3 :: 19 - 20
+	UNAVAILABLE :: 20 - 24
+Name: Volunteer 54 :: Hours 6
+	UNAVAILABLE :: 0 - 9
+	Shift 10.2 :: 9 - 10
+	Shift 14.2 :: 10 - 11
+	Shift 5.5 :: 11 - 12
+	Shift 4.1 :: 12 - 13
+	Shift 4.2 :: 13 - 14
+	Shift 4.3 :: 14 - 15
+	UNAVAILABLE :: 15 - 24
+Name: Volunteer 17 :: Hours 6
+	UNAVAILABLE :: 0 - 3
+	Shift 1.1 :: 4 - 5
+	Shift 1.2 :: 5 - 6
+	Shift 1.3 :: 6 - 7
+	Shift 1.4 :: 7 - 8
+	Shift 1.5 :: 8 - 9
+	UNAVAILABLE :: 9 - 24
+Name: Volunteer 34 :: Hours 5
+	UNAVAILABLE :: 0 - 6
+	Shift 3.1 :: 6 - 7
+	Shift 2.1 :: 7 - 8
+	Shift 2.2 :: 8 - 9
+	Shift 5.3 :: 9 - 10
+	Shift 5.4 :: 10 - 11
+	UNAVAILABLE :: 11 - 24
+Name: Volunteer 11 :: Hours 5
+	UNAVAILABLE :: 0 - 13
+	Shift 12.1 :: 13 - 14
+	Shift 8.1 :: 14 - 15
+	Shift 4.4 :: 15 - 16
+	Shift 4.5 :: 16 - 17
+	Shift 7.1 :: 17 - 18
+	UNAVAILABLE :: 18 - 24
+Name: Volunteer 47 :: Hours 4
+	UNAVAILABLE :: 0 - 15
+	Shift 12.3 :: 15 - 16
+	Shift 12.4 :: 16 - 17
+	Shift 9.1 :: 17 - 18
+	Shift 8.5 :: 18 - 19
+	UNAVAILABLE :: 19 - 24
+Name: Volunteer 41 :: Hours 4
+	UNAVAILABLE :: 0 - 5
+	Shift 6.1 :: 5 - 6
+	Shift 3.2 :: 7 - 8
+	Shift 3.3 :: 8 - 9
+	UNAVAILABLE :: 9 - 24
+Name: Volunteer 53 :: Hours 6
+	UNAVAILABLE :: 0 - 6
+	Shift 10.1 :: 8 - 9
+	Shift 14.1 :: 9 - 10
+	Shift 14.3 :: 11 - 12
+	UNAVAILABLE :: 12 - 24
+Name: Volunteer 12 :: Hours 5
+	UNAVAILABLE :: 0 - 4
+	Shift 15.1 :: 5 - 6
+	Shift 5.1 :: 7 - 8
+	Shift 5.2 :: 8 - 9
+	UNAVAILABLE :: 9 - 24
+Name: Volunteer 19 :: Hours 5
+	UNAVAILABLE :: 0 - 14
+	Shift 11.1 :: 17 - 18
+	Shift 9.2 :: 18 - 19
+	UNAVAILABLE :: 19 - 24
+Name: Volunteer 52 :: Hours 2
+	UNAVAILABLE :: 0 - 17
+	Shift 13.4 :: 17 - 18
+	Shift 13.5 :: 18 - 19
+	UNAVAILABLE :: 19 - 24
+Name: Volunteer 50 :: Hours 3
+	UNAVAILABLE :: 0 - 19
+	Shift 13.6 :: 19 - 20
+	Shift 9.4 :: 20 - 21
+	UNAVAILABLE :: 22 - 24
+Name: Volunteer 25 :: Hours 4
+	UNAVAILABLE :: 0 - 12
+	Shift 14.4 :: 12 - 13
+	Shift 14.5 :: 13 - 14
+	UNAVAILABLE :: 16 - 24
+
+
