@@ -76,7 +76,7 @@ jobs = make_random_jobs(NUM_OF_JOBS)
 # Compute the capacity based lower bound for volunteers
 total_job_hours = sum([j.length for j in jobs])
 avg_vol_capacity = sum([v.capacity for v in volunteers])/float(NUM_OF_VOLUNTEERS)
-capacity_lower_bound = int((total_job_hours/avg_vol_capacity)+1)
+capacity_lower_bound = int((total_job_hours/avg_vol_capacity))
 
 
 # Compute the overlapping intervals based lower bound for volunteers
@@ -90,8 +90,17 @@ overlapping_lower_bound = max(overlap.values())
 # Taking the larger of the two lower bounds to give us a realistic one
 realistic_lower_bound = max(overlapping_lower_bound, capacity_lower_bound)
 
-print "Lower bound on the # of volunteers needed: %s" % realistic_lower_bound
-print "\nPlease terminate process whenever you see fit (Ctrl-c in terminal).\n"
+# debug info:
+print "\n\nTotal number of volunteers available: %s" % len(volunteers)
+print "Total number of shifts that need assignment: %s" % len(jobs)
+print "Total available hours of all volunteers: %s" % sum([v.capacity for v in volunteers])
+print "Total hours of all jobs: %s" % sum([j.length for j in jobs])
+print "Capacity lower bound %s" % capacity_lower_bound
+print "Overlap lower bound %s (shifts at the same time)" % overlapping_lower_bound
+print "Lower bound on the number of volunteers needed is roughly: %s" % realistic_lower_bound
+
+print "\n\nPlease terminate process whenever you see fit (Ctrl-c in terminal).\n"
+print "Working...\n"
 
 # Init tracking variables
 current_best_schedule = []
@@ -101,6 +110,7 @@ min_volunteers_needed = NUM_OF_VOLUNTEERS
 
 # Here we start randomizing the volunteer set to get different solutions
 # we keep track of the smallest solution and store it
+# we also keep track of the weight of each solution
 # we will either get the current most optimal solution
 # or an unfeasible, partial solution, with a list of anassignable jobs.
 while (1):
@@ -115,8 +125,14 @@ while (1):
                 min_volunteers_needed = current_min
                 current_best_schedule = copy.deepcopy(volunteers)
                 current_best_weight = total_weight
-                print "Current min volunteers needed: %s" % min_volunteers_needed
-                print "Current best weight: %s" % total_weight
+                print "New solution found with %s volunteers and weight %s" % (min_volunteers_needed, current_best_weight)
+        else:
+            print "Not able to find feasible solution"
+            print "Unassigned jobs: %s" % unassigned_jobs
+            print "Using %s volunteers" % sum([1 for x in volunteers if x.is_used])
+            print "Current best schedule: "
+            show_schedule(volunteers)
+            break
 
         map(lambda x: x.clear_all(), volunteers)
         random.shuffle(volunteers)
@@ -124,16 +140,9 @@ while (1):
     except KeyboardInterrupt:
         print "Terminating...\n\n"
         if len(unassigned_jobs) == 0:
-            print "Min # of volunteers found so far: %s" % min_volunteers_needed
-            print "Schedule: "
+            print "Volunteer count: %s" % min_volunteers_needed
+            print "Job-type weight: %s" % current_best_weight
+            print "Schedule produced: "
             show_schedule(current_best_schedule)
             print "\n"
-        else:
-            print "Not able to find feasible solution"
-            print "Unassigned jobs: %s" % unassigned_jobs
-            print "Current best schedule: "
-            show_schedule(volunteers)
         sys.exit()
-
-print "Finished with optimal (%s) number of volunteers." % min_volunteers_needed
-show_schedule(current_best_schedule)
