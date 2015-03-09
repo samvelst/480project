@@ -63,37 +63,55 @@ def assign_jobs(jobs, volunteers):
 
     return (current_volunteers, unassigned_jobs)
 
-
 NUM_OF_JOBS = 15
 NUM_OF_VOLUNTEERS = 60
 volunteers = make_random_volunteers(NUM_OF_VOLUNTEERS, (2,6))
 jobs = make_random_jobs(NUM_OF_JOBS)
 
+
 # estimating lower bound by dividing sum of shifts by average volunteer capacity
 total_job_hours = sum([j.length for j in jobs])
-avg_vol_capacity = sum([v.capacity for v in volunteers])/float(len(volunteers))
-estimated_lower_bound = int((total_job_hours/avg_vol_capacity)+1)
+avg_vol_capacity = sum([v.capacity for v in volunteers])/float(NUM_OF_VOLUNTEERS)
+capacity_lower_bound = int((total_job_hours/avg_vol_capacity)+1)
+
+
+# Another way to find lower bound - by counting highest # of overlapping shifts
+overlap = dict.fromkeys(range(25), 0)
+for j in jobs:
+    for i in range(j.start, j.end):
+        overlap[i] += 1
+
+overlapping_lower_bound = max(overlap.values())
+
+print "Capacity Lower Bound %s" % capacity_lower_bound
+print "Overlapping Lower Bound: %s" % overlapping_lower_bound
+
+print "\nPlease terminate process whenever you see fit (Ctrl-c in terminal).\n"
 
 current_best_schedule = []
-min_volunteers_needed = 60
-
-print "Estimated Lower Bound: %s..." % estimated_lower_bound
+current_best_weight = 0
+min_volunteers_needed = NUM_OF_VOLUNTEERS
+realistic_lower_bound = max(overlapping_lower_bound, capacity_lower_bound)
 
 # Here we start randomizing the volunteer set to get different solutions
 # we keep track of the smallest solution and store it
 # we can choose to terminate before the optimal sol is found
 # we will either get the current most optimal solution
 # or an unfeasible, partial solution, with a list of anassignable jobs.
-while(min_volunteers_needed > estimated_lower_bound):
+while (1):
     try:
         volunteers, unassigned_jobs = assign_jobs(jobs, volunteers)
 
         if len(unassigned_jobs) == 0:
             current_min = sum([1 for x in volunteers if x.is_used])
-            if current_min < min_volunteers_needed:
-                min_volunteers_needed = current_min
-                current_best_schedule = copy.deepcopy(volunteers)
-                print "Current min volunteers needed: %s" % min_volunteers_needed
+            total_weight = sum([v.get_weight() for v in volunteers])
+            if current_min <= min_volunteers_needed:
+                if total_weight > current_best_weight:
+                    min_volunteers_needed = current_min
+                    current_best_schedule = copy.deepcopy(volunteers)
+                    current_best_weight = total_weight
+                    print "Current min volunteers needed: %s" % min_volunteers_needed
+                    print "Current best weight: %s" % total_weight
 
         map(lambda x: x.clear_all(), volunteers)
         random.shuffle(volunteers)
