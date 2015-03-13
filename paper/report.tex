@@ -124,14 +124,14 @@ We are also missing data concerning the times that its volunteers would prefer t
 %
 %====================================================
 \section{Data Collection}
-We were able to make some observations about the structure of volunteer schedules by inspecting events in North America that ranged from ones with fewer than 100 participants to the largest event in North America, Lindy Focus, that spans 5 days and has over 1000 participants.
+We were able to examine volunteer schedules from events in North America that ranged from ones with fewer than 100 participants to the largest event in North America, Lindy Focus, that spans 5 days and has over 1000 participants.
+We were able to make the following observations.
 \begin{itemize}\itemsep0pt
 \item All shifts were generally about an hour long.
 \item Odd lengthed shifts were usually set up and tear down.
 \item For any volunteer, it was uncommon for them to work more than 4 hours in a day and extremely rare for them to work more than 6 hours in a day.
 \item The majority of volunteering jobs do not require any special skill to accomplish.
 \item The longest job we found was 12 hours which consisted of 12 one hour shifts covered evenly by 3 people working 4 hours each.
-
 \end{itemize}
 
 Through some informal conversations, we were able to learn that many people who volunteer at events really would like to know their schedules sooner and be able to guarantee that they won't be working certain times or certain shifts.
@@ -151,11 +151,11 @@ We assume disjoint days because no one we talked to were aware of any Lindy Hop 
 From previous volunteer schedules and discussions with event planners, were able to make the following initial simplifying assumptions:
 \begin{itemize}\itemsep0pt
 \item All volunteers can do all jobs. This assumption is also equivalent to assuming that all volunteers are preassigned a job type.
-\item Each job consists of 1 - 12 shifts
-\item Each volunteer can get from shift to shift in very little time
-\item There are no breaks
-\item All shifts for the day can be contained in a 24 hour period
-\item Each volunteer has a maximum daily work time of 4 hours
+\item Each job consists of 1 - 12 shifts.
+\item Each volunteer can get from shift to shift in very little time.
+\item There are no breaks.
+\item All shifts for the day can be contained in a 24 hour period.
+\item Each volunteer has a maximum daily work time of X hours where X is determined by the event planners.
 \end{itemize}
 %====================================================
 % FORMULATION OF PROBLEM
@@ -177,95 +177,71 @@ From previous volunteer schedules and discussions with event planners, were able
 %====================================================
 \section{Formulation}
 Our problem can be approached multiple ways.
-Considering chromatic numbers on graphs of jobs, integer programming on time slots, and the bin packing problem are all viable approaches.
+Chromatic numbers on graphs of jobs, integer programming on time slots, and the bin packing problem are all viable approaches.
 Our problem is specifically a variation on the \textit{interval partitioning} problem which is a specific case of the bin packing problem.
+
+The interval partitioning problem asks ``Given a set of intervals $\{(s_1, f_1), (s_2, f_2), \ldots, (s_n, f_n)\}$, what is the minimum number of containers needed to store all the intervals such that in each container, no interval overlaps with another?
+There is a common greedy algorithm for this problem that runs in $O(n\log n)$ [CITATION NEEDED].
+For this problem, the lower bound on number of containers needed is the largest number of overlapping intervals, the aforementioned greedy algorithm can be proven to find this optimal lower-bound solution.
+% Expound on this solution.
+We would like to store all the work shifts in volunteers but certain shifts will not ``fit'' for reasons other than being too large.
+For this reason, we approached our problem from the bin packing problem.
 
 The general bin packing problem asks ``Given some numbers $a_1, \ldots, a_n$, what is the least number of bins with capacity $c$ needed to store all numbers $a_i$?''
 An immediate lower bound to this problem is $\big(\sum_{i = 1}^{n}\;a_i\big)/c$.
 % Describe some solutions?
 
-The interval partitioning problem asks ``Given a set of intervals $\{(s_1, f_1), (s_2, f_2), \ldots, (s_n, f_n)\}$, what is the minimum number of containers to store all the intervals such that in each container, no interval overlaps with another?
-There is a common greedy algorithm for this problem that runs in $O(n\log n)$ [CITATION NEEDED].
-For this problem, the lower bound on number of containers needed is the largest number of overlapping intervals, the aforementioned greedy algorithm can actually be proven to find this optimal lower-bound solution.
-% Expound on this solution.
-
-Unfortunately, the problem is only similar to either of these.
-We would like to partition intervals into pre-existing containers that have limitations on what can be stored in them.
-We would like to store all the work shifts in volunteers but certain shifts will not ``fit'' for reasons other than being too large.
-
-\subsection{Adjustments}
 Translating to our problem, volunteers are the ``bins'' and the ``items'' we fill them with are the shifts that we assign.
-In general, the bin packing problem is NP-Hard, but in our case it is much easier to solve since we have a relatively small sized problem.
 
-The difference to the traditional bin packing problem is that we have additional constraints on what sort of objects our ``bins'' can take.
-This problem is NP hard but by Korf, we can find an exact solution on the minimum number of bins required fairly quickly for small input sizes. 
-The Korf algorithm proved to be too memory intensive when applied to our problem, as we have varied bin sizes which only accept specific items of certain intervals. 
-Korf's algorithm used a branch and bound approach, pruning less-than-optimal partial solutions along the way. But in order to achieve this, all un-dominated completions of a certain 
-bin needed to be computed. Taking into account that all of our shifts are of length 1, the number of completions we had to keep track of grew very quickly, and these shifts being Python objects 
-took up quite a bit more space than your typical 4 byte integer. 
+The bin packing problem is NP hard[citation] but by Korf, we can find an exact solution on the minimum number of bins required fairly quickly for small input sizes.
+The Korf algorithm proved to be too memory intensive when applied to our problem.
+Korf's algorithm uses a branch and bound approach, pruning less-than-optimal partial solutions along the way.
+But in order to achieve this, all un-dominated completions of a certain bin needed to be computed.
+Because all of our shifts are of length 1, the number of completions we had to keep track of grew very quickly, and these shifts being Python objects took up quite a bit more space than your typical 4 byte integer.
 Thus an exact algorithm is not practical in our case, and we resort to a near optimal algorithm, the Best First Decreasing (BFD) algorithm.
-The BFD algorithm is an approximation algorithm that runs in polynomial time. It does not guarantee an optimal solution but does guarantee a solution that is 
-no more than 11/9 * OPT + 4 bins more than OPT (the actual optimal number of bins). Also, according to Korf, this algorithm produced the optimal solution 94.8\% of the time on average. 
+The BFD algorithm is an approximation algorithm that runs in polynomial time. It does not guarantee an optimal solution but does guarantee a solution that is no more than 11/9 * OPT + 4 bins more than OPT (the actual optimal number of bins). Also, according to Korf, this algorithm produced the optimal solution 94.8\% of the time on average.
 For our problem, this approximation is plenty accurate as well as when we consider the fact that the truly ``optimal'' algorithm could be suboptimal anyways when taking into account our other constraints.
-
-
-\subsection{Correctness}
-
 
 \section{Solution}
 
 Our actual approach at producing an optimal schedule uses a mix of the BFD and randomization to look for the best solution.
 It works as follows:
-We first find a rough lower bound by taking the max(overlapping lower bound, capacity lower bound). The overlapping lower bound tells us that if there are $n$ shifts scheduled all at the same time, then 
-we must have at least $n$ volunteers, since no volunteer can be at more than one shift at one time. The largest number of overlapping shifts gives us the first lower bound. However, this is not enough, as 
-we could have other non-overlapping shifts that bring the total number of shift hours that need to be worked over the total number of hours that are available from all volunteers. Thus, for our second lower bound,
-the capacity lower bound, we divide the total number of shift-hours by the average number of available hours a volunteer has. Note that neither of these lower bounds take into account issues with actual assignment 
-of shifts. Thus we come up with a rough practical lower bound which we use as a benchmark for determining how good our solution is. 
+We first find a rough lower bound by taking the MAX(overlapping lower bound, capacity lower bound). The overlapping lower bound tells us that if there are $n$ shifts scheduled all at the same time, then we must have at least $n$ volunteers, since no volunteer can be at more than one shift at one time. The largest of these numbers gives us the first lower bound.
+However, this is not enough, as we could have non-overlapping shifts that cause the total number of shift hours to be greater than the total number of hours that are available from all volunteers.
+Thus, for our second lower bound, we divide the total number of shift-hours by the average number of available hours a volunteer has. Note that neither of these lower bounds take into account the number of particular volunteers can actually work any particular shift.
+These minimums give us a practical lower bound which we use as a benchmark for determining how good our solution is.
 
-Once we have a lower bound, we begin by keeping running our list of volunteers and shifts through the BFD algorithm, which will produce either a complete schedule or a partial schedule with the specific un-assignable shifts
-highlighted.
+Once we have a lower bound, we begin by keeping running our list of volunteers and shifts through the BFD algorithm, which will produce either a complete schedule or a partial schedule with the specific un-assignable shifts highlighted.
 
-The BFD algorithm works by taking in our list of shifts, sorted in decreasing order of length, and our list of volunteers, ordered in decreasing order of "fullness". It then attempts to assign the first
-shift in the list to the first volunteer. If the volunteer can take this shift, we assign it to that volunteer, otherwise we move on to the next volunteer in our list. Once the job has been assigned, we re-sort
-the list of volunteers before considering the next job. This is the "best" part of the Best Decreasing Fit algorithm. We want to ensure that we always consider the volunteer with the most assigned shifts first. Now,
-if the a shift goes through all volunteers in our list unassigned, it goes into an "unassigned shifts" list, which we will then present afterwards with a partial schedule as incomplete. 
+The BFD algorithm works by taking in our list of shifts, sorted in decreasing order of length, and our list of volunteers, ordered in decreasing order of "fullness".
+It then attempts to assign the first shift in the list to the first volunteer. If the volunteer can take this shift, we assign it to that volunteer, otherwise we move on to the next volunteer in our list.
+Once the job has been assigned, we re-sort the list of volunteers before considering the next job.
+This is the "best" part of the Best Decreasing Fit algorithm.
+We want to ensure that we always consider the volunteer with the most assigned shifts first.
+Now, if the a shift goes through all volunteers in our list unassigned, it goes into an "unassigned shifts" list, which we will then present afterwards with a partial schedule as incomplete.
 
-We have also developed this notion of job-type weight that is associated with each volunteer. In essence, each shift is associated with a job-type and we would prefer to keep the same volunteer on shifts of the 
-same type, rather than shuffling around volunteers from shift to shift for no good reason (an optimal solution will not guarantee this consistency). The job-type weight of a volunteer is calculated by summing up the
-squares of the counts of shifts of the same type. (Eg, if volunteer A has shifts 1.1, 2.1, 2.2, her weight will be $1^2 + 2^2$). Counting the total weight of all volunteers who have been assigned shifts can help us compare
-solutions and find ones that better match this preferred shift assignment scheme. 
+We have also developed a notion of a job with shifts.
+In essence, each shift is associated with a job and we would prefer to keep the same volunteer on shifts of the same type, rather than shuffling around volunteers from shift to shift for no good reason (an optimal solution will not guarantee this consistency).
+We introduce a job-type weight of a volunteer which is calculated by summing up the squares of the counts of shifts of the same type.
+For example, if volunteer A has shifts 1.1, 2.1, 2.2, her weight will be $1^2 + 2^2$.
+$x$ in $x.y$ indicates the job and $y$ indicates the shift number.
+Counting the total weight of all volunteers who have been assigned shifts can help us compare
+solutions and find ones that better match this preferred shift assignment scheme.
 
-Our actual algorithm is an any-time algorithm. If the volunteer set and shift set will not produce a feasible solution, then it will return a partial solution immediately. However, if one solution is found, we continue
-by running the BFD algorithm on various random permutations of our volunteer list. This will clearly produce a different schedule, as the BFD algorithm assigns shifts in a (selective) first come first served basis. On each
-iteration we keep track of the number of volunteers this solution assigned as well as the total weight of the assignment. If the number of volunteers needed on any given iteration is smaller than the smallest we have currently 
-found, then we update our new solution to reflect this assignment. If that number is the same as the smallest we have found so far, but the total weight of volunteers exceeds the max weight we have found, then we again update
-our best solution to reflect the new max weight solution. In other words, we want to maximize the total weight but not at the cost of adding an extra volunteer. 
+Our algorithm is an any-time algorithm.
+If the volunteer set and shift set will not produce a feasible solution, then it will return a partial solution immediately.
+However, if one solution is found, we continue by running the BFD algorithm on various random permutations of our volunteer list.
+This will clearly produce a different schedule, as the BFD algorithm assigns shifts in a (selective) first come first served basis.
+On each iteration we keep track of the number of volunteers this solution assigned as well as the total weight of the assignment.
+If the number of volunteers needed on any given iteration is smaller than before, we update our new solution to reflect this assignment.
+If that number is the same as the smallest we have found so far, but the total weight of volunteers exceeds the max weight we have found, then we also update.
+In other words, we want to maximize the total weight but not at the cost of adding extra volunteers.
 
-The user can choose to terminate the running code at any time. The longer the code is left running, the better the solution might get. 
-
-
-% BEGIN COMMENT OF OLD MATERIAL
-\comment{
-Our program takes the following as input from the event organizers:
-\begin{itemize}
-\item A list of volunteers each with their preferences and the jobs they can do.
-\item A list of jobs and the shifts for the jobs.
-\item The maximum number of hours a volunteer can work in a day.
-\item The maximum and minimum number of hours a volunteer can work total for the event
-\end{itemize}
-However, in script form, we allowed these inputs to be hardcoded in as constants.
-Savoy Swing Club does not have any upcoming events until September of this year so the priority is getting a good algorithm that makes favorable schedules.
-
-Given a large pool of potential volunteers, we randomly pick sufficiently sized subsets of the volunteers and try to match them.
-One would think that this probably doesn't give a very good result but it turns out, based on the very lowest possible bound of the number of volunteers required to run the event, our algorithm usually finds an schedules with a factor of 2 volunteers.
-
-We encode the problem of volunteers having external time conflicts by pre-filling each volunteer's schedule with ``jobs'' that are labeled ``UNAVAILABLE''.
-} % END COMMENT OF OLD MATERIAL
-
-
+The user can choose to terminate the running code at any time.
+The longer the code is left running, the better the solution might get.
 
 \section{Results}
-As sample data, we are currently generating a list of 60 volunteers, each of which are only able to work a random but continuous 2-6 hour chunk a day. We then create a random list of shifts. 
+As sample data, we are currently generating a list of 60 volunteers, each of which are only able to work a random but continuous 2-6 hour chunk a day. We then create a random list of shifts.
 We do this by starting with a base of 15 jobs, each of which can have 1-6 hour long shifts, and each job can start at a random hour of the day. Our algorithm consistently finds solutions that are
 within 2-3 volunteers of the lower bound. Many times it will actually find the optimal solution. Attached in appendix B are three sample runs, each of which were terminated after 30 seconds of running.
 
@@ -282,7 +258,9 @@ SSC is unfortunately not hosting any weekend events until this fall.
 However, we also plan to follow up with them in the fall and attempt to actually implement our system for choosing volunteers.
 
 \section{Acknowledgments}
-We would like to thank our community partners over at Savoy Swing Club for working closely with us on the problem. We would also like to thank Professor Sara Billey for meeting with us to suggest ways
+We would like to thank our community partners over at Savoy Swing Club for working closely with us on the problem. A special thanks for Andrew Rogers who spoke to many dancers in the community on behalf of us and Ben White for providing volunteer schedules from national events.
+
+We would also like to thank Professor Sara Billey for meeting with us to suggest ways
 on how we could model the problem and which general problems our particular one resembled.
 
 
@@ -537,6 +515,15 @@ while (1):
 \end{lstlisting}
 
 \section{Appendix B}
+Volunteers are listed with the following format:
+\begin{lstlisting}
+Name: [Volunteer name] :: [Total hours worked]
+    [Shift name] :: [Shift Hours]
+    [Shift name] :: [Shift Hours]
+\end{lstlisting}
+The shift name ``UNAVAILABLE'' are times that the volunteer is unavailable.
+Time and hours are on a 24 hour scale. ie. 13 is 1:00 pm.
+
 \begin{lstlisting}
 Run # 1
 
