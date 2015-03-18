@@ -63,7 +63,7 @@
 %=========================
 \maketitle
 \begin{abstract}
-	The Savoy Swing Club (SSC) in Seattle, WA is a non-profit that organizes dance weekends for the general public and has outreach programs to middle schools and high schools in the greater Seattle area. All events require volunteers to run the event. Volunteer scheduling is currently done by hand. Small events are easy, but larger events become more of a headache for event planners. Our objective was to provide a program which would take a pool of volunteers and set of shifts and jobs, and return a schedule of volunteers that optimized for work balance, number of volunteers, ``choas'', and shift preferences. We were able to create schedules that came within the absolute minimum number of volunteers by 1 or 2. We consider these schedules better than the most optimal ones because cutting it as close as exact leads to disastrous problems.
+	The Savoy Swing Club (SSC) in Seattle, WA is a non-profit that organizes dance weekends for the general public and has outreach programs to middle schools and high schools in the greater Seattle area. All events require volunteers to run the event. Volunteers are assigned to shifts of various jobs that need to be done throughout the event. Scheduling is currently done by hand. Small events are easy, but larger events become more of a headache for event planners. Given a pool of volunteers and the job shifts needed to be filled, our objective was to provide a program which would return a schedule of volunteers optimized for work balance, number of volunteers, ``choas'', and shift preferences. We were able to create schedules that came within 1 or 2 volunteers of an absolute theoretical minimum. We consider these schedules better than the most optimal ones because cutting it as close as exact leads to disastrous problems.
 \end{abstract}
 %\newpage
 %\tableofcontents
@@ -77,42 +77,40 @@
 \section{Problem Description}
 \begin{multicols}{2}
 Savoy Swing Club (SSC) is local non-profit organization that currently seeks to teach swing dancing to middle and high school kids in the greater Seattle area.
-They are also heavily involved with 2 ``dance weekends'': Seattle Lindy Exchange (SLX) and Killerdiller Weekend (KDW). For this paper, we will focus on full-featured dance events where there are classes, evening dances, performances, and competitions.
-These are the events with the largest number of participants and can span any number of days and volunteers are required to make the weekend go smoothly.
+They are also heavily involved with 2 large dance events: Seattle Lindy Exchange (SLX) and Killer Diller Weekend (KDW). For this paper, we will focus full-featured dance events where there are classes, evening dances, performances, and competitions.
+These types of events have the largest number of participants and can span any number of days.
 Participants in these events are those people who take part in classes, dances, or competitions.
-Volunteers may be participants and vice versa.
-If the event isn't adequately staffed, then the event participants suffer poor service.
-If the volunteers time constraints and preferences aren't taken into account in some degree, then performance is worse which leads to a worse participant experience.
+Often times, volunteers are participants in the event who have been comped the cost of attending the event.
 
-Each volunteer has different jobs they are able to perform and preferences for which hours they are volunteering.
+Volunteers are needed to perform a variety of jobs to make the event run smoothly.
+For example, events need cashiers to accept payment at the door for dances, classes, and competitions; people to set up and tear down the venue spaces; drivers for out of town instructors; and other varying jobs based on the event.
+Each job is one of these tasks which may be further broken down into hourly shifts.
+For example, the ``Security'' job in ``Mezzanine 1'' might run from 8:00 pm to 12:00 am but have hourly shifts from 8-9, 9-10, 10-11, and 11-12 that may be filled by different volunteers.
+
 Volunteers are compensated based on the number of hours they work and the type of work.
 For example, 8 hours of volunteering which required basic skills might grant access to all classes and evening dances while fewer hours of volunteering might just mean access to evening dances.
-A technician however, might receive a full weekend pass and additional cash compensation for just 6 hours of work.
+A lights technician however, might receive a full weekend pass and additional cash compensation for just 6 hours of work.
 While we could optimize on some sort of cost function under conditions similar to the examples above, SSC has determined that since developing the cost function itself would require analysis of its own right, it is sufficient to just reduce the number of volunteers necessary for any given event.
 
-Thus our objective is to develop a program that will return a schedule that is in some sense ``optimal'' for both the volunteers and SSC.
+Thus our objective is to develop a program that will return a schedule that is in some sense ``optimal'' for both the volunteers and SSC. 
 We achieve this objective through the following means.
 
 We will take into consideration the volunteers' general time preferences and availability.
 Specifically, we will allow them to choose a time frame that they would like to be scheduled to volunteer and to list times that they absolutely cannot volunteer.
 For example a volunteer might decide that they don't want to take classes but they want to be able to participate fully in the evening dances. However, they have a late lunch date so they cannot volunteer from 1:30 - 3:00 pm.
 This volunteer could mark that they would like to be scheduled between 9 am and 5 pm but be completely unavailable from 1:00 - 3:00 pm.
-This is an improvement over the current system because typically, volunteers do not know exactly what hours they will be working until at most a few days before the event.
-This means that volunteers must commit their entire weekends even though they may only be working 6 to 8 hours over 2 days.
+This is an improvement over the current system because volunteers currently do not know what hours they will be working until a few days before the event.
+This means that volunteers must commit their entire weekend even though they may only be working 6 to 8 hours over 2 days.
 
-We will create a schedule that is not too hectic and is easy for a supervisor to understand.
-For example, the need for fewer volunteers may give way to not having a schedule that had many volunteers switching jobs and shifts throughout the day.
-Chaotic schedules have a very real overhead cost since more effort must be put into logistics instead of just doing the jobs well.
+We will create a schedule that is not "too chaotic".
+By this we mean that the schedule will attempt to assign subsequent shifts of the same job type to the same volunteer.
+For example, if Arnold is the cashier at the front door from 9:00 am to 10:00 am, we should want Arnold to take the next shift in the job from 10:00 am to 11:00 am instead of a switching to a different job in the same time slot.
+For particularly large events, chaotic schedules have a very real overhead cost since more effort must be put into logistics instead of just doing the jobs well.
 
 Finally, we will create a program that is easy for an event planner to input work shift and volunteer data which will return our schedule.
 This last goal is secondary to the first two because SSC does not have any events to run until this fall.
 This paper shall work through a rudimentary program but with the full algorithm and solution.
-\subsection{Specific Challenges}
-Initially we considered simplifying the problem with so many assumptions and constraints that resulted in schedules that were very similar to current ones done by hand and left little to be optimized or improved.
 
-Even though we have volunteer schedules from real events from around the United States, all schedules are final products after last minute adjustments and sometimes shift swaps engineered by the volunteers themselves.
-This poses a problem since we don't have each event's potential volunteer pool and for many cases, we don't know what the initial schedule was.
-We are also missing data concerning the times that its volunteers would prefer to have worked or not worked.
 
 %====================================================
 % Data Collection & Assumptions
@@ -123,31 +121,39 @@ We are also missing data concerning the times that its volunteers would prefer t
 % ASSUMPTIONS AND CONSTRAINTS
 %
 %====================================================
-\section{Data Collection}
-We were able to examine volunteer schedules from events in North America that ranged from ones with fewer than 100 participants to the largest event in North America, Lindy Focus, that spans 5 days and has over 1000 participants.
+\section{Data Evaluation}
+We examined volunteer schedules from events in North America that ranged from ones with fewer than 100 participants to the largest event in North America, Lindy Focus, that spans 5 days and has over 1000 participants.
 We were able to make the following observations.
 \begin{itemize}\itemsep0pt
 \item All shifts were generally about an hour long.
-\item Odd lengthed shifts were usually set up and tear down.
+\item Odd length shifts were usually set up and tear down.
 \item For any volunteer, it was uncommon for them to work more than 4 hours in a day and extremely rare for them to work more than 6 hours in a day.
 \item The majority of volunteering jobs do not require any special skill to accomplish.
 \item The longest job we found was 12 hours which consisted of 12 one hour shifts covered evenly by 3 people working 4 hours each.
 \end{itemize}
 
-Through some informal conversations, we were able to learn that many people who volunteer at events really would like to know their schedules sooner and be able to guarantee that they won't be working certain times or certain shifts.
+Through some informal conversations, we were able to learn that many people who volunteer at events would really like to know their schedules sooner and be able to guarantee that they won't be working certain times or certain shifts.
 Though we were already planning to implement this feature, it was good to know that it was actually desired in the community.
 
-Checking people off at registration and making sure non-paying people don't get into classes is not particularly difficult.
 At large events such as Lindy Focus, many volunteers are screened before hand so they already have a predetermined role.
 
 Most of these events are hosted in a single hotel so traveling from one room to the next takes less than 5 minutes.
-We decided that factoring in this time would not be valuable and instead decided to make the program more likely to match a volunteer who is already matched to the first shift in a job to the second shift in that same job (assuming all requirements of that job are met).
+We decided that factoring in this time would not be valuable.
 The same is true for breaks.
-We leave it to the organizers to determine breaks and whether or not individual shifts have, say, a 10 minute break at each end.
+We can leave it to the organizers to determine breaks and whether or not individual shifts have, say, a 10 minute break at each end.
 
-We assume disjoint days because no one we talked to were aware of any Lindy Hop event where there are activities between 5 am and 8 am.
+We assume disjoint days because no one we talked to was aware of any Lindy Hop event where there are activities between 5 am and 8 am.
 
 \subsection{Simplifying Assumptions}
+Initially we considered simplifying the problem with so many assumptions and constraints that resulted in schedules that were very similar to current ones done by hand and left little to be optimized or improved.
+
+For example, if we assumed that all shifts were in a ``block chunk'' and all the volunteers were available for the same hours, then assigning shifts is trivially easy.
+If we break up each day into 3 sections, then due to the small number of possible shifts, this solution is also easily done by hand.
+
+Even though we have volunteer schedules from real events from around the United States, all schedules are final products after last minute adjustments and sometimes shift swaps engineered by the volunteers themselves.
+This poses a problem since we don't have each event's potential volunteer pool and for many cases, we don't know what the initial schedule was.
+We are also missing data concerning the times that its volunteers would prefer to have worked or not worked.
+
 From previous volunteer schedules and discussions with event planners, were able to make the following initial simplifying assumptions:
 \begin{itemize}\itemsep0pt
 \item All volunteers can do all jobs. This assumption is also equivalent to assuming that all volunteers are preassigned a job type.
@@ -181,20 +187,18 @@ Chromatic numbers on graphs of jobs, integer programming on time slots, and the 
 Our problem is specifically a variation on the \textit{interval partitioning} problem which is a specific case of the bin packing problem.
 
 The interval partitioning problem asks ``Given a set of intervals $\{(s_1, f_1), (s_2, f_2), \ldots, (s_n, f_n)\}$, what is the minimum number of containers needed to store all the intervals such that in each container, no interval overlaps with another?
-There is a common greedy algorithm for this problem that runs in $O(n\log n)$ [CITATION NEEDED].
+There is a common greedy algorithm for this problem that runs in $O(n\log n)$ [2].
 For this problem, the lower bound on number of containers needed is the largest number of overlapping intervals, the aforementioned greedy algorithm can be proven to find this optimal lower-bound solution.
-% Expound on this solution.
 We would like to store all the work shifts in volunteers but certain shifts will not ``fit'' for reasons other than being too large.
 For this reason, we approached our problem from the bin packing problem.
 
 The general bin packing problem asks ``Given some numbers $a_1, \ldots, a_n$, what is the least number of bins with capacity $c$ needed to store all numbers $a_i$?''
-An immediate lower bound to this problem is $\big(\sum_{i = 1}^{n}\;a_i\big)/c$.
-% Describe some solutions?
+Note: an immediate lower bound to this problem is $\big(\sum_{i = 1}^{n}\;a_i\big)/c$.
 
 Translating to our problem, volunteers are the ``bins'' and the ``items'' we fill them with are the shifts that we assign.
 
-The bin packing problem is NP hard[citation] but by Korf, we can find an exact solution on the minimum number of bins required fairly quickly for small input sizes.
-The Korf algorithm proved to be too memory intensive when applied to our problem.
+The bin packing problem is NP hard[1] but by Korf, we can find an exact solution on the minimum number of bins required fairly quickly for small input sizes.
+Unfortunately, Korf's algorithm proved to be too memory intensive when applied to our problem.
 Korf's algorithm uses a branch and bound approach, pruning less-than-optimal partial solutions along the way.
 But in order to achieve this, all un-dominated completions of a certain bin needed to be computed.
 Because all of our shifts are of length 1, the number of completions we had to keep track of grew very quickly, and these shifts being Python objects took up quite a bit more space than your typical 4 byte integer.
@@ -245,17 +249,29 @@ As sample data, we are currently generating a list of 60 volunteers, each of whi
 We do this by starting with a base of 15 jobs, each of which can have 1-6 hour long shifts, and each job can start at a random hour of the day. Our algorithm consistently finds solutions that are
 within 2-3 volunteers of the lower bound. Many times it will actually find the optimal solution. Attached in appendix B are three sample runs, each of which were terminated after 30 seconds of running.
 
-We are fairly satisfied with the results of this algorithm. Inspecting the schedules ourselves, we have determined that there might be room for improvement in the sense of shuffling around shifts to make 
-things more consistent. However, this should provide our friends over at Savoy Swing Club a good starting point with their scheduling pain points. They will now be able to produce a fairly optimal schedule
-in under a minute with which they can then further "hand-optimize" to suit their needs. 
-
+We are fairly satisfied with the results of this algorithm. Inspecting the schedules ourselves, we have determined that there might be room for improvement in the sense of shuffling around shifts to make things more consistent.
+However, this should provide our friends over at Savoy Swing Club a good starting point with their scheduling pain points.
+They will now be able to produce a fairly optimal schedule in under a minute with which they can then further "hand-optimize" to suit their needs.
 
 \section{Future Work}
 We have so far reasonably solved the algorithmic problem of assigning volunteers to positions based on availability.
 We plan to proceed with the program and build a fully functional web app that will allow event organizers to use different approaches to solve the problem and to manually adjust any schedule that we conjure up.
 
 SSC is unfortunately not hosting any weekend events until this fall.
-However, we also plan to follow up with them in the fall and attempt to actually implement our system for choosing volunteers.
+However, we plan to follow up with them in the fall and attempt to actually implement our system for choosing volunteers.
+
+There are some things that we did not optimize for or consider that could be undertaken in future projects.
+
+Optimize under the restriction that some of the jobs are restricted to certain volunteers.
+We allowed all volunteers to do any job or restricted all volunteers to do the same job.
+That is, we did not allow some volunteers to do jobs A, B, and C while also allowing others to only do jobs B, D, and E.
+We basically considered all jobs to be the same.
+While this is a reasonable restriction to have, we envision that in an ideal world, volunteers would be allowed to do some subset of the full list of jobs and we would like to find the minimum number of volunteers under these restrictions.
+
+Allow shifts to be different from an hour.
+We restricted each shift to be exactly 1 hour.
+While this is reasonable, there are a non-trivial number of edge cases where organizers would like a 45 minute or 1.5 hour shift for some jobs.
+While our program can actually take these types of shifts into account, it currently does not spit out anything that someone examining the schedule would consider optimal.
 
 \section{Acknowledgments}
 We would like to thank our community partners over at Savoy Swing Club for working closely with us on the problem. A special thanks for Andrew Rogers who spoke to many dancers in the community on behalf of us and Ben White for providing volunteer schedules from national events.
@@ -878,12 +894,17 @@ Name: Volunteer 20 :: Hours 6
 
 
 \begin{thebibliography}{9}
-\bibitem{02}
+\bibitem{1}
 	Richard E. Korf
 	A New Algorithm for Optimal Bin Packing
 	AAAI-02 Proceedings. Copyright © 2002, AAAI
 	2002
 
+\bibitem{2}
+    Kleinberg and Tardos
+    Algorithm Design
+    Copyright 2006 by Pearson Education
+    2006
 \end{thebibliography}
 
 \end{document}
