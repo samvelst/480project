@@ -3,6 +3,7 @@ import random
 import copy
 import Work as SS
 
+import time
 
 # Helper functions
 def rand_time_interval(a_min, a_max, a_length):
@@ -90,16 +91,18 @@ overlapping_lower_bound = max(overlap.values())
 # Taking the larger of the two lower bounds to give us a realistic one
 realistic_lower_bound = max(overlapping_lower_bound, capacity_lower_bound)
 
-# debug info:
-print "\n\nTotal number of volunteers available: %s" % len(volunteers)
+print "\n\n------------- Data ----------------------"
+print "Total number of volunteers available: %s" % len(volunteers)
 print "Total number of shifts that need assignment: %s" % len(jobs)
 print "Total available hours of all volunteers: %s" % sum([v.capacity for v in volunteers])
 print "Total hours of all jobs: %s" % sum([j.length for j in jobs])
 print "Capacity lower bound %s" % capacity_lower_bound
 print "Overlap lower bound %s (shifts at the same time)" % overlapping_lower_bound
 print "Lower bound on the number of volunteers needed is roughly: %s" % realistic_lower_bound
+print "-----------------------------------------"
 
-print "\n\nPlease terminate process whenever you see fit (Ctrl-c in terminal).\n"
+print "\n\nAlgorithm will now run for 60 seconds."
+print "Please terminate process whenever you see fit (Ctrl-c in terminal).\n"
 print "Working...\n"
 
 # Init tracking variables
@@ -113,7 +116,9 @@ min_volunteers_needed = NUM_OF_VOLUNTEERS
 # we also keep track of the weight of each solution
 # we will either get the current most optimal solution
 # or an unfeasible, partial solution, with a list of anassignable jobs.
-while (1):
+start = time.time()
+end = 0
+while (end <= 60):
     try:
         volunteers, unassigned_jobs = assign_jobs(jobs, volunteers)
 
@@ -125,7 +130,8 @@ while (1):
                 min_volunteers_needed = current_min
                 current_best_schedule = copy.deepcopy(volunteers)
                 current_best_weight = total_weight
-                print "New solution found with %s volunteers and weight %s" % (min_volunteers_needed, current_best_weight)
+                t_length = time.time() - start
+                print "New solution found with %s volunteers and weight %s in %s seconds" % (min_volunteers_needed, current_best_weight, t_length)
         else:
             print "Not able to find feasible solution"
             print "Unassigned jobs: %s" % unassigned_jobs
@@ -137,6 +143,8 @@ while (1):
         map(lambda x: x.clear_all(), volunteers)
         random.shuffle(volunteers)
 
+        end = time.time() - start
+
     except KeyboardInterrupt:
         print "Terminating...\n\n"
         if len(unassigned_jobs) == 0:
@@ -146,3 +154,9 @@ while (1):
             show_schedule(current_best_schedule)
             print "\n"
         sys.exit()
+
+print "Volunteer count: %s" % min_volunteers_needed
+print "Job-type weight: %s" % current_best_weight
+print "Schedule produced: "
+show_schedule(current_best_schedule)
+print "\n"
